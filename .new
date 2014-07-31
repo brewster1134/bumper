@@ -1,0 +1,9 @@
+---
+license: "[LICENSE]"
+version: 0.0.0
+developer:
+  name: "[NAME]"
+  email: "[EMAIL]"
+project_name: bumper
+project_filename: bumper
+type: js
