@@ -1,9 +1,9 @@
 ###
-# * bumper
+# * bumper core
 # * https://github.com/brewster1134/bumper
 # *
 # * @version 0.0.1
-# * @author [NAME]
+# * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
 ###
@@ -13,6 +13,10 @@
     define [], ->
       factory()
   else
-    factory()
+    window.Bumper = factory()
 ) @, ->
-  # script
+
+  # Create empty bumper object
+  Responsive:
+    Image:
+      Background: null
