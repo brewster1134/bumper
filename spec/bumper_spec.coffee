@@ -18,7 +18,7 @@ describe 'bumper-responsive-image-background', ->
       window.Bumper.Responsive.Image.Background.resizeEl @$img, 'breaka'
 
     it 'should have build the correct background image url', ->
-      expect(@$img.css('background-image')).to.equal('url("http://foo.com/bar.jpg?wid=100&hei=100")')
+      expect(@$img.css('background-image')).to.equal('url(http://foo.com/bar.jpg?wid=100&hei=100)')
 
 
   context 'with default but no breakpoint params', ->
@@ -30,7 +30,7 @@ describe 'bumper-responsive-image-background', ->
       window.Bumper.Responsive.Image.Background.resizeEl @$img, 'breaka'
 
     it 'should have build the correct background image url', ->
-      expect(@$img.css('background-image')).to.equal('url("http://foo.com/bar.jpg?wid=100")')
+      expect(@$img.css('background-image')).to.equal('url(http://foo.com/bar.jpg?wid=100)')
 
   context 'with no default but with breakpoint params', ->
     before ->
@@ -41,7 +41,7 @@ describe 'bumper-responsive-image-background', ->
       window.Bumper.Responsive.Image.Background.resizeEl @$img, 'breaka'
 
     it 'should have build the correct background image url', ->
-      expect(@$img.css('background-image')).to.equal('url("http://foo.com/bar.jpg?hei=100")')
+      expect(@$img.css('background-image')).to.equal('url(http://foo.com/bar.jpg?hei=100)')
 
   context 'with no default or breakpoint params', ->
     before ->
@@ -51,4 +51,4 @@ describe 'bumper-responsive-image-background', ->
       window.Bumper.Responsive.Image.Background.resizeEl @$img, 'breaka'
 
     it 'should have build the correct background image url', ->
-      expect(@$img.css('background-image')).to.equal('url("http://foo.com/bar.jpg")')
+      expect(@$img.css('background-image')).to.equal('url(http://foo.com/bar.jpg)')
