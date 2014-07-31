@@ -1,6 +1,8 @@
 {
   "name": "bumper",
-  "dependencies": {},
+  "dependencies": {
+    "jquery": "~2.1.1"
+  },
   "devDependencies": {
     "chai": "latest",
     "chai-as-promised": "latest",

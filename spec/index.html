@@ -1,4 +1,4 @@
-<html>
+  <html>
   <head>
     <link rel="stylesheet" href="/vendor/mocha/mocha.css">
     <link rel="stylesheet" href="/lib/bumper.css">
@@ -12,6 +12,7 @@
   </body>
 
   <!-- Dependencies -->
+  <script src="/vendor/jquery/dist/jquery.js"></script>
 
   <!-- Testing -->
   <script src="/vendor/mocha/mocha.js"></script>
@@ -26,7 +27,9 @@
     window.expect = chai.expect;
   </script>
 
-  <script src="/lib/bumper.js"></script>
+  <script src="/lib/bumper-core.js"></script>
+  <script src="/lib/bunmper-responsive-image-background.js"></script>
+
   <script src="/.tmp/bumper_spec.js"></script>
 
   <script>
