@@ -22,9 +22,11 @@
     # resize the background image for a single jquery object
     #
     resizeEl: ($el, breakpoint) ->
-      url = $el.attr('data-bumper-responsive-image-background-url')
+      url = $el.attr("data-bumper-responsive-image-background-url-#{breakpoint}") ||
+        $el.attr('data-bumper-responsive-image-background-url')
+
       unless url
-        console.warn 'data-bumper-responsive-image-background-url is not set on: ', $el
+        console.warn "data-bumper-responsive-image-background-url[-#{breakpoint}] is not set.", $el
         return
 
       defaultParams = $el.attr('data-bumper-responsive-image-background-url-params')

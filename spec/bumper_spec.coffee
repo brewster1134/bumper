@@ -52,3 +52,13 @@ describe 'bumper-responsive-image-background', ->
 
     it 'should have build the correct background image url', ->
       expect(@$img.css('background-image')).to.equal('url(http://foo.com/bar.jpg)')
+
+  context 'with breakpoint url', ->
+    before ->
+      @$img = $('<img/>').attr
+        'data-bumper-responsive-image-background-url-breaka': 'http://foo.com/breaka-bar.jpg'
+
+      window.Bumper.Responsive.Image.Background.resizeEl @$img, 'breaka'
+
+    it 'should have build the correct background image url', ->
+      expect(@$img.css('background-image')).to.equal('url(http://foo.com/breaka-bar.jpg)')
