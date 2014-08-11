@@ -6,7 +6,10 @@
       breakpoint = $(window).innerWidth() <= 800 ? 'mobile' : 'desktop';
       return Bumper.Responsive.Image.Background.resizeAll(breakpoint);
     });
-    return $(window).trigger('resize');
+    $(window).trigger('resize');
+    return $(window).on('bumper.responsive.image.background.loaded', function(e, data) {
+      return console.log('Image Loaded');
+    });
   });
 
 }).call(this);

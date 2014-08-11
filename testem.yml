@@ -17,6 +17,7 @@ src_files:
 serve_files:
   - .tmp/*.js
   - lib/*.js
+  - spec/*.jpg
 launch_in_dev:
   - phantomjs
 launch_in_ci:

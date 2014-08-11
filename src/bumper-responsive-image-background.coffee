@@ -19,6 +19,7 @@
     factory jQuery
 ) @, ($) ->
   class ResponsiveBg
+
     # resize the background image for a single jquery object
     #
     resizeEl: ($el, breakpoint) ->
@@ -37,8 +38,15 @@
         return n != undefined && n != null && n != ''
       params = if params.length then "?#{params.join('&')}" else ''
 
-      $el.css
-        backgroundImage: "url(#{url}#{params})"
+      # create a temp image tag so we can fire an event when the image is loaded
+      $img = $('<img/>')
+      $img.load ->
+        $el.css
+          backgroundImage: "url(#{$(@).attr('src')})"
+
+        $(window).trigger 'bumper.responsive.image.background.loaded'
+      $img.attr 'src', "#{url}#{params}"
+
 
     # resize all matching elements
     #

@@ -8,3 +8,6 @@ $ ->
     Bumper.Responsive.Image.Background.resizeAll breakpoint
 
   $(window).trigger 'resize'
+
+  $(window).on 'bumper.responsive.image.background.loaded', (e, data) ->
+    console.log 'Image Loaded'
