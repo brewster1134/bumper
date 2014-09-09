@@ -2,7 +2,7 @@
 # * bumper | responsive | image
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 0.0.1
+# * @version 0.1.0
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -13,37 +13,41 @@
     define [
       'jquery'
       'bumper-core'
-    ], ($) ->
-      factory $
+    ], ($, BumperCore) ->
+      factory $, BumperCore
   else
-    window.Bumper.Responsive.Image = factory jQuery
-) @, ($) ->
+    root.Bumper.Responsive.Image = factory jQuery, root.Bumper.Core
+) @, ($, BumperCore) ->
 
-  # resize the image for a single jquery img
-  #
-  resize: ($img, breakpoint) ->
-    url = $img.attr("data-bumper-responsive-image-url-#{breakpoint}") ||
-      $img.attr('data-bumper-responsive-image-url')
+  class BumperResponsiveImage extends BumperCore
 
-    unless url
-      console.warn "data-bumper-responsive-image-url[-#{breakpoint}] is not set.", $img
-      return
+    # resize the image for a single jquery img
+    #
+    resize: ($img, breakpoint) ->
+      url = $img.attr("data-bumper-responsive-image-url-#{breakpoint}") ||
+            $img.attr('data-bumper-responsive-image-url')
 
-    defaultParams = $img.attr('data-bumper-responsive-image-url-params')
-    bpParams = $img.attr("data-bumper-responsive-image-url-params-#{breakpoint}")
+      unless url
+        console.warn "data-bumper-responsive-image-url[-#{breakpoint}] is not set.", $img
+        return
 
-    # remove empty values and create url paramaters
-    params = [defaultParams, bpParams].filter (n) -> n != undefined && n != null && n != ''
-    params = if params.length then "?#{params.join('&')}" else ''
+      defaultParams = $img.attr('data-bumper-responsive-image-url-params')
+      bpParams = $img.attr("data-bumper-responsive-image-url-params-#{breakpoint}")
 
-    # trigger event
-    $img.load ->
-      $img.trigger 'bumper.responsive.image.loaded'
-    $img.attr 'data-bumper-breakpoint', breakpoint
-    $img.attr 'src', "#{url}#{params}"
+      # prepare image source
+      params = @combineParams defaultParams, bpParams
+      src = @interpolateElementAttrs "#{url}#{params}"
 
-  # resize all matching elements
-  #
-  resizeAll: (breakpoint) ->
-    _this = @
-    $('.bumper-responsive-image').each -> _this.resize($(@), breakpoint)
+      # trigger event
+      $img.load ->
+        $img.trigger 'bumper.responsive.image.loaded'
+      $img.attr 'data-bumper-breakpoint', breakpoint
+      $img.attr 'src', src
+
+    # resize all matching elements
+    #
+    resizeAll: (breakpoint) ->
+      _this = @
+      $('.bumper-responsive-image').each -> _this.resize($(@), breakpoint)
+
+  new BumperResponsiveImage

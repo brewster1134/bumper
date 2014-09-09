@@ -13,41 +13,45 @@
     define [
       'jquery'
       'bumper-core'
-    ], ($) ->
-      factory $
+    ], ($, BumperCore) ->
+      factory $, BumperCore
   else
-    window.Bumper.Responsive.BackgroundImage = factory jQuery
-) @, ($) ->
+    root.Bumper.Responsive.BackgroundImage = factory jQuery, root.Bumper.Core
+) @, ($, BumperCore) ->
 
-  # resize the background image for a single jquery object
-  #
-  resize: ($el, breakpoint) ->
-    url = $el.attr("data-bumper-responsive-backgroundimage-url-#{breakpoint}") ||
-      $el.attr('data-bumper-responsive-backgroundimage-url')
+  class BumperResponsiveBackgroundImage extends BumperCore
 
-    unless url
-      console.warn "data-bumper-responsive-backgroundimage-url[-#{breakpoint}] is not set.", $el
-      return
+    # resize the background image for a single jquery object
+    #
+    resize: ($el, breakpoint) ->
+      url = $el.attr("data-bumper-responsive-backgroundimage-url-#{breakpoint}") ||
+            $el.attr('data-bumper-responsive-backgroundimage-url')
 
-    defaultParams = $el.attr('data-bumper-responsive-backgroundimage-url-params')
-    bpParams = $el.attr("data-bumper-responsive-backgroundimage-url-params-#{breakpoint}")
+      unless url
+        console.warn "data-bumper-responsive-backgroundimage-url[-#{breakpoint}] is not set.", $el
+        return
 
-    # remove empty values and create url paramaters
-    params = [defaultParams, bpParams].filter (n) -> n != undefined && n != null && n != ''
-    params = if params.length then "?#{params.join('&')}" else ''
+      defaultParams = $el.attr('data-bumper-responsive-backgroundimage-url-params')
+      bpParams = $el.attr("data-bumper-responsive-backgroundimage-url-params-#{breakpoint}")
 
-    # create a temp image tag so we can fire an event when the image is loaded
-    $img = $('<img/>')
-    $img.load ->
-      $el.attr 'data-bumper-breakpoint', breakpoint
-      $el.css
-        backgroundImage: "url(#{$(@).attr('src')})"
+      # prepare image source
+      params = @combineParams defaultParams, bpParams
+      src = @interpolateElementAttrs "#{url}#{params}"
 
-      $el.trigger 'bumper.responsive.backgroundimage.loaded'
-    $img.attr 'src', "#{url}#{params}"
+      # create a temp image tag so we can fire an event when the image is loaded
+      $img = $('<img/>')
+      $img.load ->
+        $el.attr 'data-bumper-breakpoint', breakpoint
+        $el.css
+          backgroundImage: "url(#{$(@).attr('src')})"
 
-  # resize all matching elements
-  #
-  resizeAll: (breakpoint) ->
-    _this = @
-    $('.bumper-responsive-backgroundimage').each -> _this.resizeEl($(@), breakpoint)
+        $el.trigger 'bumper.responsive.backgroundimage.loaded'
+      $img.attr 'src', src
+
+    # resize all matching elements
+    #
+    resizeAll: (breakpoint) ->
+      _this = @
+      $('.bumper-responsive-backgroundimage').each -> _this.resizeEl($(@), breakpoint)
+
+  new BumperResponsiveBackgroundImage
