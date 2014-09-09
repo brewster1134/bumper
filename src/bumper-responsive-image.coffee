@@ -1,5 +1,5 @@
 ###
-# * bumper | responsive | images
+# * bumper | responsive | image
 # * https://github.com/brewster1134/bumper
 # *
 # * @version 0.0.1
