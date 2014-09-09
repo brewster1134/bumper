@@ -52,6 +52,6 @@
     #
     resizeAll: (breakpoint) ->
       _this = @
-      $('.bumper-responsive-backgroundimage').each -> _this.resizeEl($(@), breakpoint)
+      $('.bumper-responsive-backgroundimage').each -> _this.resize($(@), breakpoint)
 
   new BumperResponsiveBackgroundImage
