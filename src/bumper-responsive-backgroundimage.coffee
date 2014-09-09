@@ -21,7 +21,7 @@
 
   # resize the background image for a single jquery object
   #
-  resizeEl: ($el, breakpoint) ->
+  resize: ($el, breakpoint) ->
     url = $el.attr("data-bumper-responsive-backgroundimage-url-#{breakpoint}") ||
       $el.attr('data-bumper-responsive-backgroundimage-url')
 
