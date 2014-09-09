@@ -1,13 +1,8 @@
 $ ->
   $(window).resize ->
-    breakpoint = if $(window).innerWidth() <= 800
-      'mobile'
-    else
-      'desktop'
+    breakpoint = if $(window).innerWidth() <= 800 then 'mobile' else 'desktop'
 
-    Bumper.Responsive.Image.Background.resizeAll breakpoint
+    Bumper.Responsive.BackgroundImage.resizeAll breakpoint
+    Bumper.Responsive.Image.resizeAll breakpoint
 
   $(window).trigger 'resize'
-
-  $(window).on 'bumper.responsive.image.background.loaded', (e, data) ->
-    console.log 'Image Loaded'

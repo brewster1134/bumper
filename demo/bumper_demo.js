@@ -4,12 +4,10 @@
     $(window).resize(function() {
       var breakpoint;
       breakpoint = $(window).innerWidth() <= 800 ? 'mobile' : 'desktop';
-      return Bumper.Responsive.Image.Background.resizeAll(breakpoint);
+      Bumper.Responsive.BackgroundImage.resizeAll(breakpoint);
+      return Bumper.Responsive.Image.resizeAll(breakpoint);
     });
-    $(window).trigger('resize');
-    return $(window).on('bumper.responsive.image.background.loaded', function(e, data) {
-      return console.log('Image Loaded');
-    });
+    return $(window).trigger('resize');
   });
 
 }).call(this);

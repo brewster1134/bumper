@@ -13,11 +13,9 @@
     define [], ->
       factory()
   else
+    window.Bumper ||= {}
+    window.Bumper.Responsive ||= {}
+    window.Bumper.Responsive.Image ||= {}
+
     factory()
 ) @, ->
-
-  # Create empty bumper object
-  window.Bumper =
-    Responsive:
-      Image:
-        Background: null
