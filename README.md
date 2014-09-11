@@ -47,10 +47,10 @@ window.Bumper.Responsive.Image.resize $('img#foo'), 'breakFoo'
 ```
 
 ###### Interpolation
-You can use dynamic data from the within dom with the convention `{elementId:attribute}`
+You can use dynamic data from the within dom with the convention `{cssSelector:attribute}`
 
-* `elementId`
-  * An ID of a given element available on the dom
+* `cssSelector`
+  * A css selector for an element on the dom to get attributes from
 * `attribute`
   * Any jquery method with comma separated , and returns a value needed for your image url
 

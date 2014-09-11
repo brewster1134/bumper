@@ -24,7 +24,7 @@ describe 'bumper-core', ->
       $('body').append sized_element
 
     it 'should interpolate params from element attributes', ->
-      expect(bumperCore.interpolateElementAttrs('wid={sized_element:outerWidth,true}&class={sized_element:attr,class}')).to.equal 'wid=222&class=foo'
+      expect(bumperCore.interpolateElementAttrs('wid={#sized_element:outerWidth,true}&class={#sized_element:attr,class}')).to.equal 'wid=222&class=foo'
 
 describe 'bumper-responsive-image', ->
   @$img = null

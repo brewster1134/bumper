@@ -2,7 +2,7 @@
 # * bumper core
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 0.1.0
+# * @version 1.0.0
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -40,7 +40,7 @@
         splitArray = match.replace(/[{}]/g, '').split ':'
 
         # find element in dom
-        element = $("##{splitArray[0]}")
+        element = $("#{splitArray[0]}")
 
         # extract comma separated method and arguments
         args = splitArray[1].split ','
