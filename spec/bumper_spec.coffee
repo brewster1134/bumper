@@ -1,5 +1,6 @@
-# bumper core spec
-
+#
+# CORE
+#
 describe 'bumper-core', ->
   bumperCore = new window.Bumper.Core
 
@@ -26,9 +27,11 @@ describe 'bumper-core', ->
     it 'should interpolate params from element attributes', ->
       expect(bumperCore.interpolateElementAttrs('wid={#sized_element:outerWidth,true}&class={#sized_element:attr,class}')).to.equal 'wid=222&class=foo'
 
-describe 'bumper-responsive-image', ->
-  @$img = null
 
+#
+# RESPONSIVE IMAGE
+#
+describe 'bumper-responsive-image', ->
   context 'with breakpoint url', ->
     before (done) ->
       @$img = $('<img/>').attr
@@ -96,71 +99,90 @@ describe 'bumper-responsive-image', ->
         expect(@$img.attr('src')).to.include('/spec/bike.jpg')
 
 
+#
+# RESPONSIVE BACKGROUND IMAGE
+#
 describe 'bumper-responsive-backgroundimage', ->
-  @$img = null
+  context 'when accessing image attributes', ->
+    before (done) ->
+      @imgWidth = null
+      @imgHeight = null
+      @$bgdiv = $('<div/>').attr
+        'data-bumper-responsive-backgroundimage-url': '/spec/bike-small.jpg'
+
+      @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', (e, data) =>
+        @imgWidth = data.img[0].width
+        @imgHeight = data.img[0].height
+        done()
+
+      window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
+
+    it 'should return image dimensions', ->
+      expect(@imgWidth).to.equal 200
+      expect(@imgHeight).to.equal 131
 
   context 'with breakpoint url', ->
     before (done) ->
-      @$img = $('<img/>').attr
+      @$bgdiv = $('<div/>').attr
         'data-bumper-responsive-backgroundimage-url-breaka': '/spec/bike-small.jpg'
 
-      @$img.on 'bumper.responsive.backgroundimage.loaded', -> done()
+      @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', -> done()
 
-      window.Bumper.Responsive.BackgroundImage.resize @$img, 'breaka'
+      window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
 
     it 'should have build the correct background image url', ->
-      expect(@$img.css('background-image')).to.include('/spec/bike-small.jpg')
+      expect(@$bgdiv.css('background-image')).to.include('/spec/bike-small.jpg')
 
   context 'with default params', ->
     context 'with breakpoint params', ->
       before (done) ->
-        @$img = $('<img/>').attr
+        @$bgdiv = $('<div/>').attr
           'data-bumper-responsive-backgroundimage-url': '/spec/bike.jpg'
           'data-bumper-responsive-backgroundimage-url-params': 'wid=100'
           'data-bumper-responsive-backgroundimage-url-params-breaka': 'hei=100'
 
-        @$img.on 'bumper.responsive.backgroundimage.loaded', -> done()
+        @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', -> done()
 
-        window.Bumper.Responsive.BackgroundImage.resize @$img, 'breaka'
+        window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
 
       it 'should have build the correct background image url', ->
-        expect(@$img.css('background-image')).to.include('/spec/bike.jpg?wid=100&hei=100')
+        expect(@$bgdiv.css('background-image')).to.include('/spec/bike.jpg?wid=100&hei=100')
 
     context 'without breakpoint params', ->
       before (done) ->
-        @$img = $('<img/>').attr
+        @$bgdiv = $('<div/>').attr
           'data-bumper-responsive-backgroundimage-url': '/spec/bike.jpg'
           'data-bumper-responsive-backgroundimage-url-params': 'wid=100'
 
-        @$img.on 'bumper.responsive.backgroundimage.loaded', -> done()
+        @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', -> done()
 
-        window.Bumper.Responsive.BackgroundImage.resize @$img, 'breaka'
+        window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
 
       it 'should have build the correct background image url', ->
-        expect(@$img.css('background-image')).to.include('/spec/bike.jpg?wid=100')
+        expect(@$bgdiv.css('background-image')).to.include('/spec/bike.jpg?wid=100')
 
   context 'without default params', ->
     context 'with breakpoint params', ->
       before (done) ->
-        @$img = $('<img/>').attr
+        @$bgdiv = $('<div/>').attr
           'data-bumper-responsive-backgroundimage-url': '/spec/bike.jpg'
           'data-bumper-responsive-backgroundimage-url-params-breaka': 'hei=100'
 
-        @$img.on 'bumper.responsive.backgroundimage.loaded', -> done()
+        @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', -> done()
 
-        window.Bumper.Responsive.BackgroundImage.resize @$img, 'breaka'
+        window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
 
       it 'should have build the correct background image url', ->
-        expect(@$img.css('background-image')).to.include('/spec/bike.jpg?hei=100')
+        expect(@$bgdiv.css('background-image')).to.include('/spec/bike.jpg?hei=100')
 
     context 'without breakpoint params', ->
       before (done) ->
-        @$img = $('<img/>').attr
+        @$bgdiv = $('<div/>').attr
           'data-bumper-responsive-backgroundimage-url': '/spec/bike.jpg'
 
-        @$img.on 'bumper.responsive.backgroundimage.loaded', -> done()
+        @$bgdiv.on 'bumper.responsive.backgroundimage.loaded', -> done()
 
-        window.Bumper.Responsive.BackgroundImage.resize @$img, 'breaka'
+        window.Bumper.Responsive.BackgroundImage.resize @$bgdiv, 'breaka'
 
       it 'should have build the correct background image url', ->
-        expect(@$img.css('background-image')).to.include('/spec/bike.jpg')
+        expect(@$bgdiv.css('background-image')).to.include('/spec/bike.jpg')

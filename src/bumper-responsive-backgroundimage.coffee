@@ -45,7 +45,8 @@
         $el.css
           backgroundImage: "url(#{$(@).attr('src')})"
 
-        $el.trigger 'bumper.responsive.backgroundimage.loaded'
+        $el.trigger 'bumper.responsive.backgroundimage.loaded',
+          img: $img
       $img.attr 'src', src
 
     # resize all matching elements
