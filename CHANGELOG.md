@@ -18,3 +18,7 @@
 ###### 1.0.1
 * Responsive Background Image
   * Passes temp image with loaded event
+
+###### 1.0.2
+* Core
+  * Interpolation accepts a scope as 2nd argument for better element selection control

@@ -2,7 +2,7 @@
 # * bumper | responsive | image
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 1.0.0
+# * @version 1.0.2
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -36,7 +36,7 @@
 
       # prepare image source
       params = @combineParams defaultParams, bpParams
-      src = @interpolateElementAttrs "#{url}#{params}"
+      src = @interpolateElementAttrs "#{url}#{params}", $img
 
       # trigger event
       $img.load ->

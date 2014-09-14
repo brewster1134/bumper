@@ -2,7 +2,7 @@
 # * bumper core
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 1.0.0
+# * @version 1.0.2
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -30,7 +30,7 @@
       paramArray = params.filter (p) -> !!p
       if paramArray.length then "?#{paramArray.join('&')}" else ''
 
-    interpolateElementAttrs: (string) ->
+    interpolateElementAttrs: (string, $rootEl) ->
       regex = /\{([^&]+)\}/g
       matches = string.match /\{([^&]+)\}/g
       return string unless matches
@@ -39,8 +39,15 @@
         # extract each interpolation declaration
         splitArray = match.replace(/[{}]/g, '').split ':'
 
-        # find element in dom
-        element = $("#{splitArray[0]}")
+        # find first match within elements parents
+        $elements = if $rootEl then $rootEl.closest("#{splitArray[0]}") else $()
+
+        # add any matching elements anywhere on the dom
+        $elements = $elements.add("#{splitArray[0]}")
+
+        unless $elements.length
+          console.warn "No element for `#{splitArray[0]}` found."
+          return
 
         # extract comma separated method and arguments
         args = splitArray[1].split ','
@@ -56,6 +63,6 @@
             else arg
           args[index] = newArg
 
-        string = string.replace match, element[method](args...)
+        string = string.replace match, $elements.first()[method](args...)
 
       string
