@@ -3,32 +3,37 @@
     <link rel="stylesheet" href="/vendor/mocha/mocha.css">
     <link rel="stylesheet" href="/lib/bumper.css">
     <link rel="stylesheet" href="/.tmp/bumper_spec.css">
+
+    <!-- Testing Dependencies -->
+    <script src="/vendor/jquery/dist/jquery.js"></script>
+    <script src="/vendor/mocha/mocha.js"></script>
+    <script src="/vendor/chai/chai.js"></script>
+    <script src="/vendor/sinon/lib/sinon.js"></script>
+    <script src="/vendor/sinon/lib/sinon/call.js"></script>
+    <script src="/vendor/sinon/lib/sinon/spy.js"></script>
+    <script src="/vendor/sinon/lib/sinon/stub.js"></script>
+    <script src="/vendor/sinon-chai/lib/sinon-chai.js"></script>
+    <script src="/testem.js"></script>
+
+    <!-- Header Libraries -->
+    <script src="/lib/bumper-core.js"></script>
+    <script src="/lib/bumper-responsive-breakpoint.js"></script>
+    <script src="/lib/bumper-responsive-image.js"></script>
   </head>
 
   <body>
     <div id='mocha'></div>
   </body>
 
-  <!-- Dependencies -->
-  <script src="/vendor/jquery/dist/jquery.js"></script>
-
-  <!-- Testing -->
-  <script src="/vendor/mocha/mocha.js"></script>
-  <script src="/vendor/chai/chai.js"></script>
-  <script src="/vendor/sinon/lib/sinon.js"></script>
-  <script src="/vendor/sinon/lib/sinon/call.js"></script>
-  <script src="/vendor/sinon/lib/sinon/spy.js"></script>
-  <script src="/vendor/sinon-chai/lib/sinon-chai.js"></script>
-  <script src="/testem.js"></script>
   <script>
     mocha.setup('bdd');
     window.expect = chai.expect;
   </script>
 
-  <script src="/lib/bumper-core.js"></script>
-  <script src="/lib/bumper-responsive-image.js"></script>
-  <script src="/lib/bumper-responsive-backgroundimage.js"></script>
+  <!-- Footer Libraries -->
+  <script src="/lib/bumper-dom-jquery.js"></script>
 
+  <!-- Specs -->
   <script src="/.tmp/bumper_spec.js"></script>
 
   <script>

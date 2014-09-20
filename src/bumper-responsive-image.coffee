@@ -2,7 +2,7 @@
 # * bumper | responsive | image
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 1.0.2
+# * @version 2.0.0
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -11,43 +11,57 @@
 ((root, factory) ->
   if typeof define == 'function' && define.amd
     define [
-      'jquery'
       'bumper-core'
-    ], ($, BumperCore) ->
-      factory $, BumperCore
+      'bumper-responsive-breakpoint'
+    ], ->
+      factory()
   else
-    root.Bumper.Responsive.Image = factory jQuery, root.Bumper.Core
-) @, ($, BumperCore) ->
+    factory()
+) @, ->
 
-  class BumperResponsiveImage extends BumperCore
+  class BumperResponsiveImage
 
-    # resize the image for a single jquery img
+    # resize the image for a single jquery element
     #
-    resize: ($img, breakpoint) ->
-      url = $img.attr("data-bumper-responsive-image-url-#{breakpoint}") ||
-            $img.attr('data-bumper-responsive-image-url')
+    resize: (el, breakpoint) ->
+      el = el[0] if el.jquery # convert from a jquery object
+      breakpoint ||= window.Bumper.Responsive.Breakpoint.getCurrent()
+      fullUrl = window.Bumper.Core.getUrl el, breakpoint
 
-      unless url
-        console.warn "data-bumper-responsive-image-url[-#{breakpoint}] is not set.", $img
-        return
+      return unless fullUrl
 
-      defaultParams = $img.attr('data-bumper-responsive-image-url-params')
-      bpParams = $img.attr("data-bumper-responsive-image-url-params-#{breakpoint}")
+      # handle images
+      #
+      if el.tagName == 'IMG'
+        img = el
+        # trigger event
+        img.addEventListener 'load', ->
+          event = new Event 'bumper-responsive-image-loaded'
+          img.dispatchEvent event
 
-      # prepare image source
-      params = @combineParams defaultParams, bpParams
-      src = @interpolateElementAttrs "#{url}#{params}", $img
+        img.setAttribute 'data-bumper-breakpoint', breakpoint
+        img.setAttribute 'src', fullUrl
 
-      # trigger event
-      $img.load ->
-        $img.trigger 'bumper.responsive.image.loaded'
-      $img.attr 'data-bumper-breakpoint', breakpoint
-      $img.attr 'src', src
+      # handle background images
+      #
+      else
+        # create a temp image tag so we can fire an event when the image is loaded
+        img = document.createElement 'img'
+        img.addEventListener 'load', ->
+          src = @getAttribute 'src'
 
-    # resize all matching elements
-    #
-    resizeAll: (breakpoint) ->
-      _this = @
-      $('.bumper-responsive-image').each -> _this.resize($(@), breakpoint)
+          el.setAttribute 'data-bumper-breakpoint', breakpoint
+          el.style.backgroundImage = "url(#{src})"
 
-  new BumperResponsiveImage
+          event = new CustomEvent 'bumper-responsive-image-loaded',
+            detail:
+              img: img
+          el.dispatchEvent event
+
+        img.setAttribute 'src', fullUrl
+
+      return fullUrl
+
+  window.Bumper ||= {}
+  window.Bumper.Responsive ||= {}
+  window.Bumper.Responsive.Image ||= new BumperResponsiveImage

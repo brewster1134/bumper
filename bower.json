@@ -1,13 +1,11 @@
 {
   "name": "bumper",
-  "dependencies": {
-    "jquery": "~2.1.1"
-  },
   "devDependencies": {
-    "chai": "latest",
-    "chai-as-promised": "latest",
-    "mocha": "latest",
-    "sinon-chai": "latest",
-    "sinon": "latest"
+    "chai": "~1.9.1",
+    "chai-as-promised": "~4.1.1",
+    "jquery": "~2.1.1",
+    "mocha": "~1.21.4",
+    "sinon": "~1.10.3",
+    "sinon-chai": "~2.5.0"
   }
 }
