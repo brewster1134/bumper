@@ -1,12 +1,18 @@
 <html>
   <head>
     <title>bumper</title>
-    <link type="text/css" rel="stylesheet" media="all" href="../dist/bumper.css"/>
+    <link type="text/css" rel="stylesheet" media="all" href="../lib/bumper.css"/>
     <link type="text/css" rel="stylesheet" media="all" href="bumper_demo.css"/>
+
+    <!-- Header Libraries -->
+    <script type="text/javascript" src="../lib/bumper-core.js"></script>
+    <script type="text/javascript" src="../lib/bumper-responsive-breakpoint.js"></script>
+    <script type="text/javascript" src="../lib/bumper-responsive-image.js"></script>
+
   </head>
   <body>
 
-    <h1>Responsive | Image</h1>
+    <h3>Responsive | Image</h3>
     <img
       class="bumper-responsive-image"
       data-bumper-responsive-image-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
@@ -15,21 +21,30 @@
       data-bumper-responsive-image-url-params-desktop="bgc=0,255,0&wid=400"
     />
 
-    <h1>Responsive | Background Image</h1>
+    <h3>Responsive | Image w/ Background Image</h3>
     <div
-      class="bumper-responsive-backgroundimage"
-      data-bumper-responsive-backgroundimage-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
-      data-bumper-responsive-backgroundimage-url-params="opac=50"
-      data-bumper-responsive-backgroundimage-url-params-mobile="bgc=255,0,0&wid=200"
-      data-bumper-responsive-backgroundimage-url-params-desktop="bgc=0,255,0&wid=400"
+      class="bumper-responsive-image"
+      id="responsive-background-image"
+      data-bumper-responsive-image-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
+      data-bumper-responsive-image-url-params="opac=50"
+      data-bumper-responsive-image-url-params-mobile="bgc=255,0,0&wid=200"
+      data-bumper-responsive-image-url-params-desktop="bgc=0,255,0&wid=400"
+    >
+    </div>
+
+    <h3>Responsive | Image w/ interpolation</h3>
+    <div id="interpolation"></div>
+    <img
+      class="bumper-responsive-image"
+      data-bumper-responsive-image-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
+      data-bumper-responsive-image-url-params="wid={#interpolation:outerWidth}"
     />
 
   </body>
 
-  <script src="../vendor/jquery/dist/jquery.js"></script>
-  <script type="text/javascript" src="../lib/bumper-core.js"></script>
-  <script type="text/javascript" src="../lib/bumper-responsive-image.js"></script>
-  <script type="text/javascript" src="../lib/bumper-responsive-backgroundimage.js"></script>
+  <!-- Footer Libraries -->
+  <script type="text/javascript" src="../vendor/jquery/dist/jquery.js"></script>
+  <script type="text/javascript" src="../lib/bumper-dom-jquery.js"></script>
   <script type="text/javascript" src="bumper_demo.js"></script>
 
 </html>

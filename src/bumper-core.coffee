@@ -2,7 +2,7 @@
 # * bumper core
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 1.0.2
+# * @version 2.0.0
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -10,59 +10,81 @@
 
 ((root, factory) ->
   if typeof define == 'function' && define.amd
-    define [
-      'jquery'
-    ], ($) ->
-      factory $
+    define [], ->
+      factory()
   else
-    root.Bumper ||= {}
-    root.Bumper.Responsive ||= {}
-    root.Bumper.Core = factory jQuery
-) @, ($) ->
+    factory()
+) @, ->
 
-  # return the class so bumper modules can extend it
-  #
   class BumperCore
+    constructor: ->
+      @events()
+      @watch()
 
-    # remove empty values and create url paramaters
+    # process inital images
+    events: ->
+      # process all modules on page load
+      window.onload = => @process()
+
+      # process all modules on breakpoint changes
+      window.addEventListener 'bumper-responsive-breakpoint-change', => @process()
+
+      # check for breakpoint changes on window resize
+      window.onresize = requestAnimationFrame ->
+        window.Bumper.Responsive.Breakpoint.checkBreakpointChange()
+
+    # Creates a mutation observor for bumper modules when new elements are added to the dom
+    # Register a module into the switch statement with how to handle the new element
     #
-    combineParams: (params...) ->
-      paramArray = params.filter (p) -> !!p
-      if paramArray.length then "?#{paramArray.join('&')}" else ''
+    watch: ->
+      # http://caniuse.com/#feat=mutationobserver
+      #
+      responsiveObserver = new MutationObserver (mutations) ->
+        # return unless window.Bumper
+        for mutation in mutations
+          for node in mutation.addedNodes
+            return if typeof node.className != 'string'
+            switch
+              when node.className.indexOf('bumper-responsive-image') > -1
+                window.Bumper.Responsive.Image.resize node
 
-    interpolateElementAttrs: (string, $rootEl) ->
-      regex = /\{([^&]+)\}/g
-      matches = string.match /\{([^&]+)\}/g
-      return string unless matches
+      responsiveObserver.observe document,
+        childList: true
+        subtree: true
 
-      for match in matches
-        # extract each interpolation declaration
-        splitArray = match.replace(/[{}]/g, '').split ':'
+    process: ->
+      images = document.querySelectorAll '.bumper-responsive-image'
+      for image in images
+        window.Bumper.Responsive.Image.resize image
 
-        # find first match within elements parents
-        $elements = if $rootEl then $rootEl.closest("#{splitArray[0]}") else $()
+    # Gets the full url based on bumper data attributes
+    #
+    getUrl: (el, breakpoint) ->
+      url = el.getAttribute("data-bumper-responsive-image-url-#{breakpoint}") ||
+            el.getAttribute('data-bumper-responsive-image-url')
+      params = el.getAttribute("data-bumper-responsive-image-url-params-#{breakpoint}") ||
+               el.getAttribute('data-bumper-responsive-image-url-params')
 
-        # add any matching elements anywhere on the dom
-        $elements = $elements.add("#{splitArray[0]}")
+      # Log warning if no url is defined
+      unless url
+        console.warn "data-bumper-responsive-image-url[-#{breakpoint}] is not set.", el
+        return
 
-        unless $elements.length
-          console.warn "No element for `#{splitArray[0]}` found."
+      fullUrl = if params
+        "#{url}?#{params}"
+      else
+        url
+
+      # detect if inteprolation is needed
+      if fullUrl.indexOf('{') > -1
+        if window.Bumper.Dom
+          fullUrl = window.Bumper.Dom.interpolateElementAttrs fullUrl, el
+        else
+          if el.className.indexOf 'bumper-responsive-image-delay' == -1
+            el.className = "#{el.className} bumper-responsive-image-delay"
           return
 
-        # extract comma separated method and arguments
-        args = splitArray[1].split ','
+      return fullUrl
 
-        # use the first arg as the method
-        method = args.shift()
-
-        # convert special value types
-        for arg, index in args
-          newArg = switch arg
-            when 'true' then true
-            when 'false' then false
-            else arg
-          args[index] = newArg
-
-        string = string.replace match, $elements.first()[method](args...)
-
-      string
+  window.Bumper ||= {}
+  window.Bumper.Core ||= new BumperCore

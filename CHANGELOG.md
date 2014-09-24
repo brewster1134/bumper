@@ -22,3 +22,8 @@
 ###### 1.0.2
 * Core
   * Interpolation accepts a scope as 2nd argument for better element selection control
+
+###### 2.0.0
+* removed jquery (except for dom handler)
+* Responsive Background Image
+  * combined into Responsive Image

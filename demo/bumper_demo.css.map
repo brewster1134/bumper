@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,4BAA4B;EAC1B,UAAU,EAAE,KAAK;;AAEnB,cAAc;EACZ,KAAK,EAAE,KAAK",
+"sources": ["bumper_demo.sass"],
+"names": [],
+"file": "bumper_demo.css"
+}
