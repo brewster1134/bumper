@@ -17,10 +17,6 @@
 ) @, ->
 
   class BumperCore
-    constructor: ->
-      @events()
-      @watch()
-
     # process inital images
     events: ->
       # process all modules on page load
