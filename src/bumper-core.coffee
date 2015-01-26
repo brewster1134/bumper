@@ -62,9 +62,7 @@
                el.getAttribute('data-bumper-responsive-image-url-params')
 
       # Log warning if no url is defined
-      unless url
-        console.warn "data-bumper-responsive-image-url[-#{breakpoint}] is not set.", el
-        return
+      throw "data-bumper-responsive-image-url[-#{breakpoint}] is not set." unless url
 
       fullUrl = if params
         "#{url}?#{params}"

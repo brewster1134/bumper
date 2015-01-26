@@ -39,9 +39,7 @@
         if !$element || !$element.length
           $element = $("#{splitArray[0]}").first()
 
-        unless $element.length
-          console.warn "No element for `#{splitArray[0]}` found."
-          return
+        throw "No element for `#{splitArray[0]}` found." unless $element.length
 
         # extract comma separated method and arguments
         args = splitArray[1].split ','

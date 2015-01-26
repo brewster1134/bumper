@@ -36,7 +36,7 @@
         img = el
         # trigger event
         img.addEventListener 'load', ->
-          event = new Event 'bumper-responsive-image-loaded'
+          event = new CustomEvent 'bumper-responsive-image-loaded'
           img.dispatchEvent event
 
         img.setAttribute 'data-bumper-breakpoint', breakpoint

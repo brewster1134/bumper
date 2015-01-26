@@ -87,7 +87,6 @@ describe 'bumper-responsive-breakpoint', ->
   describe '#checkBreakpointChange', ->
     before (done) ->
       $(window).on 'bumper-responsive-breakpoint-change', (e) ->
-        console.log e
         done()
 
       window.Bumper.Responsive.Breakpoint.setBreakpoints

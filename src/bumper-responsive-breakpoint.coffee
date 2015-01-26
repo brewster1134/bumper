@@ -24,12 +24,12 @@
     #
     setBreakpoints: (breakpoints) ->
       # validate object
-      return console.warn 'breakpoints must be an object' unless typeof breakpoints == 'object'
+      throw 'breakpoints must be an object' unless typeof breakpoints == 'object'
 
       # validate breakpoint data
       for name, data of breakpoints
-        return console.warn "breakpoint #{name} must have a min value" if data.min == undefined
-        return console.warn "breakpoint #{name} must have a max value" if data.max == undefined
+        throw "breakpoint #{name} must have a min value" if data.min == undefined
+        throw "breakpoint #{name} must have a max value" if data.max == undefined
 
       @list = breakpoints
 
@@ -46,7 +46,7 @@
     # Can be helpful if you are using jRespond or something similar
     #
     setCurrentFunction: (func) ->
-      return console.warn 'Must be a function!' unless typeof func == 'function'
+      throw 'Must be a function!' unless typeof func == 'function'
       @getCurrent = func
 
     checkBreakpointChange: ->
