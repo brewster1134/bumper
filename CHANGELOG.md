@@ -1,5 +1,5 @@
 #### CHANGE LOG
-###### 2.0.1
+###### 2.0.3
 * DOM Jquery
   * Fallback to parent element when interpolating
 
