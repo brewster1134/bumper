@@ -2,7 +2,7 @@
 # * bumper | responsive | image
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 2.0.0
+# * @version 2.0.1
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.

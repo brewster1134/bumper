@@ -2,7 +2,7 @@
 # * bumper core
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 2.0.0
+# * @version 2.0.1
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -27,7 +27,7 @@
 
       # check for breakpoint changes on window resize
       window.onresize = requestAnimationFrame ->
-        window.Bumper.Responsive.Breakpoint.checkBreakpointChange()
+        window.Bumper.Responsive?.Breakpoint?.checkBreakpointChange()
 
     # Creates a mutation observor for bumper modules when new elements are added to the dom
     # Register a module into the switch statement with how to handle the new element

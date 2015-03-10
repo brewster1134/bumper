@@ -2,7 +2,7 @@
 # * bumper | dom | jquery
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 2.0.0
+# * @version 2.0.1
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -31,13 +31,14 @@
         # extract each interpolation declaration
         splitArray = match.replace(/[{}]/g, '').split ':'
 
-        # find first match within elements parents
-        if $rootEl
-          $element = $rootEl.closest("#{splitArray[0]}")
+        # find match within element's parent chain
+        $element = $rootEl.closest("#{splitArray[0]}")
 
-        # add any matching elements anywhere on the dom
-        if !$element || !$element.length
-          $element = $("#{splitArray[0]}").first()
+        # find first matching elemnt anywhere in the dom
+        $element = $("#{splitArray[0]}").first() unless $element.length
+
+        # use the direct parent
+        $element = $rootEl.parent() unless $element.length
 
         throw "No element for `#{splitArray[0]}` found." unless $element.length
 
