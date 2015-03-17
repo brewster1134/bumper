@@ -1,26 +1,21 @@
-# bumper
-
+# Bumper
 Bumper is a growing collection of front end tools and opinionated best practices.
 
-## Tools
-#### Core `bumper-core.js`
-You will always want to include core before all other modules.  It registers watchers and has common helper functions that most bumper modules need to access.
+## Modules
+### Core `bumper-core.js`
+You will always want to include core before all other modules.  It holds common helper functions and meta data other bumper modules use.
 
-Core uses mutation observers to interact with other bumper modules. Check [caniuse](http://caniuse.com/#feat=mutationobserver) for browser support, and polymer's [polyfill](https://github.com/polymer/MutationObservers) for some unsupported browsers.
-
-#### Responsive Breakpoint `bumper-responsive-breakpoint.js`
+### Responsive Breakpoint `bumper-responsive-breakpoint.js`
 Responsive Breakpoint allows you to manage your supported breakpoints, or configure to use other tools like jRespond
 
-###### `setBreakpoints` Sets your custom breakpoints
-
+#### Methods
+##### `setBreakpoints` Sets your custom breakpoints
 > _Arguments_
-
 ```yaml
 object: Reference the example for the object structure
 ```
 ---
 > _example_
-
 ```coffee
 Bumper.Responsive.Breakpoint.setBreakpoints
   'break-a':
@@ -28,39 +23,42 @@ Bumper.Responsive.Breakpoint.setBreakpoints
     'max': 1279   # the maximum width in pixels of the breakpoint
 ```
 
-###### `current` Gets the current breakpoint
-
+##### `getCurrent` Gets the current breakpoint
 > _example_
-
 ```coffee
-Bumper.Responsive.Breakpoint.current()
+Bumper.Responsive.Breakpoint.getCurrent()
 ```
 
-###### `setCurrentFunction` Overwrite the function used to get the current breakpoint.
+##### `setCurrentFunction` Overwrite the function used to get the current breakpoint.
 If you would rather use a different tool for managing your breakpoints (eg jRespond), set the function that bumper uses to get the current breakpoint.
 
 > _Arguments_
-
 ```yaml
 function: An alternative function for return the current breakpoint
 ```
 ---
 > _example_
-
 ```coffee
 Bumper.Responsive.Breakpoint.setCurrentFunction jRespond.getBreakpoint
 ```
 
-#### Responsive Image `bumper-responsive-image.js`
+#### Events
+##### `bumper-responsive-breakpoint-change` fires on the window when a breakpoint changes
+##### `bumper-responsive-breakpoint-change-increase` fires on the window when a breakpoint changes to a larger breakpoint
+##### `bumper-responsive-breakpoint-change-decrease` fires on the window when a breakpoint changes to a smaller breakpoint
+
+### Responsive Image `bumper-responsive-image.js`
 Allows you to request appropriate image sizes for different breakpoints with data attributes.
 
 * If an `img` is used, it will set the img src attributes.
-* Otherwise the background-image css attribute will be set
+* If a `div` is used, the background-image css attribute will be set
 
 For the best performance, you want to include this script in the <head> and above most all other scripts.  This lets bumper start requesting your images as soon as possible.
 
-###### `resize`
-Request a single image's source
+##### `resizeAll` Resizes all elements on the page
+All elements must have the class `bumper-repsonsive-image`
+
+##### `resize` Request a single image's source
 
 _data attribute markup_
 * `data-bumper-responsive-image-url`
@@ -92,23 +90,25 @@ _data attribute markup_
 ```
 
 > _Arguments_
-
 ```yaml
 el: An html element
 breakpoint (optional): A breakpoint name to request an image for
 ```
 
-#### DOM Handlers
+#### Events
+##### `bumper-responsive-image-loaded` fires on the img/div element when an image is loaded
+> passes the img/div in the event details
+
+### DOM Handlers
 DOM Handlers allow for more complex handling of bumper modules and are AMD compatible
 
 ###### jQuery `bumper-dom-jquery.js`
-###### `interpolateElementAttrs
+##### `interpolateElementAttrs
 Sometimes you may need details about the context of an element to request the correct image.  The responsive image modules support a string convention for finding, and getting attribute values from an element.
 
 `{cssSelector:attribute,arg1,arg2,...}`
 
 > _Arguments_
-
 ```yaml
 cssSelector: any css selector of an element on the DOM
 attribute: A jquery function that will return usable data
@@ -116,7 +116,6 @@ args: A comma delimited list of arguments to pass to the jquery function
 ```
 ---
 > _example_
-
 ```html
 <!-- bike_foo.jpg -->
 <div id="foo"></div>

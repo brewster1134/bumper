@@ -1,3 +1,5 @@
+window.Bumper.Responsive.Image.events()
+window.Bumper.Responsive.Breakpoint.events()
 window.Bumper.Responsive.Breakpoint.setBreakpoints
   mobile:
     min: 0

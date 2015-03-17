@@ -2,7 +2,6 @@
 # * bumper | responsive | breakpoint
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 2.0.3
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -14,22 +13,27 @@
       'bumper-core'
     ], ->
       factory()
+  else if typeof exports != 'undefined'
+    module.exports = factory()
   else
     factory()
 ) @, ->
 
   class BumperResponsiveBreakpoint
+    events: ->
+      # check for breakpoint changes on window resize
+      window.addEventListener 'resize', => @checkBreakpointChange()
 
-    # Sets the breakpoints.
+      return @
+
+    # Sets the breakpoints
     #
     setBreakpoints: (breakpoints) ->
-      # validate object
-      throw 'breakpoints must be an object' unless typeof breakpoints == 'object'
-
-      # validate breakpoint data
+      # validate object and breakpoint data
+      throw new Error 'breakpoints must be an object' unless typeof breakpoints == 'object'
       for name, data of breakpoints
-        throw "breakpoint #{name} must have a min value" if data.min == undefined
-        throw "breakpoint #{name} must have a max value" if data.max == undefined
+        throw new Error "breakpoint #{name} must have a min value" if data.min == undefined
+        throw new Error "breakpoint #{name} must have a max value" if data.max == undefined
 
       @list = breakpoints
 
@@ -42,23 +46,42 @@
         if width >= data.min && width <= data.max
           return @current = name
 
+      return @current
+
     # Instead of using setBreakpoints, you can provide a custom method to return a breakpoint value
     # Can be helpful if you are using jRespond or something similar
     #
     setCurrentFunction: (func) ->
-      throw 'Must be a function!' unless typeof func == 'function'
+      throw new Error 'Must be a function!' unless typeof func == 'function'
       @getCurrent = func
 
     checkBreakpointChange: ->
-      currentBp = @current
-      return false if @getCurrent() == currentBp
+      # return false if the breakpoint hasn't changed
+      previousBp = @current
+      return false if @getCurrent() == previousBp
 
-      # trigger event
+      # create a small object with breakpoint data
       bp = {}
       bp[@current] = @list[@current]
-      event = new CustomEvent 'bumper-responsive-breakpoint-change',
+
+      # trigger breakpoint change event
+      changeEvent = new CustomEvent 'bumper-responsive-breakpoint-change',
         detail: bp
-      window.dispatchEvent event
+      window.dispatchEvent changeEvent
+
+      # trigger breakpoint change increase event
+      if @list[previousBp].min < @list[@current].min
+        changeIncreaseEvent = new CustomEvent 'bumper-responsive-breakpoint-change-increase',
+          detail: bp
+        window.dispatchEvent changeIncreaseEvent
+
+      # trigger breakpoint change decrease event
+      else
+        changeDecreaseEvent = new CustomEvent 'bumper-responsive-breakpoint-change-decrease',
+          detail: bp
+        window.dispatchEvent changeDecreaseEvent
+
+      return bp
 
   window.Bumper ||= {}
   window.Bumper.Responsive ||= {}
