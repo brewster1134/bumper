@@ -2,7 +2,6 @@
 # * bumper | dom | jquery
 # * https://github.com/brewster1134/bumper
 # *
-# * @version 2.0.3
 # * @author Ryan Brewster
 # * Copyright (c) 2014
 # * Licensed under the MIT license.
@@ -14,6 +13,8 @@
       'jquery'
     ], ($) ->
       factory $
+  else if typeof exports != 'undefined'
+    module.exports = factory jQuery
   else
     factory jQuery
 ) @, ($) ->
@@ -21,7 +22,7 @@
   class BumperDom
     # Find an element on the page to use it's attributes as responsive data
     #
-    interpolateElementAttrs: (string, rootEl) ->
+    interpolateElementAttrs: (string, rootEl, restrictToParents = false) ->
       $rootEl = $(rootEl)
       regex = /\{([^&]+)\}/g
       matches = string.match /\{([^&]+)\}/g
@@ -35,12 +36,13 @@
         $element = $rootEl.closest("#{splitArray[0]}")
 
         # find first matching elemnt anywhere in the dom
-        $element = $("#{splitArray[0]}").first() unless $element.length
+        if restrictToParents == false && !$element.length
+          $element = $("#{splitArray[0]}").first()
 
         # use the direct parent
         $element = $rootEl.parent() unless $element.length
 
-        throw "No element for `#{splitArray[0]}` found." unless $element.length
+        throw new Error "No element for `#{splitArray[0]}` found." unless $element.length
 
         # extract comma separated method and arguments
         args = splitArray[1].split ','
@@ -58,10 +60,9 @@
 
         string = string.replace match, $element[method](args...)
 
-      string
+      return string
 
   window.Bumper ||= {}
-  if window.Bumper.Dom
-    console.warn 'There is already a dom handler loaded', window.Bumper.Dom
-    console.warn 'It will be replaced by the jQuery handler.'
+  if window.Bumper.Dom?
+    console.warn 'There is already a dom handler loaded. It will be replaced by the jQuery handler', window.Bumper.Dom
   window.Bumper.Dom = new BumperDom

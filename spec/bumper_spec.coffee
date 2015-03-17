@@ -5,30 +5,9 @@ describe 'bumper-core', ->
   it 'should create global object', ->
     expect(window.Bumper.Core).to.not.equal undefined
 
-  describe '#getUrl', ->
-    url = null
+  it 'should return a version', ->
+    expect(window.Bumper.Core.version).to.be.a 'string'
 
-    context 'with a breakpoint', ->
-      before ->
-        $element = $('<div/>')
-          .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg'
-          .attr 'data-bumper-responsive-image-url-small', '/spec/bike-small.jpg'
-          .attr 'data-bumper-responsive-image-url-params', 'wid=200'
-          .attr 'data-bumper-responsive-image-url-params-small', 'wid=100'
-        url = window.Bumper.Core.getUrl $element[0], 'small'
-
-      it 'should create a full url from bumper attributes', ->
-        expect(url).to.equal '/spec/bike-small.jpg?wid=100'
-
-    context 'without a breakpoint', ->
-      before ->
-        $element = $('<div/>')
-          .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg'
-          .attr 'data-bumper-responsive-image-url-params', 'wid=200'
-        url = window.Bumper.Core.getUrl $element[0]
-
-      it 'should create a full url from bumper attributes', ->
-        expect(url).to.equal '/spec/bike.jpg?wid=200'
 
 
 #
@@ -53,6 +32,7 @@ describe 'bumper-dom', ->
 
     it 'should interpolate params from element attributes', ->
       expect(url).to.equal 'wid=222&class=foo'
+
 
 
 #
@@ -98,15 +78,56 @@ describe 'bumper-responsive-breakpoint', ->
     it 'should fire an event with breakpoint data', ->
       expect(window.Bumper.Responsive.Breakpoint.current).to.equal 'newbreakpoint'
 
+    context 'when increasing breakpoints', ->
+      before (done) ->
+        $(window).on 'bumper-responsive-breakpoint-change-increase', (e) ->
+          expect(e.originalEvent.detail.newbreakpointBar.min).to.equal 0
+          done()
+
+        window.Bumper.Responsive.Breakpoint.current = 'newbreakpointFoo'
+        window.Bumper.Responsive.Breakpoint.setBreakpoints
+          newbreakpointFoo:
+            min: -4000
+            max: 0
+          newbreakpointBar:
+            min: 0
+            max: 4000
+
+        window.Bumper.Responsive.Breakpoint.checkBreakpointChange()
+
+      it 'should fire an event with breakpoint data', ->
+        expect(window.Bumper.Responsive.Breakpoint.current).to.equal 'newbreakpointBar'
+
+    context 'when decreasing breakpoints', ->
+      before (done) ->
+        $(window).on 'bumper-responsive-breakpoint-change-decrease', (e) ->
+          expect(e.originalEvent.detail.newbreakpointBar.min).to.equal 0
+          done()
+
+        window.Bumper.Responsive.Breakpoint.current = 'newbreakpointFoo'
+        window.Bumper.Responsive.Breakpoint.setBreakpoints
+          newbreakpointFoo:
+            min: 4001
+            max: 8000
+          newbreakpointBar:
+            min: 0
+            max: 4000
+
+        window.Bumper.Responsive.Breakpoint.checkBreakpointChange()
+
+      it 'should fire an event with breakpoint data', ->
+        expect(window.Bumper.Responsive.Breakpoint.current).to.equal 'newbreakpointBar'
+
+
 
 #
 # RESPONSIVE IMAGE
 #
 describe 'bumper-responsive-image', ->
-  context 'with an img element', ->
-    $img = null
+  describe '#resize', ->
+    context 'with an img element', ->
+      $img = null
 
-    context '#resize', ->
       before (done) ->
         $img = $('<img/>').attr
           'data-bumper-responsive-image-url': '/spec/bike.jpg'
@@ -117,10 +138,9 @@ describe 'bumper-responsive-image', ->
       it 'should add a url to the image src', ->
         expect($img.attr('src')).to.include('/spec/bike.jpg')
 
-  context 'with a div element', ->
-    $div = null
+    context 'with a div element', ->
+      $div = null
 
-    context '#resize', ->
       before (done) ->
         $div = $('<div/>').attr
           'data-bumper-responsive-image-url': '/spec/bike.jpg'
@@ -130,3 +150,28 @@ describe 'bumper-responsive-image', ->
 
       it 'should add a url to the background image', ->
         expect($div.css('backgroundImage')).to.include('/spec/bike.jpg')
+
+  describe '#getUrl', ->
+    url = null
+
+    context 'with a breakpoint', ->
+      before ->
+        $element = $('<div/>')
+          .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg'
+          .attr 'data-bumper-responsive-image-url-small', '/spec/bike-small.jpg'
+          .attr 'data-bumper-responsive-image-url-params', 'wid=200'
+          .attr 'data-bumper-responsive-image-url-params-small', 'wid=100'
+        url = window.Bumper.Responsive.Image.getUrl $element[0], 'small'
+
+      it 'should create a full url from bumper attributes', ->
+        expect(url).to.equal '/spec/bike-small.jpg?wid=100'
+
+    context 'without a breakpoint', ->
+      before ->
+        $element = $('<div/>')
+          .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg'
+          .attr 'data-bumper-responsive-image-url-params', 'wid=200'
+        url = window.Bumper.Responsive.Image.getUrl $element[0]
+
+      it 'should create a full url from bumper attributes', ->
+        expect(url).to.equal '/spec/bike.jpg?wid=200'
