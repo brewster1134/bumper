@@ -33,7 +33,7 @@
         splitArray = match.replace(/[{}]/g, '').split ':'
 
         # find match within element's parent chain
-        $element = $rootEl.closest("#{splitArray[0]}")
+        $element = $rootEl.parent().closest("#{splitArray[0]}")
 
         # find first matching elemnt anywhere in the dom
         if restrictToParents == false && !$element.length

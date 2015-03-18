@@ -116,6 +116,7 @@ args: A comma delimited list of arguments to pass to the jquery function
 ```
 ---
 > _example_
+
 ```html
 <!-- bike_foo.jpg -->
 <div id="foo"></div>
