@@ -1,44 +1,139 @@
 #
 # CORE
 #
-describe 'bumper-core', ->
+describe 'Bumper.Core', ->
   it 'should create global object', ->
     expect(window.Bumper.Core).to.not.equal undefined
 
   it 'should return a version', ->
     expect(window.Bumper.Core.version).to.be.a 'string'
 
+  describe '#castType', ->
+    it 'should detect type from string', ->
+      expect(window.Bumper.Core.castType('true')).to.eq true
+      expect(window.Bumper.Core.castType('false')).to.eq false
+
+    it 'should convert booleans', ->
+      expect(window.Bumper.Core.castType('true', 'boolean')).to.eq true
+      expect(window.Bumper.Core.castType('false', 'boolean')).to.eq false
+
+    it 'should convert integers', ->
+      expect(window.Bumper.Core.castType('2.1', 'integer')).to.eq 2
+      expect(window.Bumper.Core.castType('2', 'float')).to.eq 2.0
+
+  describe 'Module', ->
+    before ->
+      class BumperFooBar extends window.Bumper.Core.Module
+        options:
+          foo: 'module init'
+      window.Bumper.Foo ||= {}
+      window.Bumper.Foo.Bar ||= new BumperFooBar
+
+    it 'should register a global options object', ->
+      expect(window.Bumper.Core.Options.Foo.Bar.foo).to.equal 'module init'
+
+    describe 'setOption', ->
+      before ->
+        window.Bumper.Foo.Bar.setOption 'baz', 'module setOption'
+
+      it 'should set options on the module', ->
+        expect(window.Bumper.Foo.Bar.options.baz).to.eq 'module setOption'
+
+      it 'should make module options available globally', ->
+        expect(window.Bumper.Core.Options.Foo.Bar.baz).to.eq 'module setOption'
+
 
 
 #
 # DOM
 #
-describe 'bumper-dom', ->
-  describe '#interpolateElementAttrs', ->
-    url = null
+describe 'Bumper.Dom', ->
+  describe '#getElementData', ->
+    context 'with custom function', ->
+      before ->
+        $interpolate_element_function = $('<div/>')
+          .attr 'id', 'interpolate_element_function'
+          .css
+            width: 12.34
+            padding: 12.34
+          .data 'bumper-dom-function', (value) ->
+            parseInt(value)
 
-    before ->
-      $sized_element = $('<div/>')
-        .attr 'id', 'sized_element'
-        .attr 'class', 'foo'
-        .css
-          borderStyle: 'solid'
-          borderWidth: 1
-          margin: 10
-          width: 200
+        $('body').append $interpolate_element_function
 
-      $('body').append $sized_element
-      url = window.Bumper.Dom.interpolateElementAttrs('wid={#sized_element:outerWidth,true}&class={#sized_element:attr,class}')
+      it 'should pass the value to the custom function', ->
+        url = window.Bumper.Dom.getElementData('wid={#interpolate_element_function:width}')
+        expect(url).to.equal 'wid=12'
 
-    it 'should interpolate params from element attributes', ->
-      expect(url).to.equal 'wid=222&class=foo'
+    context 'with method arguments', ->
+      before ->
+        $interpolate_element_args = $('<div/>')
+          .attr 'id', 'interpolate_element_args'
+          .attr 'class', 'foo'
+          .css
+            borderStyle: 'solid'
+            borderWidth: 1
+            margin: 10
+            width: 200
+
+        $('body').append $interpolate_element_args
+
+      it 'should interpolate params from element attributes', ->
+        url = window.Bumper.Dom.getElementData('wid={#interpolate_element_args:outerWidth,true}&class={#interpolate_element_args:attr,class}')
+        expect(url).to.equal 'wid=222&class=foo'
+
+    context 'with options defined', ->
+      before ->
+        window.Bumper.Dom.options['foo'] = 'bar'
+
+        $interpolate_element_options = $('<div/>')
+          .attr 'id', 'interpolate_element_options'
+
+        $('body').append $interpolate_element_options
+
+      it 'should not overwrite module options', ->
+        window.Bumper.Dom.getElementData('wid={#interpolate_element_options:width:foo=baz}')
+        expect(window.Bumper.Dom.options.foo).to.eq 'bar'
+
+    context 'with `parents`', ->
+      $interpolate_element_parents_root = null
+
+      before ->
+        $interpolate_element_parents_target = $('<div/>')
+          .attr 'id', 'interpolate_element_parents_target'
+          .css
+            width: 321
+
+        # nested div with a parent
+        $interpolate_element_parents_root_parent = $('<div/>')
+          .css
+            width: 123
+        $interpolate_element_parents_root = $('<div/>')
+          .attr 'id', 'interpolate_element_parents_root'
+
+        $interpolate_element_parents_root_parent.append($interpolate_element_parents_root)
+        $('body').append $interpolate_element_parents_target
+        $('body').append $interpolate_element_parents_root_parent
+
+      after ->
+        window.Bumper.Dom.setOption 'parents', false
+
+      context 'enabled', ->
+        it 'should not match outside elements', ->
+          url = window.Bumper.Dom.getElementData('wid={#interpolate_element_parents_target:width:type=string,parents=true}', $interpolate_element_parents_root)
+          expect(url).to.equal 'wid=123'
+
+      context 'disabled', ->
+        it 'should match outside elements', ->
+          url = window.Bumper.Dom.getElementData('wid={#interpolate_element_parents_target:width:type=string,parents=false}', $interpolate_element_parents_root)
+          expect(url).to.equal 'wid=321'
 
 
 
 #
 # RESPONSIVE BREAKPOINT
 #
-describe 'bumper-responsive-breakpoint', ->
+describe 'Bumper.Responsive.Breakpoint', ->
   describe '#setBreakpoints', ->
     before ->
       window.Bumper.Responsive.Breakpoint.setBreakpoints
@@ -123,7 +218,7 @@ describe 'bumper-responsive-breakpoint', ->
 #
 # RESPONSIVE IMAGE
 #
-describe 'bumper-responsive-image', ->
+describe 'Bumper.Responsive.Image', ->
   describe '#resize', ->
     context 'with an img element', ->
       $img = null

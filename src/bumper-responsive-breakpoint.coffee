@@ -19,7 +19,7 @@
     factory()
 ) @, ->
 
-  class BumperResponsiveBreakpoint
+  class BumperResponsiveBreakpoint extends window.Bumper.Core.Module
     events: ->
       # check for breakpoint changes on window resize
       window.addEventListener 'resize', => @checkBreakpointChange()

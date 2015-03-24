@@ -100,39 +100,68 @@ breakpoint (optional): A breakpoint name to request an image for
 > passes the img/div in the event details
 
 ### DOM Handlers
-DOM Handlers allow for more complex handling of bumper modules and are AMD compatible
+DOM Handlers provide additional functionality to bumper modules. Only one DOM handler can be loaded at a time.
 
-###### jQuery `bumper-dom-jquery.js`
-##### `interpolateElementAttrs
-Sometimes you may need details about the context of an element to request the correct image.  The responsive image modules support a string convention for finding, and getting attribute values from an element.
+##### `getElementData
+Sometimes a bumper module may need data from another element on the page. Bumper supports this by simply declaring a specific convention within any supported bumper data attribute string. The convention is:
 
-`{cssSelector:attribute,arg1,arg2,...}`
+`{cssSelector:method,arg1,arg2:option=value,foo=bar}`
 
 > _Arguments_
 ```yaml
 cssSelector: any css selector of an element on the DOM
-attribute: A jquery function that will return usable data
-args: A comma delimited list of arguments to pass to the jquery function
+method: Any function that can be called on whatever dom handler solution is loaded
+args: A comma delimited list of arguments to pass to the method
+options: A comma delimited list of key value pairs of options (separated by an `=`) (optional)
 ```
+
+###### options
+* `parents`: when set to true, elements will only be looked for in the root elements parent chain.  when set to false, any element on the page can be used. _(default: false)_
+
 ---
 > _example_
 
+This example shows how you can use this convention to get custom data to use with the repsonsive image module.
+
 ```html
-<!-- bike_foo.jpg -->
-<div id="foo"></div>
+<div id="foo" class="bar"></div>
 <img
   class="bumper-responsive-image"
   data-bumper-responsive-image-url="bike_{#foo:attr,class}.jpg"
 />
+<!-- will request `bike_bar.jpg` -->
 
-<!-- http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors?wid=100&hei=100 -->
-<div id="bar" style="width: 100px; height: 100px"></div>
+<div id="bar" style="width: 100px"></div>
 <img
   class="bumper-responsive-image"
-  data-bumper-responsive-image-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
-  data-bumper-responsive-image-url-params="wid={#bar:innerWidth}&hei={#bar:innerHeight}.jpg"
+  data-bumper-responsive-image-url="bike.jpg"
+  data-bumper-responsive-image-url-params="wid={#bar:width}"
 />
+<!-- will request bike.jpg?wid=100 -->
 ```
+
+Additionally, a custom function can be attached to an element that the value is passed through.
+
+> _example_
+
+Say we want to do some additional processing on the width to make sure its an integer. _(We will be using the jquery DOM handler for this example)_
+
+```html
+<div id="bar" style="width: 123.456px"></div>
+<img
+  class="bumper-responsive-image"
+  data-bumper-responsive-image-url="bike.jpg"
+  data-bumper-responsive-image-url-params="wid={#bar:width}"
+/>
+<!-- will request bike.jpg?wid=100 -->
+```
+
+```coffee
+$('.bumper-responsive-image').data 'bumper-dom-function', (value) ->
+  parseInt(value)
+```
+
+Even though the width returns `123.456px`, when the function runs we parse it for an integer, and a request is made for `bike.jpg?wid=123`
 
 ## Development
 ### Dependencies
