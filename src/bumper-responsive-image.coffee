@@ -20,10 +20,7 @@
     factory()
 ) @, ->
 
-  class BumperResponsiveImage
-    options:
-      restrictToParents: false # used when interpolating
-
+  class BumperResponsiveImage extends window.Bumper.Core.Module
     events: ->
       # resize all images on page load
       window.addEventListener 'load', => @resizeAll()
@@ -115,7 +112,7 @@
 
       # detect if inteprolation is needed
       if window.Bumper.Dom? && fullUrl.indexOf('{') >= 0
-        fullUrl = window.Bumper.Dom.interpolateElementAttrs fullUrl, el, @options.restrictToParents
+        fullUrl = window.Bumper.Dom.getElementData fullUrl, el
 
       return fullUrl
 

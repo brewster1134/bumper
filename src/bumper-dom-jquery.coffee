@@ -19,46 +19,77 @@
     factory jQuery
 ) @, ($) ->
 
-  class BumperDom
+  class BumperDom extends window.Bumper.Core.Module
+    # default options
+    options:
+      parents: false  # when set to true, searching for elements will be restricted to the parent chain of a root element
+
     # Find an element on the page to use it's attributes as responsive data
     #
-    interpolateElementAttrs: (string, rootEl, restrictToParents = false) ->
+    getElementData: (string, rootEl) ->
       $rootEl = $(rootEl)
+
+      # regex to match the convention:
+      # {selector:method,arg:option=value,foo=bar}
       regex = /\{([^&]+)\}/g
-      matches = string.match /\{([^&]+)\}/g
+
+      # extract matches from string
+      matches = string.match regex
+
+      # return original string if no interpolation is found
       return string unless matches
 
+      # in case there are multiple matches to interpolate, process each one individually
       for match in matches
-        # extract each interpolation declaration
-        splitArray = match.replace(/[{}]/g, '').split ':'
+        # extract data from string
+        stringArray = match.replace(/[{}]/g, '').split ':'
+        stringSelector = stringArray[0]
+        stringMethodArgs = stringArray[1]
+        stringOptions = stringArray[2]
+
+        # extract options into js object
+        stringOptionsObject = {}
+        if stringOptions
+          for option in stringOptions.split(',')
+            keyValue = option.split('=')
+            key = keyValue[0].trim()
+            value = keyValue[1].trim()
+            stringOptionsObject[key] = window.Bumper.Core.castType(value)
+
+        # merge options into defaults
+        options = $.extend {}, @options, stringOptionsObject
+
+        # extract method and arguments
+        stringArgs = stringMethodArgs.split ','
+
+        # use the first arg as the method name
+        stringMethod = stringArgs.shift()
 
         # find match within element's parent chain
-        $element = $rootEl.parent().closest("#{splitArray[0]}")
+        $element = $rootEl.parent().closest("#{stringSelector}")
 
         # find first matching elemnt anywhere in the dom
-        if restrictToParents == false && !$element.length
-          $element = $("#{splitArray[0]}").first()
+        if options.parents == false && !$element.length
+          $element = $("#{stringSelector}").first()
 
-        # use the direct parent
-        $element = $rootEl.parent() unless $element.length
+        # use the nearest visible parent as a last resort
+        $element = $rootEl.parent().closest(':visible') unless $element.length
 
-        throw new Error "No element for `#{splitArray[0]}` found." unless $element.length
-
-        # extract comma separated method and arguments
-        args = splitArray[1].split ','
-
-        # use the first arg as the method
-        method = args.shift()
+        throw new Error "No element found for `#{stringSelector}`." unless $element.length
 
         # convert special value types
-        for arg, index in args
-          newArg = switch arg
-            when 'true' then true
-            when 'false' then false
-            else arg
-          args[index] = newArg
+        # typically options passed in the string will want to be boolean (e.g. true vs 'true')
+        for arg, index in stringArgs
+          stringArgs[index] = window.Bumper.Core.castType(arg)
 
-        string = string.replace match, $element[method](args...)
+        # call methods to request data
+        value = $element[stringMethod](stringArgs...)
+
+        # call custom function if it exists
+        value = $element.data('bumper-dom-function')?(value) || value
+
+        # replace inteprolation syntax with value
+        string = string.replace match, value
 
       return string
 
