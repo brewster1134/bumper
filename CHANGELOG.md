@@ -1,4 +1,19 @@
 #### CHANGE LOG
+###### 3.1.0
+* Core
+  * type casting method
+  * modules now extend a common BumperModule class
+  * module options are now initialized and available globally through Bumper.Core.Options
+* DOM
+  * options can now be overwritten through string inteprolation
+  * custom functions can be run to modify element data
+
+###### 3.0.1
+* exclude self when traversing parents
+
+###### 3.0.0
+* restructure of classes and methods
+
 ###### 2.0.3
 * DOM Jquery
   * Fallback to parent element when interpolating

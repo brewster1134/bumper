@@ -66,7 +66,7 @@
         stringMethod = stringArgs.shift()
 
         # find match within element's parent chain
-        $element = $rootEl.parent().closest("#{stringSelector}")
+        $element = $rootEl.closest("#{stringSelector}")
 
         # find first matching elemnt anywhere in the dom
         if options.parents == false && !$element.length
