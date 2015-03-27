@@ -24,13 +24,19 @@
     options:
       parents: false  # when set to true, searching for elements will be restricted to the parent chain of a root element
 
-    # Find an element on the page to use it's attributes as responsive data
+    # Get data associated with an element given the string interpolation syntax
+    # {selector:method,arg:option=value,foo=bar}
+    #
+    # @param string [String]
+    #   A string that may contain the above interpolation syntax
+    # @param rootEl [String/jQuery] (optional)
+    #   A jQuery object or a css selector for a root element to search from
+    #
     #
     getElementData: (string, rootEl) ->
       $rootEl = $(rootEl)
 
       # regex to match the convention:
-      # {selector:method,arg:option=value,foo=bar}
       regex = /\{([^&]+)\}/g
 
       # extract matches from string
@@ -66,16 +72,17 @@
         stringMethod = stringArgs.shift()
 
         # find match within element's parent chain
-        $element = $rootEl.closest("#{stringSelector}")
+        $element = $rootEl.parent().closest("#{stringSelector}")
 
-        # find first matching elemnt anywhere in the dom
+        # find first matching element anywhere in the dom
         if options.parents == false && !$element.length
           $element = $("#{stringSelector}").first()
 
-        # use the nearest visible parent as a last resort
+        # use the nearest visible parent as a last resort with the root element
         $element = $rootEl.parent().closest(':visible') unless $element.length
 
-        throw new Error "No element found for `#{stringSelector}`." unless $element.length
+        # use the body tag as a LAST last resort
+        $element = $('body') unless $element.length
 
         # convert special value types
         # typically options passed in the string will want to be boolean (e.g. true vs 'true')
@@ -85,8 +92,19 @@
         # call methods to request data
         value = $element[stringMethod](stringArgs...)
 
-        # call custom function if it exists
-        value = $rootEl.data('bumper-dom-function')?(value) || value
+        # create data object with details to pass custom functions
+        matchData =
+          element: $element
+          selector: stringSelector
+          method: stringMethod
+          arguments: stringArgs
+          options: options
+
+        # call custom function on target element (if it exists)
+        value = $element.data('bumper-dom-function')?(value, matchData) || value
+
+        # call custom function on root element (if it exists)
+        value = $rootEl.data('bumper-dom-function')?(value, matchData) || value
 
         # replace inteprolation syntax with value
         string = string.replace match, value

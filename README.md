@@ -3,149 +3,187 @@ Bumper is a growing collection of front end tools and opinionated best practices
 
 ## Modules
 ### Core `bumper-core.js`
-You will always want to include core before all other modules.  It holds common helper functions and meta data other bumper modules use.
+You will always want to include core before all other modules. It holds common helper functions and meta data that other Bumper modules depend on.
 
 ### Responsive Breakpoint `bumper-responsive-breakpoint.js`
-Responsive Breakpoint allows you to manage your supported breakpoints, or configure to use other tools like jRespond
+Responsive Breakpoint provides tools to define and manage breakpoints for a responsive site solution.
 
 #### Methods
-##### `setBreakpoints` Sets your custom breakpoints
-> _Arguments_
-```yaml
-object: Reference the example for the object structure
-```
 ---
-> _example_
-```coffee
-Bumper.Responsive.Breakpoint.setBreakpoints
-  'break-a':
-    'min': 1024   # the minimum width in pixels
-    'max': 1279   # the maximum width in pixels of the breakpoint
+###### `setBreakpoints` Define your custom breakpoints
+> _Arguments_
+> ```yaml
+object: [Object] required
+  A properly formatted object of breakpoint names and min/max values
 ```
 
-##### `getCurrent` Gets the current breakpoint
-> _example_
+```coffee
+Bumper.Responsive.Breakpoint.setBreakpoints
+  'small':    # unique breakpoint name
+    min: 0        # the minimum width in pixels
+    max: 1023     # the maximum width in pixels of the breakpoint
+  'large':
+    min: 1024
+    max: 4000
+```
+---
+###### `getCurrent` Returns the current breakpoint name
 ```coffee
 Bumper.Responsive.Breakpoint.getCurrent()
 ```
-
-##### `setCurrentFunction` Overwrite the function used to get the current breakpoint.
-If you would rather use a different tool for managing your breakpoints (eg jRespond), set the function that bumper uses to get the current breakpoint.
+---
+###### `setCurrentFunction` Overwrite the function used to get the current breakpoint
+> If you want to use a different breakpoint tool (e.g. jRespond), you can tell Bumper what function to call. This will allow you to still use other Bumper modules with the breakpoint solution of your choice.
 
 > _Arguments_
 ```yaml
-function: An alternative function for return the current breakpoint
+function: [Function] required
+  An alternative function for return the current breakpoint
 ```
----
-> _example_
+
 ```coffee
 Bumper.Responsive.Breakpoint.setCurrentFunction jRespond.getBreakpoint
 ```
-
+---
 #### Events
-##### `bumper-responsive-breakpoint-change` fires on the window when a breakpoint changes
-##### `bumper-responsive-breakpoint-change-increase` fires on the window when a breakpoint changes to a larger breakpoint
-##### `bumper-responsive-breakpoint-change-decrease` fires on the window when a breakpoint changes to a smaller breakpoint
-
+Responsive Breakpoint events pass the new breakpoint data as an argument
+```yaml
+bumper-responsive-breakpoint-change: fires on the window when a breakpoint changes
+bumper-responsive-breakpoint-change-increase: fires on the window when a breakpoint changes to a larger breakpoint
+bumper-responsive-breakpoint-change-decrease: fires on the window when a breakpoint changes to a smaller breakpoint
+```
+---
 ### Responsive Image `bumper-responsive-image.js`
-Allows you to request appropriate image sizes for different breakpoints with data attributes.
-
-* If an `img` is used, it will set the img src attributes.
+Responsive Image provides tools to request custom image sizes based on current breakpoint size, orientation, or any other conditions you need
+* If an `img` is used, it will set the img src attributes
 * If a `div` is used, the background-image css attribute will be set
+* All responsive image data attributes support Bumper string interpolation _(see DOM Handler docs below)_
 
-For the best performance, you want to include this script in the <head> and above most all other scripts.  This lets bumper start requesting your images as soon as possible.
+Responsive Image relies on certain data attributes to be set to request the correct image
 
-##### `resizeAll` Resizes all elements on the page
-All elements must have the class `bumper-repsonsive-image`
-
-##### `resize` Request a single image's source
-
-_data attribute markup_
-* `data-bumper-responsive-image-url`
-  * Default image url
-* `data-bumper-responsive-image-url-[BREAKPOINT]`
-  * Breakpoint specific image url
-
+> _Attributes_
+> ```yaml
+data-bumper-responsive-image-url: required
+data-bumper-responsive-image-url-[BREAKPOINT NAME]: optional
+  Valid url to an image resource
+data-bumper-responsive-image-url-params: optional
+data-bumper-responsive-image-url-params-[BREAKPOINT NAME]: optional
+  Optional url parameters for parameter based image services
+```
+> _Example_ with breakpoint specific urls
 ```html
 <img
-  class="bumper-responsive-image"
+  id="foo"
   data-bumper-responsive-image-url="bike.jpg"
-  data-bumper-responsive-image-url-mobile="bike_mobile.jpg"
+  data-bumper-responsive-image-url-large="bike_desktop.jpg"
 />
+<!-- if at the `small` breakpoint, `bike.jpg` is requested -->
+<!-- if at the `large` breakpoint, `bike_desktop.jpg` is requested -->
 ```
-
-###### For paramater based image services...
-* `data-bumper-responsive-image-url-params`
-  * Default params applied to all breakpoints
-* `data-bumper-responsive-image-url-params-[BREAKPOINT]`
-  * Breakpoint specific paramaters
-
+> _Example_ with breakpoint specific url parameters
 ```html
-<div
-  class="bumper-responsive-image"
-  data-bumper-responsive-image-url="http://s7d1.scene7.com/is/image/DanaCo/all_bike_colors"
-  data-bumper-responsive-image-url-params="wid=400"
-  data-bumper-responsive-image-url-params-mobile="wid=200"
+<img
+  id="foo"
+  data-bumper-responsive-image-url="bike.jpg"
+  data-bumper-responsive-image-url-small="bike_mobile.jpg"
+  data-bumper-responsive-image-url-params="wid=200"
+  data-bumper-responsive-image-url-params-large="wid=400"
 />
+<!-- if at the `small` breakpoint, `bike_mobile.jpg?wid=200` is requested -->
+<!-- if at the `large` breakpoint, `bike.jpg?wid=400` is requested -->
 ```
 
-> _Arguments_
-```yaml
-el: An html element
-breakpoint (optional): A breakpoint name to request an image for
-```
-
-#### Events
-##### `bumper-responsive-image-loaded` fires on the img/div element when an image is loaded
-> passes the img/div in the event details
-
-### DOM Handlers
-DOM Handlers provide additional functionality to bumper modules. Only one DOM handler can be loaded at a time.
-
-##### `getElementData
-Sometimes a bumper module may need data from another element on the page. Bumper supports this by simply declaring a specific convention within any supported bumper data attribute string. The convention is:
-
-`{cssSelector:method,arg1,arg2:option=value,foo=bar}`
-
-> _Arguments_
-```yaml
-cssSelector: any css selector of an element on the DOM
-method: Any function that can be called on whatever dom handler solution is loaded
-args: A comma delimited list of arguments to pass to the method
-options: A comma delimited list of key value pairs of options (separated by an `=`) (optional)
-```
-
-###### options
-* `parents`: when set to true, elements will only be looked for in the root elements parent chain.  when set to false, any element on the page can be used. _(default: false)_
-
+#### Methods
 ---
-> _example_
+###### `resizeAll` Resizes all responsive image elements on the page
+Elements are detected by looking for the class `bumper-repsonsive-image`
+```coffee
+Bumper.Responsive.Image.resizeAll()
+```
+---
+###### `resize` Resize a single responsive image element
+Responsive image elements are resized based on various data attributes
+> _Arguments_
+> ```yaml
+el: [HTML Element] required
+  An html element that has the neccessary data attributes
+breakpoint: [String] optional
+  Name of a breakpoint.  If not passed, `getCurrent` will be called from the responsive breakpoint module
+force: [Boolean] optional
+  default: false
+  When `false`, if the url is the same, no changes are made to the image, and no events are fired
+  When `true`, even if the url is the same, the source will be set and events will be fired
+```
 
-This example shows how you can use this convention to get custom data to use with the repsonsive image module.
+```coffee
+Bumper.Responsive.Image.resize document.getElementById('foo')
+```
+---
+#### Events
+Responsive Image events pass the image element as an argument
+```yaml
+bumper-responsive-image-loaded: fires on the image element after an image is loaded
+```
+---
+### DOM Handlers
+DOM Handlers provide additional functionality to Bumper modules. Only one DOM handler can be loaded at a time. The following examples use the jQuery dom handler
 
+###### String Interpolation
+Sometimes a Bumper module may need data from another element on the page. Bumper supports this by simply declaring a specific convention within any supported Bumper data attribute string. The convention is:
+
+`{selector:function,arg1,arg2:option=value,foo=bar}`
+
+> _Arguments_
+```yaml
+selector: required
+  A css selector of an element on the DOM
+function: optional
+  Any function name allowed by your DOM handler
+args: optional
+  A comma delimited list of arguments to pass to the function
+  If the function/args are left out, only the custom function will be run (see docs below)
+options: optional
+  A comma delimited list of key value pairs of options (separated by an `=`)
+  parents: [Boolean]
+    default: false
+    When `true`, only the elements in the parent chain will be searched
+    When `false`, elements anywhere on the page will be searched
+```
+
+The following examples use the responsive image module
+
+> _Example_ with function & arguments for url
 ```html
 <div id="foo" class="bar"></div>
 <img
-  class="bumper-responsive-image"
   data-bumper-responsive-image-url="bike_{#foo:attr,class}.jpg"
 />
 <!-- will request `bike_bar.jpg` -->
+```
 
+> _Example_ with function & arguments for url params
+```html
 <div id="bar" style="width: 100px"></div>
 <img
-  class="bumper-responsive-image"
   data-bumper-responsive-image-url="bike.jpg"
   data-bumper-responsive-image-url-params="wid={#bar:width}"
 />
 <!-- will request bike.jpg?wid=100 -->
 ```
 
-Additionally, a custom function can be attached to an element that the value is passed through.
+Additionally, we can further customize the value by using a custom function that can be attached to a root element, or the target element's data attributes. Say we want to do some additional processing on the width to make sure its an integer.
 
-> _example_
-
-Say we want to do some additional processing on the width to make sure its an integer. _(We will be using the jquery DOM handler for this example)_
-
+> _Example_ setting a function on the target element
+```coffee
+$('#bar').data 'bumper-dom-function', (value) ->
+  value * 2
+```
+> _Example_ setting a function on the root element
+```coffee
+$('.bumper-responsive-image').data 'bumper-dom-function', (value) ->
+  parseInt(value)
+```
+> _Example_
 ```html
 <div id="bar" style="width: 123.456px"></div>
 <img
@@ -153,15 +191,25 @@ Say we want to do some additional processing on the width to make sure its an in
   data-bumper-responsive-image-url="bike.jpg"
   data-bumper-responsive-image-url-params="wid={#bar:width}"
 />
-<!-- will request bike.jpg?wid=100 -->
+<!-- will request bike.jpg?wid=246 -->
 ```
+
+* The width returns: `123.456`
+* The target element function runs and we double it: `246.912`
+* The root element function runs and we parse it for an integer: `246`
+* A request is made for `bike.jpg?wid=246`
+
+A 2nd argument is passed to your custom function with additional data if you need it
 
 ```coffee
-$('.bumper-responsive-image').data 'bumper-dom-function', (value) ->
-  parseInt(value)
+$('.bumper-responsive-image').data 'bumper-dom-function', (value, data) ->
+  # data includes...
+  #   element
+  #   selector
+  #   method
+  #   arguments
+  #   options
 ```
-
-Even though the width returns `123.456px`, when the function runs we parse it for an integer, and a request is made for `bike.jpg?wid=123`
 
 ## Development
 ### Dependencies
@@ -173,7 +221,7 @@ npm install
 bower install
 ```
 
-Do **NOT** modify any `.js` files!  Modify their `.coffee` counterparts.  They are watched for changes and compiled on demand when Testem is running.
+Do **NOT** modify any `.js` files!  Modify their `.coffee` counterparts. They are watched for changes and compiled on demand when Testem is running.
 
 ### Compiling & Testing
 Run `testem`

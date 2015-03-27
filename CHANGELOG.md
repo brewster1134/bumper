@@ -1,4 +1,7 @@
 #### CHANGE LOG
+###### 3.1.1
+* custom function support for both target & root elements
+
 ###### 3.1.0
 * Core
   * type casting method

@@ -110,9 +110,8 @@
       # combine params if they are found
       fullUrl = if params then "#{url}?#{params}" else url
 
-      # detect if inteprolation is needed
-      if window.Bumper.Dom? && fullUrl.indexOf('{') >= 0
-        fullUrl = window.Bumper.Dom.getElementData fullUrl, el
+      # process any possible string inteprolation
+      fullUrl = window.Bumper.Dom?.getElementData(fullUrl, el) || fullUrl
 
       return fullUrl
 
