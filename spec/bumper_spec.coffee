@@ -51,18 +51,22 @@ describe 'Bumper.Dom', ->
   describe '#getElementData', ->
     context 'with custom function', ->
       before ->
+        $interpolate_element_function_root = $('<div/>')
+          .attr 'id', 'interpolate_element_function_root'
+          .data 'bumper-dom-function', (value) ->
+            parseInt(value)
+
         $interpolate_element_function = $('<div/>')
           .attr 'id', 'interpolate_element_function'
           .css
             width: 12.34
             padding: 12.34
-          .data 'bumper-dom-function', (value) ->
-            parseInt(value)
 
+        $('body').append $interpolate_element_function_root
         $('body').append $interpolate_element_function
 
       it 'should pass the value to the custom function', ->
-        url = window.Bumper.Dom.getElementData('wid={#interpolate_element_function:width}')
+        url = window.Bumper.Dom.getElementData('wid={#interpolate_element_function:width}', '#interpolate_element_function_root')
         expect(url).to.equal 'wid=12'
 
     context 'with method arguments', ->

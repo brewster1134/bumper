@@ -86,7 +86,7 @@
         value = $element[stringMethod](stringArgs...)
 
         # call custom function if it exists
-        value = $element.data('bumper-dom-function')?(value) || value
+        value = $rootEl.data('bumper-dom-function')?(value) || value
 
         # replace inteprolation syntax with value
         string = string.replace match, value
