@@ -1,4 +1,6 @@
 # Bumper
+
+[![Join the chat at https://gitter.im/brewster1134/bumper](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/brewster1134/bumper?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Bumper is a growing collection of front end tools and opinionated best practices.
 
 ## Modules
