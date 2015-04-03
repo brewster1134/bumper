@@ -1,4 +1,8 @@
 #### CHANGE LOG
+###### 3.1.2
+* Resonsive Image
+  * sets height & width of background image elements
+
 ###### 3.1.1
 * custom function support for both target & root elements
 

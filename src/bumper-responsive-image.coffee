@@ -84,6 +84,8 @@
 
           el.setAttribute 'data-bumper-breakpoint', breakpoint
           el.style.backgroundImage = "url(#{src})"
+          el.style.width = "#{img.width}px"
+          el.style.height = "#{img.height}px"
 
           event = new CustomEvent 'bumper-responsive-image-loaded',
             detail:

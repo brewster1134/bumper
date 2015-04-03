@@ -17,7 +17,7 @@
 
   class BumperCore
     # Maintain bumper version here...
-    version: '3.1.0'
+    version: '3.1.2'
 
     # convert strings into a given javascript class type
     #
