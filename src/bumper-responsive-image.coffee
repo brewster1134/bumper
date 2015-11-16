@@ -7,20 +7,18 @@
 # * Licensed under the MIT license.
 ###
 
-((root, factory) ->
-  if typeof define == 'function' && define.amd
+((factory) ->
+  if define.amd
     define [
       'bumper-core'
       'bumper-responsive-breakpoint'
-    ], ->
-      factory()
-  else if typeof exports != 'undefined'
-    module.exports = factory()
+    ], (Core, ResponsiveBreakpoint) ->
+      factory Core, ResponsiveBreakpoint
   else
-    factory()
-) @, ->
+    factory window.Bumper.Core, window.Bumper.Responsive.Breakpoint
+) (Core, ResponsiveBreakpoint) ->
 
-  class BumperResponsiveImage extends window.Bumper.Core.Module
+  class BumperResponsiveImage extends Core.Module
     events: ->
       # resize all images on page load
       window.addEventListener 'load', => @resizeAll()

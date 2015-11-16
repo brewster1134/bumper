@@ -1,4 +1,7 @@
 #### CHANGE LOG
+###### 3.1.3
+* fixed issues with requirejs headers
+
 ###### 3.1.2
 * Resonsive Image
   * sets height & width of background image elements

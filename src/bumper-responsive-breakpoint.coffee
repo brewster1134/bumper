@@ -7,19 +7,17 @@
 # * Licensed under the MIT license.
 ###
 
-((root, factory) ->
+((factory) ->
   if typeof define == 'function' && define.amd
     define [
       'bumper-core'
-    ], ->
-      factory()
-  else if typeof exports != 'undefined'
-    module.exports = factory()
+    ], (Core) ->
+      factory Core
   else
-    factory()
-) @, ->
+    factory window.Bumper.Core
+) (Core) ->
 
-  class BumperResponsiveBreakpoint extends window.Bumper.Core.Module
+  class BumperResponsiveBreakpoint extends Core.Module
     events: ->
       # check for breakpoint changes on window resize
       window.addEventListener 'resize', => @checkBreakpointChange()
