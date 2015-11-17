@@ -7,13 +7,13 @@
 # * Licensed under the MIT license.
 ###
 
-((root, factory) ->
-  if typeof define == 'function' && define.amd
+((factory) ->
+  if define.amd
     define [], ->
       factory()
   else
     factory()
-) @, ->
+) ->
 
   class BumperCore
     # Maintain bumper version here...

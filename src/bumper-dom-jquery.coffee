@@ -7,19 +7,18 @@
 # * Licensed under the MIT license.
 ###
 
-((root, factory) ->
-  if typeof define == 'function' && define.amd
+((factory) ->
+  if define.amd
     define [
       'jquery'
-    ], ($) ->
-      factory $
-  else if typeof exports != 'undefined'
-    module.exports = factory jQuery
+      'bumper-core'
+    ], ($, Core) ->
+      factory $, Core
   else
-    factory jQuery
-) @, ($) ->
+    factory window.jQuery, window.Bumper.Core
+) ($, Core) ->
 
-  class BumperDom extends window.Bumper.Core.Module
+  class BumperDom extends Core.Module
     # default options
     options:
       parents: false  # when set to true, searching for elements will be restricted to the parent chain of a root element
