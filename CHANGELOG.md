@@ -1,4 +1,7 @@
 #### CHANGE LOG
+###### 3.1.4
+* support for urls already containing params
+
 ###### 3.1.3
 * fixed issues with requirejs headers
 

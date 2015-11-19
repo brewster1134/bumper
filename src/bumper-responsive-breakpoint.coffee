@@ -8,7 +8,7 @@
 ###
 
 ((factory) ->
-  if typeof define == 'function' && define.amd
+  if define?.amd
     define [
       'bumper-core'
     ], (Core) ->

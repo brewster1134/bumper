@@ -8,7 +8,7 @@
 ###
 
 ((factory) ->
-  if define.amd
+  if define?.amd
     define [
       'jquery'
       'bumper-core'
