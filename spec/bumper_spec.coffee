@@ -275,3 +275,23 @@ describe 'Bumper.Responsive.Image', ->
 
       it 'should create a full url from bumper attributes', ->
         expect(url).to.equal '/spec/bike.jpg?wid=200'
+
+    context 'when url has existing params', ->
+      context 'when params attribute is set', ->
+        before ->
+          $element = $('<div/>')
+            .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg?hei=200'
+            .attr 'data-bumper-responsive-image-url-params', 'wid=200'
+          url = window.Bumper.Responsive.Image.getUrl $element[0]
+
+        it 'should prepend the url params to the params attribute', ->
+          expect(url).to.equal '/spec/bike.jpg?hei=200&wid=200'
+
+      context 'when params attribute is not set', ->
+        before ->
+          $element = $('<div/>')
+            .attr 'data-bumper-responsive-image-url', '/spec/bike.jpg?wid=200'
+          url = window.Bumper.Responsive.Image.getUrl $element[0]
+
+        it 'should prepend the url params to the params attribute', ->
+          expect(url).to.equal '/spec/bike.jpg?wid=200'

@@ -8,7 +8,7 @@
 ###
 
 ((factory) ->
-  if define.amd
+  if define?.amd
     define [
       'bumper-core'
       'bumper-responsive-breakpoint'
@@ -106,6 +106,16 @@
 
       # Log warning if no url is defined
       throw new Error "data-bumper-responsive-image-url[-#{breakpoint}] is not set." unless url
+
+      # preserve any params in the url value
+      # best practice is to keep all url parameters out of the url attribute, but this provides fallback support for special cases
+      urlParams = url.split('?')
+      if urlParams.length > 1
+        url = urlParams[0]
+        params = if params
+          "#{urlParams[1]}&#{params}"
+        else
+          urlParams[1]
 
       # combine params if they are found
       fullUrl = if params then "#{url}?#{params}" else url

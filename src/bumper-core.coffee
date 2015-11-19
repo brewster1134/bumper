@@ -8,16 +8,16 @@
 ###
 
 ((factory) ->
-  if define.amd
+  if define?.amd
     define [], ->
       factory()
   else
     factory()
-) ->
+) () ->
 
   class BumperCore
     # Maintain bumper version here...
-    version: '3.1.2'
+    version: '3.1.4'
 
     # convert strings into a given javascript class type
     #
