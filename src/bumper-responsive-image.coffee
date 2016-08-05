@@ -40,7 +40,8 @@
     resizeAll: ->
       images = document.querySelectorAll '.bumper-responsive-image'
       for image in images
-        @resize image
+        try
+          @resize image
 
       return images
 
