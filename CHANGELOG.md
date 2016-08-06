@@ -1,4 +1,7 @@
 #### CHANGE LOG
+###### 3.1.5
+* exception catching for resizeAll
+
 ###### 3.1.4
 * support for urls already containing params
 
