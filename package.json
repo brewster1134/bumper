@@ -1,18 +1,18 @@
 {
-  "name": "bumper",
+  "name": "express",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
-    "cookie-parser": "~1.4",
-    "debug": "~2.6",
-    "express-coffee-script": "~0.2",
-    "express": "~4.16",
-    "http-errors": "~1.6",
-    "morgan": "~1.9",
-    "node-sass-middleware": "~0.11",
-    "pug": "~2.0"
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "node-sass-middleware": "0.11.0",
+    "pug": "2.0.0-beta11",
+    "webpack": "^4.16.5"
   }
 }

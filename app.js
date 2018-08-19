@@ -4,8 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
-var coffee = require('express-coffee-script');
+
 var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+
 var app = express();
 
 // view engine setup
@@ -22,23 +24,10 @@ app.use(sassMiddleware({
   indentedSyntax: true, // true = .sass and false = .scss
   sourceMap: true
 }));
-app.use(sassMiddleware({
-  src: path.join(__dirname, 'assets'),
-  dest: path.join(__dirname, 'assets'),
-  indentedSyntax: true, // true = .sass and false = .scss
-  sourceMap: true,
-  debug: true
-}));
-app.use(coffee({
-  src: path.join(__dirname, 'public'),
-  dest: path.join(__dirname, 'public'),
-  debug: true,
-  prefix: '/js' // will remove /js from .coffee file path 
-}));
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
