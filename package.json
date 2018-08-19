@@ -1,18 +1,24 @@
 {
-  "name": "express",
+  "name": "bumper",
   "version": "0.0.0",
-  "private": true,
+  "description": "Protect Your Front End",
+  "license": "MIT",
+  "author": "Ryan Brewster <brewster1134@gmail.com>",
+  "repository": "git@github.com:brewster1134/bumper.git",
+  "private": false,
+  "main": "app.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "demo": "node ./server/demo.js"
   },
   "dependencies": {
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.16.0",
-    "http-errors": "~1.6.2",
-    "morgan": "~1.9.0",
-    "node-sass-middleware": "0.11.0",
-    "pug": "2.0.0-beta11",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.9",
+    "express": "^4.16.0",
+    "http-errors": "^1.6.2",
+    "js-yaml": "^3.12.0",
+    "morgan": "^1.9.0",
+    "node-sass-middleware": "^0.11.0",
+    "pug": "^2.0.3",
     "webpack": "^4.16.5"
   }
 }

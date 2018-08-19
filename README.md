@@ -8,5 +8,8 @@
 ### Install
 `yarn`
 
+## Configure
+Customize `config.yaml` for your demo app
+
 ### Run
 `yarn start`
