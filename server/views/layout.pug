@@ -2,6 +2,11 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/demo/demo.css')
+    link(rel='stylesheet', href='/foo/foo.css')
+    link(rel='stylesheet', href='/bar/bar.css')
   body
     block content
+    script(src='/demo/demo.js')
+    script(src='/foo/foo.js')
+    script(src='/bar/bar.js')
