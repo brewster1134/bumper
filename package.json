@@ -6,19 +6,25 @@
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "repository": "git@github.com:brewster1134/bumper.git",
   "private": false,
-  "main": "app.js",
   "scripts": {
     "demo": "node ./server/demo.js"
   },
   "dependencies": {
-    "cookie-parser": "^1.4.3",
-    "debug": "^2.6.9",
-    "express": "^4.16.0",
-    "http-errors": "^1.6.2",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "coffee-loader": "^0.9.0",
+    "coffeescript": "^2.3.1",
+    "css-loader": "^1.0.0",
+    "express": "^4.16.3",
     "js-yaml": "^3.12.0",
-    "morgan": "^1.9.0",
-    "node-sass-middleware": "^0.11.0",
+    "mini-css-extract-plugin": "^0.4.2",
+    "node-sass": "^4.9.3",
     "pug": "^2.0.3",
-    "webpack": "^4.16.5"
-  }
+    "sass-loader": "^7.1.0",
+    "webpack": "^4.16.5",
+    "webpack-dev-middleware": "^3.2.0",
+    "write-file-webpack-plugin": "^4.3.2"
+  },
+  "devDependencies": {}
 }
