@@ -9,7 +9,7 @@ module.exports = [
     entry: path.resolve(__dirname, 'server', 'src', 'scripts', 'demo.coffee'),
     output: {
       path: path.resolve(__dirname, 'server', '.dist', 'scripts'),
-      filename: '[name].js'
+      filename: 'demo.js'
     },
     plugins: [
       new Write()
