@@ -6,8 +6,8 @@ Write = require 'write-file-webpack-plugin'
 module.exports =
   mode: 'development'
   entry:
-    demo_scripts: path.resolve 'server', 'scripts', 'demo.coffee'
-    demo_styles: path.resolve 'server', 'styles', 'demo.sass'
+    app_scripts: path.resolve 'server', 'scripts', 'app.coffee'
+    app_styles: path.resolve 'server', 'styles', 'app.sass'
   output:
     path: path.resolve '.tmp'
     filename: '[name].js'

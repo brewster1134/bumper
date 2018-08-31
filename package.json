@@ -7,7 +7,7 @@
   "repository": "git@github.com:brewster1134/bumper.git",
   "private": false,
   "scripts": {
-    "demo": "./scripts/demo.sh"
+    "start": "./scripts/app.sh"
   },
   "dependencies": {
     "babel-core": "^6.26.3",

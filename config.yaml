@@ -1,1 +1,8 @@
-title: 'Your Demo Title'
+# see README.md for details
+app:
+  title:
+  viewEngine:
+env:
+  host:
+  port:
+user:
