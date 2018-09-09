@@ -1,8 +1,9 @@
 doctype html
 html
   head
-    title= title
-    link(rel='stylesheet', href='/app_styles.css')
+    title= config.app.title
+    if helpers.isProd
+      link(rel='stylesheet', href='/app.css')
   body
     block content
-    script(src='/app_scripts.js')
+    script(src='/app.js')

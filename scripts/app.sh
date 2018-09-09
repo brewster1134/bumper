@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# clear tmp directory
+rm -rf $bumper_root_dir/.tmp
+
 # always run app from the same directory, no matter where app.sh is run from
 bumper_root_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
 cd $bumper_root_dir

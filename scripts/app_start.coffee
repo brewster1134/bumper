@@ -1,11 +1,12 @@
 # => DEPENDENCIES
 # ---
 coffee = require 'coffeescript/register'
+debMW = require 'webpack-dev-middleware'
 express = require 'express'
 fs = require 'fs'
+hotMW = require 'webpack-hot-middleware'
 path = require 'path'
 webpack = require 'webpack'
-webpackMiddleware = require 'webpack-dev-middleware'
 yaml = require 'js-yaml'
 
 
@@ -33,19 +34,22 @@ app.set 'view engine', config.app.viewEngine
 app.set 'views', path.join('server', 'views')
 app.locals.config = config
 
-# webpack
-webpackConfig = require path.join(rootPath, 'webpack')
-webpackCompiler = webpack(webpackConfig)
-app.use webpackMiddleware webpackCompiler
-
 # helpers
-app.locals.helpers = require(path.join(rootPath, 'server', 'scripts', 'helpers')) app.locals.config
+helpers = require(path.join(rootPath, 'server', 'scripts', 'helpers')) config
+app.locals.helpers = helpers
+
+# webpack
+webpackConfig = require(path.join(rootPath, 'webpack')) config, helpers
+webpackCompiler = webpack(webpackConfig)
+app.use debMW webpackCompiler
+app.use hotMW webpackCompiler
 
 # routes
-rootRouter = require(path.join(rootPath, 'server', 'routes', 'root')) app.locals.config.app, app.locals.helpers
-libsRouter = require(path.join(rootPath, 'server', 'routes', 'libs')) app.locals.config.app, app.locals.helpers
-app.use '/', rootRouter
-app.use '/libs', libsRouter
+app.use (req, res, next) ->
+  res.locals = app.locals
+  next()
+app.use '/', require(path.join(rootPath, 'server', 'routes', 'root')) helpers
+app.use '/libs', require(path.join(rootPath, 'server', 'routes', 'libs')) helpers
 
 # listen
 app.listen config.env.port, config.env.host, ->

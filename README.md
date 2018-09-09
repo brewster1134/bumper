@@ -22,3 +22,7 @@ You can optionally define a custom configuration by editting `config.yaml`
 
 ### To-Do
 * support additional view engine (https://github.com/tj/consolidate.js)
+* libs
+  * scrape `libs` for `package.json`'s and install their dependencies: `yarn install --cwd [CWD]`
+  * init new webpack compiler for each lib: `webpack [--config webpack.config.js]``
+  * each lib able to shim dependencies

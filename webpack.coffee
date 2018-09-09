@@ -1,22 +1,26 @@
-coffee = require 'coffeescript/register'
 Extract = require 'mini-css-extract-plugin'
 path = require 'path'
-Write = require 'write-file-webpack-plugin'
+webpack = require 'webpack'
 
-module.exports =
+module.exports = (config, helpers) ->
   mode: 'development'
-  entry:
-    app_scripts: path.resolve 'server', 'scripts', 'app.coffee'
-    app_styles: path.resolve 'server', 'styles', 'app.sass'
+  entry: [
+    path.resolve 'server', 'scripts', 'app.coffee'
+    'webpack-hot-middleware/client?reload=true&quiet=true'
+  ]
   output:
-    path: path.resolve '.tmp'
-    filename: '[name].js'
+    filename: 'app.js'
   plugins: [
-    new Write()
     new Extract()
+    new webpack.HotModuleReplacementPlugin()
   ]
   module:
     rules: [
+      test: /\.pug$/
+      use: [
+        loader: 'pug-loader'
+      ]
+    ,
       test: /\.coffee$/
       use: [
         loader: 'babel-loader'
@@ -26,9 +30,9 @@ module.exports =
         loader: 'coffee-loader'
       ]
     ,
-      test: /\.sass/
+      test: /\.sass$/
       use: [
-        loader: Extract.loader
+        loader: if helpers.isProd then Extract.loader else 'style-loader'
       ,
         loader: 'css-loader'
       ,

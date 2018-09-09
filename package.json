@@ -21,10 +21,12 @@
     "mini-css-extract-plugin": "^0.4.2",
     "node-sass": "^4.9.3",
     "pug": "^2.0.3",
+    "pug-loader": "^2.4.0",
     "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
     "webpack": "^4.16.5",
     "webpack-dev-middleware": "^3.2.0",
-    "write-file-webpack-plugin": "^4.3.2"
+    "webpack-hot-middleware": "^2.22.3"
   },
   "devDependencies": {}
 }
