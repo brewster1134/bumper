@@ -13,16 +13,16 @@ yaml = require 'js-yaml'
 # => CONFIGURATION
 # ---
 rootPath = process.cwd()
-userConfig = yaml.safeLoad fs.readFileSync(path.join(rootPath, 'config.yaml'))
+userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
 config =
   app:
     title: userConfig.app.title || 'Bumper'
-    viewEngine: userConfig.app.title || 'pug'
+    templates: userConfig.app.templates || ['pug']
   env:
     host: process.env.BUMPER_HOST || userConfig.env.host || 'localhost'
     port: process.env.BUMPER_PORT || userConfig.env.port || 8383
     rootPath: rootPath
-  user: userConfig.user || new Object
+  libs: userConfig.libs || new Object
 
 
 # => SERVER
@@ -30,7 +30,7 @@ config =
 app = express()
 
 # application
-app.set 'view engine', config.app.viewEngine
+app.set 'view engine', 'pug'
 app.set 'views', path.join('server', 'views')
 app.locals.config = config
 
@@ -39,7 +39,7 @@ helpers = require(path.join(rootPath, 'server', 'scripts', 'helpers')) config
 app.locals.helpers = helpers
 
 # webpack
-webpackConfig = require(path.join(rootPath, 'webpack')) config, helpers
+webpackConfig = require(path.join(rootPath, 'webpack')) helpers
 webpackCompiler = webpack(webpackConfig)
 app.use debMW webpackCompiler
 app.use hotMW webpackCompiler

@@ -1,5 +1,5 @@
 extends layout
 
 block content
-  each lib in libs
-    h2= lib
+  each val, lib in libs
+    div !{val.html.demo}

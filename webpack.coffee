@@ -2,7 +2,7 @@ Extract = require 'mini-css-extract-plugin'
 path = require 'path'
 webpack = require 'webpack'
 
-module.exports = (config, helpers) ->
+module.exports = (helpers) ->
   mode: 'development'
   entry: [
     path.resolve 'server', 'scripts', 'app.coffee'

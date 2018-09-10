@@ -1,10 +1,9 @@
-module.exports = (config) ->
+module.exports = ->
   express = require 'express'
   router = express.Router()
 
   router.get '/', (req, res, next) ->
-    res.render 'root',
-      title: config.title
+    res.render 'root'
 
   return router
 

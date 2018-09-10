@@ -1,39 +1,35 @@
-module.exports = (config) ->
-  express = require 'express'
-  router = express.Router()
+express = require 'express'
+router = express.Router()
 
+module.exports = (helpers) ->
   # ALL: require all libs
-  router.get '/', (req, res, next) ->
-    libs = {}
-    libs.bar = require '../../client/src/bar/bar'
-    console.log 'LIBS!', libs
-    res.render 'libs',
-      libs: libs
 
-  # router.get '/', (req, res, next) ->
-  #   libs = req.params[0].split('/')
-  #   res.render 'root',
-  #     title: config.title
+  # SELECT: require all specified libs
+  router.get '/*', (req, res, next) ->
+    libsNames = req.params[0].split /\W/
+    libs = new Object
+
+    for libName in libsNames
+      lib = libs[libName] =
+        css: new Object
+        html: new Object
+        js: new Object
+
+      # CSS: lib
+
+      # CSS: demo
+
+      # HTML: demo
+      lib.html.demo = helpers.getLibFile libName, 'html', true
+
+      # JS: lib
+
+      # JS: demo
+
+    res.render 'libs',
+      title: Object.keys(libs).join ', '
+      libs: libs
 
   return router
 
 return module.exports
-
-# express = require 'express'
-# router = express.Router()
-#
-# router.get '/', (req, res, next) ->
-#   res.render 'index',
-#     title: 'Express'
-#
-# module.exports = router
-#
-#
-#
-#
-#
-# demo.get('/libs/*', (req, res) => {
-#   var libs = req.params[0].split('/');
-#   res.render('libs', { libs: libs });
-# });
-#

@@ -1,8 +1,8 @@
 # see README.md for details
 app:
   title:
-  viewEngine:
+  templates:
 env:
   host:
   port:
-user:
+libs:

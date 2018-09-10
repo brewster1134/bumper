@@ -1,7 +1,10 @@
 doctype html
 html
   head
-    title= config.app.title
+    title
+      = config.app.title
+      if title
+        = ': ' + title
     if helpers.isProd
       link(rel='stylesheet', href='/app.css')
   body
