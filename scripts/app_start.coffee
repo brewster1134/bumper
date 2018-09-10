@@ -47,6 +47,7 @@ app.use hotMW webpackCompiler
 # routes
 app.use (req, res, next) ->
   res.locals = app.locals
+  res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
 app.use '/', require(path.join(rootPath, 'server', 'routes', 'root')) helpers
 app.use '/libs', require(path.join(rootPath, 'server', 'routes', 'libs')) helpers

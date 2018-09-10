@@ -27,7 +27,7 @@ module.exports = (helpers) ->
       # JS: demo
 
     res.render 'libs',
-      title: Object.keys(libs).join ', '
+      subtitle: Object.keys(libs).join ', '
       libs: libs
 
   return router

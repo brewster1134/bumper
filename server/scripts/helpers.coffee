@@ -1,3 +1,4 @@
+_ = require 'lodash'
 consolidate = require 'consolidate'
 fs = require 'fs'
 path = require 'path'
@@ -6,6 +7,9 @@ module.exports = (config) ->
   class Helper
     isProd: process.env.NODE_ENV == 'production'
     rootPath: config.env.rootPath
+
+    buildTitle: (strings...) ->
+      _.compact(strings).join(': ')
 
     getLibFile: (libName, libType, isDemo) ->
       libRootPath = path.join @rootPath, 'libs', libName

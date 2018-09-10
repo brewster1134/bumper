@@ -2,4 +2,5 @@ extends layout
 
 block content
   each val, lib in libs
+    h1(class='lib')= lib
     div !{val.html.demo}
