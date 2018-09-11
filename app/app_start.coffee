@@ -31,11 +31,11 @@ app = express()
 
 # application
 app.set 'view engine', 'pug'
-app.set 'views', path.join('server', 'views')
+app.set 'views', path.join('app', 'views')
 app.locals.config = config
 
 # helpers
-helpers = require(path.join(rootPath, 'server', 'scripts', 'helpers')) config
+helpers = require(path.join(rootPath, 'app', 'scripts', 'helpers')) config
 app.locals.helpers = helpers
 
 # webpack
@@ -49,8 +49,8 @@ app.use (req, res, next) ->
   res.locals = app.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
-app.use '/', require(path.join(rootPath, 'server', 'routes', 'root')) helpers
-app.use '/libs', require(path.join(rootPath, 'server', 'routes', 'libs')) helpers
+app.use '/', require(path.join(rootPath, 'app', 'routes', 'root')) helpers
+app.use '/libs', require(path.join(rootPath, 'app', 'routes', 'libs')) helpers
 
 # listen
 app.listen config.env.port, config.env.host, ->

@@ -5,7 +5,7 @@ webpack = require 'webpack'
 module.exports = (helpers) ->
   mode: 'development'
   entry: [
-    path.resolve 'server', 'scripts', 'app.coffee'
+    path.resolve 'app', 'scripts', 'app.coffee'
     'webpack-hot-middleware/client?reload=true&quiet=true'
   ]
   output:
