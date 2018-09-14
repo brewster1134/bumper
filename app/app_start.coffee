@@ -35,7 +35,7 @@ app.set 'views', path.join('app', 'views')
 app.locals.config = config
 
 # helpers
-helpers = require(path.join(rootPath, 'app', 'scripts', 'helpers')) config
+helpers = require(path.join(rootPath, 'app', 'libs', 'helpers')) config
 app.locals.helpers = helpers
 
 # webpack

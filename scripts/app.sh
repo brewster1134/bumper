@@ -11,4 +11,4 @@ cd $bumper_root_dir
 yarn run coffee -o $bumper_root_dir/.tmp/app_start.js $bumper_root_dir/app/app_start.coffee
 
 # start the app
-node $bumper_root_dir/.tmp/app_start.js
+nodemon $bumper_root_dir/.tmp/app_start.js
