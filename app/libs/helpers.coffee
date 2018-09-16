@@ -9,17 +9,15 @@ module.exports = (config) ->
     rootPath: config.env.rootPath
 
     # Build a single string from multiple strings
-    # @function
-    # @param {string} - String(s) to be concatenated
-    # @return {string}
+    # @param strings [String] String(s) to be concatenated
+    # @return [String]
     #
     buildTitle: (strings...) ->
       _.compact(strings).join(': ')
 
     # Renders the demo for a given library
-    # * @function
-    # * @param {string} libName - The name of the library
-    # * @return {string} - Raw html
+    # @param libName [String] The name of the library
+    # @return [String] Raw html
     #
     includeDemoHtml: (libName) ->
       rawFile = null
