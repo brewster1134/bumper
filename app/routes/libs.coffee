@@ -1,21 +1,34 @@
 express = require 'express'
+fs = require 'fs'
+path = require 'path'
 router = express.Router()
 
 module.exports = (helpers) ->
-  # ALL: require all libs
+  # ALL: list all libs
+  router.get '/', (req, res, next) ->
+    libsDir = path.join helpers.rootPath, 'libs'
+    libsDirEntries = fs.readdirSync libsDir
+    libs = new Array
 
-  # SELECT: require all specified libs
+    # check libs directory for all subdirectories
+    for entry in libsDirEntries
+      if fs.statSync(path.join(libsDir, entry)).isDirectory()
+        libs.push entry
+
+    res.render 'libs_index',
+      libs: libs
+
+  # SELECT: require user-selected libs
+  router.post '/', (req, res, next) ->
+    libNames = Object.keys(req.body).join '/'
+    res.redirect "/libs/#{libNames}"
+
   router.get '/*', (req, res, next) ->
     libNames = req.params[0].split /\W/
-    libs = new Object
-
-    for libName in libNames
-      lib = libs[libName] =
-        js: "/#{libName}_demo.js"
-        template: helpers.includeDemoHtml libName
+    libs = helpers.buildLibsObject libNames
 
     res.render 'libs',
-      subtitle: Object.keys(libNames).join ', '
+      subtitle: libNames.join ', '
       libs: libs
 
   return router

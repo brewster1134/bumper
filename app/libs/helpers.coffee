@@ -5,6 +5,8 @@ path = require 'path'
 
 module.exports = (config) ->
   class Helper
+    # GLOBAL
+    #
     isProd: process.env.NODE_ENV == 'production'
     rootPath: config.env.rootPath
 
@@ -14,6 +16,24 @@ module.exports = (config) ->
     #
     buildTitle: (strings...) ->
       _.compact(strings).join(': ')
+
+    # ROUTES
+    # -> LIBS
+    #
+
+    # Builds libs object required for the libs route
+    # @param libNames [Array|String] Array of lib names
+    # @return [Object]
+    #
+    buildLibsObject: (libNames) ->
+      libs = new Object
+
+      for libName in libNames
+        lib = libs[libName] =
+          js: "/#{libName}_demo.js"
+          template: @includeDemoHtml libName
+
+      return libs
 
     # Renders the demo for a given library
     # @param libName [String] The name of the library

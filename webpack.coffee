@@ -32,19 +32,12 @@ module.exports = (helpers) ->
         loader: 'babel-loader'
       ]
     ,
-      test: /\.sass$/
+      test: /\.(sass|css)$/
       use: [
         loader: if helpers.isProd then Extract.loader else 'style-loader'
       ,
         loader: 'css-loader'
       ,
         loader: 'sass-loader'
-      ]
-    ,
-      test: /\.css$/
-      use: [
-        loader: if helpers.isProd then Extract.loader else 'style-loader'
-      ,
-        loader: 'css-loader'
       ]
     ]

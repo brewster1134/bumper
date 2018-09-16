@@ -1,6 +1,7 @@
 # => DEPENDENCIES
 # ---
 _ = require 'lodash'
+bodyParser = require 'body-parser'
 coffee = require 'coffeescript/register'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'
@@ -47,6 +48,8 @@ webpackCompiler = webpack(webpackConfig)
 app.use debMW webpackCompiler
 
 # routes
+app.use bodyParser.urlencoded
+  extended: false
 app.use (req, res, next) ->
   res.locals = app.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
