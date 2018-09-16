@@ -6,5 +6,3 @@ module.exports = ->
     res.render 'root'
 
   return router
-
-return module.exports

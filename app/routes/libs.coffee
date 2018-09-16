@@ -6,30 +6,16 @@ module.exports = (helpers) ->
 
   # SELECT: require all specified libs
   router.get '/*', (req, res, next) ->
-    libsNames = req.params[0].split /\W/
+    libNames = req.params[0].split /\W/
     libs = new Object
 
-    for libName in libsNames
+    for libName in libNames
       lib = libs[libName] =
-        css: new Object
-        html: new Object
-        js: new Object
-
-      # CSS: lib
-
-      # CSS: demo
-
-      # HTML: demo
-      lib.html.demo = helpers.getLibFile libName, 'html', true
-
-      # JS: lib
-
-      # JS: demo
+        js: "/#{libName}_demo.js"
+        template: helpers.includeDemoHtml libName
 
     res.render 'libs',
-      subtitle: Object.keys(libs).join ', '
+      subtitle: Object.keys(libNames).join ', '
       libs: libs
 
   return router
-
-return module.exports

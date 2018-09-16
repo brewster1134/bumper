@@ -1,10 +1,10 @@
 # => DEPENDENCIES
 # ---
+_ = require 'lodash'
 coffee = require 'coffeescript/register'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'
 fs = require 'fs'
-hotMW = require 'webpack-hot-middleware'
 path = require 'path'
 webpack = require 'webpack'
 yaml = require 'js-yaml'
@@ -17,7 +17,10 @@ userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
 config =
   app:
     title: userConfig.app.title || 'Bumper'
-    templates: userConfig.app.templates || ['pug']
+    engines:
+      css: _.union userConfig.app.engines.css || new Array, ['sass', 'css']
+      html: _.union userConfig.app.engines.html || new Array, ['pug', 'html']
+      js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
   env:
     host: process.env.BUMPER_HOST || userConfig.env.host || 'localhost'
     port: process.env.BUMPER_PORT || userConfig.env.port || 8383
@@ -42,7 +45,6 @@ app.locals.helpers = helpers
 webpackConfig = require(path.join(rootPath, 'webpack')) helpers
 webpackCompiler = webpack(webpackConfig)
 app.use debMW webpackCompiler
-app.use hotMW webpackCompiler
 
 # routes
 app.use (req, res, next) ->

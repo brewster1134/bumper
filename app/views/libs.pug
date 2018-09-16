@@ -2,5 +2,8 @@ extends layout
 
 block content
   each val, lib in libs
-    h1(class='lib')= lib
-    div !{val.html.demo}
+    div(class='lib' id=lib)
+      h1(class='lib__header')= lib
+      div(class='lib__template')
+        != val.template
+      script(src=val.js)

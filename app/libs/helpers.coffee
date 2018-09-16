@@ -8,32 +8,29 @@ module.exports = (config) ->
     isProd: process.env.NODE_ENV == 'production'
     rootPath: config.env.rootPath
 
+    # Build a single string from multiple strings
+    # @function
+    # @param {string} - String(s) to be concatenated
+    # @return {string}
+    #
     buildTitle: (strings...) ->
       _.compact(strings).join(': ')
 
-    getLibFile: (libName, libType, isDemo) ->
-      libRootPath = path.join @rootPath, 'libs', libName
-      libFileName = if isDemo then "#{libName}_demo" else libName
+    # Renders the demo for a given library
+    # * @function
+    # * @param {string} libName - The name of the library
+    # * @return {string} - Raw html
+    #
+    includeDemoHtml: (libName) ->
       rawFile = null
+      libRootPath = path.join @rootPath, 'libs', libName
 
-      switch libType
-        when 'css'
-          console.log 'get CSS'
+      for engine in config.app.engines.html
+        libFilePath = path.join libRootPath, "#{libName}_demo.#{engine}"
 
-        when 'html'
-          for template in config.app.templates
-            templateFile = path.join libRootPath, "#{libFileName}.#{template}"
-
-            if fs.existsSync templateFile
-              consolidate[template] templateFile, config.libs[libName] || {}, (err, html) ->
-                rawFile = err || html
-              return rawFile
-
-        when 'js'
-          console.log 'get JS'
-
-      return rawFile
+        if fs.existsSync libFilePath
+          consolidate[engine] libFilePath, config.libs[libName] || {}, (err, html) ->
+            rawFile = err || html
+          return rawFile
 
   return new Helper
-
-return module.exports

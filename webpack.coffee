@@ -1,15 +1,14 @@
+entry = require 'webpack-glob-entry'
 Extract = require 'mini-css-extract-plugin'
-path = require 'path'
 webpack = require 'webpack'
 
 module.exports = (helpers) ->
   mode: 'development'
-  entry: [
-    path.resolve 'app', 'scripts', 'app.coffee'
-    'webpack-hot-middleware/client?reload=true&quiet=true'
-  ]
+  entry: entry  "#{helpers.rootPath}/app/scripts/*.coffee",
+                "#{helpers.rootPath}/libs/**/*_demo.coffee",
+                "#{helpers.rootPath}/libs/**/*_demo.js"
   output:
-    filename: 'app.js'
+    filename: '[name].js'
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()
@@ -24,10 +23,13 @@ module.exports = (helpers) ->
       test: /\.coffee$/
       use: [
         loader: 'babel-loader'
-        options:
-          presets: ['babel-preset-env']
       ,
         loader: 'coffee-loader'
+      ]
+    ,
+      test: /\.js$/
+      use: [
+        loader: 'babel-loader'
       ]
     ,
       test: /\.sass$/
@@ -37,5 +39,12 @@ module.exports = (helpers) ->
         loader: 'css-loader'
       ,
         loader: 'sass-loader'
+      ]
+    ,
+      test: /\.css$/
+      use: [
+        loader: if helpers.isProd then Extract.loader else 'style-loader'
+      ,
+        loader: 'css-loader'
       ]
     ]

@@ -1,5 +1,4 @@
 {
-  "verbose": true,
-  "ext": "coffee json",
+  "ext": "coffee",
   "watch": ["app/libs", "app/routes", "webpack.coffee"]
 }

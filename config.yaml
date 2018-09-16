@@ -1,7 +1,10 @@
 # see README.md for details
 app:
   title:
-  templates:
+  engines:
+    css:
+    html:
+    js:
 env:
   host:
   port:
