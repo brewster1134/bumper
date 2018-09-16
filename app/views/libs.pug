@@ -4,6 +4,8 @@ block content
   each val, lib in libs
     div(class='lib' id=lib)
       h1(class='lib__header')= lib
-      div(class='lib__template')
-        != val.template
+      div(class='lib__demo')
+        != val.demo
+      div(class='lib__docs')
+        != val.docs
       script(src=val.js)

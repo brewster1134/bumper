@@ -20,7 +20,7 @@ config =
     title: userConfig.app.title || 'Bumper'
     engines:
       css: _.union userConfig.app.engines.css || new Array, ['sass', 'css']
-      html: _.union userConfig.app.engines.html || new Array, ['pug', 'html']
+      html: _.union userConfig.app.engines.html || new Array, ['pug', 'md', 'html']
       js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
   env:
     host: process.env.BUMPER_HOST || userConfig.env.host || 'localhost'

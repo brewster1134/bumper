@@ -1,6 +1,7 @@
 _ = require 'lodash'
 consolidate = require 'consolidate'
 fs = require 'fs'
+markdown = require 'marked'
 path = require 'path'
 
 module.exports = (config) ->
@@ -21,6 +22,9 @@ module.exports = (config) ->
     # -> LIBS
     #
 
+    getLibPath: (libName) ->
+      path.join @rootPath, 'libs', libName
+
     # Builds libs object required for the libs route
     # @param libNames [Array|String] Array of lib names
     # @return [Object]
@@ -30,8 +34,15 @@ module.exports = (config) ->
 
       for libName in libNames
         lib = libs[libName] =
+
+          # js demo file path
           js: "/#{libName}_demo.js"
-          template: @includeDemoHtml libName
+
+          # demo html
+          demo: @renderDemoHtml libName
+
+          # documentation
+          docs: @renderDocsHtml libName
 
       return libs
 
@@ -39,16 +50,36 @@ module.exports = (config) ->
     # @param libName [String] The name of the library
     # @return [String] Raw html
     #
-    includeDemoHtml: (libName) ->
-      rawFile = null
-      libRootPath = path.join @rootPath, 'libs', libName
+    renderDemoHtml: (libName) ->
+      compiledHtml = null
 
       for engine in config.app.engines.html
-        libFilePath = path.join libRootPath, "#{libName}_demo.#{engine}"
+        libFilePath = path.join @getLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
           consolidate[engine] libFilePath, config.libs[libName] || {}, (err, html) ->
-            rawFile = err || html
-          return rawFile
+            compiledHtml = html unless err
+          break
+
+      return compiledHtml
+
+    renderDocsHtml: (libName) ->
+      compiledHtml = null
+
+      for engine in config.app.engines.html
+        libFilePath = path.join @getLibPath(libName), "#{libName}_docs.#{engine}"
+
+        if fs.existsSync libFilePath
+          fileContents = fs.readFileSync libFilePath, 'utf8'
+
+          switch engine
+            when 'md'
+              compiledHtml = markdown fileContents,
+                breaks: true
+                gfm: true
+
+          break
+
+      return compiledHtml
 
   return new Helper
