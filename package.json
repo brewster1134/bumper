@@ -5,10 +5,11 @@
   "license": "MIT",
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "repository": "git@github.com:brewster1134/bumper.git",
-  "private": false,
+  "private": true,
   "scripts": {
     "start": "./scripts/app.sh"
   },
+  "workspaces": ["libs/*"],
   "dependencies": {
     "@babel/core": "^7.0.1",
     "babel-loader": "^8.0.2",

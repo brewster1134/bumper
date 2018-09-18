@@ -24,8 +24,8 @@ You can optionally define a custom configuration by editting `config.yaml`
 ### Run
 `yarn start`
 
-### To-Do
-* libs  q
-  * scrape `libs` for `package.json`'s and install their dependencies: `yarn install --cwd [CWD]`
-  * init new webpack compiler for each lib: `webpack [--config webpack.config.js]``
-  * each lib able to shim dependencies
+## LIB DEVELOPMENT
+##### How to create a library
+
+### Dependencies
+* `yarn workspace [LIB] add [NPM_PACKAGE]`
