@@ -6,8 +6,9 @@ path = require 'path'
 
 module.exports = (config) ->
   class Helper
-    # GLOBAL
-    #
+
+    # => GLOBAL
+    # ---
     isProd: process.env.NODE_ENV == 'production'
     rootPath: config.env.rootPath
 
@@ -15,46 +16,48 @@ module.exports = (config) ->
     # @param strings [String] String(s) to be concatenated
     # @return [String]
     #
-    buildTitle: (strings...) ->
-      _.compact(strings).join(': ')
+    buildTitle: (strings...) -> _.compact(strings).join(': ')
 
-    # ROUTES
-    # -> LIBS
+
+    # => LIBS
+    # ---
+    # Get path to a specific lib directory
+    # @param libName [String] Name of a library
+    # @return [String] Absolute path to the library
     #
-
-    getLibPath: (libName) ->
+    libsGetPath: (libName) ->
       path.join @rootPath, 'libs', libName
 
     # Builds libs object required for the libs route
-    # @param libNames [Array|String] Array of lib names
+    # @param libNames [Array<String>] Array of lib names
     # @return [Object]
     #
-    buildLibsObject: (libNames) ->
+    libsBuildObject: (libNames) ->
       libs = new Object
 
       for libName in libNames
-        lib = libs[libName] =
+        libs[libName] =
 
           # js demo file path
           js: "/#{libName}_demo.js"
 
           # demo html
-          demo: @renderDemoHtml libName
+          demo: @libsRenderDemoHtml libName
 
           # documentation
-          docs: @renderDocsHtml libName
+          docs: @libsRenderDocsHtml libName
 
       return libs
 
     # Renders the demo for a given library
-    # @param libName [String] The name of the library
+    # @param libName [String] Name of a library
     # @return [String] Raw html
     #
-    renderDemoHtml: (libName) ->
+    libsRenderDemoHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.app.engines.html
-        libFilePath = path.join @getLibPath(libName), "#{libName}_demo.#{engine}"
+        libFilePath = path.join @libsGetPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
           consolidate[engine] libFilePath, config.libs[libName] || {}, (err, html) ->
@@ -63,11 +66,15 @@ module.exports = (config) ->
 
       return compiledHtml
 
-    renderDocsHtml: (libName) ->
+    # Renders the documentation for a given library
+    # @param libName [String] Name of a library
+    # @return [String] Raw html
+    #
+    libsRenderDocsHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.app.engines.html
-        libFilePath = path.join @getLibPath(libName), "#{libName}_docs.#{engine}"
+        libFilePath = path.join @libsGetPath(libName), "#{libName}_docs.#{engine}"
 
         if fs.existsSync libFilePath
           fileContents = fs.readFileSync libFilePath, 'utf8'
