@@ -1,9 +1,12 @@
 entry = require 'webpack-glob-entry'
 Extract = require 'mini-css-extract-plugin'
+nodeExternals = require 'webpack-node-externals'
 webpack = require 'webpack'
 
 module.exports = (helpers) ->
   mode: 'development'
+  target: 'node'
+  externals: [nodeExternals()]
   entry: entry  "#{helpers.rootPath}/app/scripts/*.coffee",
                 "#{helpers.rootPath}/libs/**/*_demo.coffee",
                 "#{helpers.rootPath}/libs/**/*_demo.js"

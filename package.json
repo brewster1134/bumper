@@ -6,10 +6,15 @@
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "repository": "git@github.com:brewster1134/bumper.git",
   "private": true,
-  "scripts": {
-    "start": "./scripts/app.sh"
+  "bin": {
+    "bumper": "./bin/bumper"
   },
-  "workspaces": ["libs/*"],
+  "scripts": {
+    "bumper": "./bin/bumper"
+  },
+  "workspaces": [
+    "libs/*"
+  ],
   "dependencies": {
     "@babel/core": "^7.0.1",
     "babel-loader": "^8.0.2",
@@ -27,10 +32,12 @@
     "pug": "^2.0.3",
     "pug-loader": "^2.4.0",
     "sass-loader": "^7.1.0",
+    "shelljs": "^0.8.2",
     "style-loader": "^0.23.0",
     "webpack": "^4.16.5",
     "webpack-dev-middleware": "^3.3.0",
-    "webpack-glob-entry": "^2.1.1"
-  },
-  "devDependencies": {}
+    "webpack-glob-entry": "^2.1.1",
+    "webpack-node-externals": "^1.7.2",
+    "yargs": "^12.0.2"
+  }
 }
