@@ -26,6 +26,7 @@ config =
   env:
     host: process.env.BUMPER_HOST || userConfig.env.host || argv.host
     port: process.env.BUMPER_PORT || userConfig.env.port || argv.port
+    tests: userConfig.env.tests || argv.tests == 'true'
     rootPath: rootPath
   libs: userConfig.libs || new Object
 

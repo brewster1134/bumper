@@ -8,6 +8,7 @@ block content
         != val.demo
       div(class='lib__docs')
         != val.docs
-      div(class='lib__test')
-        != val.test
+      if val.test
+        div(class='lib__test')
+          != val.test
       script(src=val.js)

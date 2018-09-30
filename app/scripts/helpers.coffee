@@ -98,6 +98,8 @@ module.exports = (config) ->
     # @return [String] Raw html
     #
     libsRenderTestHtml: (libName) ->
+      return false unless config.env.tests
+
       jestConfigFile = path.join @rootPath, 'jest.js'
       testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
 
