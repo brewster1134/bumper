@@ -3,6 +3,7 @@ consolidate = require 'consolidate'
 fs = require 'fs'
 markdown = require 'marked'
 path = require 'path'
+shell = require 'shelljs'
 
 module.exports = (config) ->
   class Helper
@@ -47,6 +48,9 @@ module.exports = (config) ->
           # documentation
           docs: @libsRenderDocsHtml libName
 
+          # test report
+          test: @libsRenderTestHtml libName
+
       return libs
 
     # Renders the demo for a given library
@@ -88,5 +92,17 @@ module.exports = (config) ->
           break
 
       return compiledHtml
+
+    # Renders the test results
+    # @param libName [String] Name of a library
+    # @return [String] Raw html
+    #
+    libsRenderTestHtml: (libName) ->
+      jestConfigFile = path.join @rootPath, 'jest.js'
+      testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
+
+      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/libs/#{libName}/#{libName}_test.js'"
+
+      return fs.readFileSync testReportFile, 'utf8'
 
   return new Helper
