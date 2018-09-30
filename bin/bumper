@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# always run app from the same directory, no matter where the script is called from
+bumper_root_dir=$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )
+
+# delete the tmp directory
+rm -rf $bumper_root_dir/.tmp
+
+yarn run -s coffee -o $bumper_root_dir/.tmp/bumper.js $bumper_root_dir/bin/bumper.coffee
+node $bumper_root_dir/.tmp/bumper.js $@

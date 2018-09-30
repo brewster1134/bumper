@@ -1,6 +1,7 @@
 # => DEPENDENCIES
 # ---
 _ = require 'lodash'
+argv = require('yargs-parser') process.argv.slice 2
 bodyParser = require 'body-parser'
 coffee = require 'coffeescript/register'
 debMW = require 'webpack-dev-middleware'
@@ -23,8 +24,8 @@ config =
       html: _.union userConfig.app.engines.html || new Array, ['pug', 'md', 'html']
       js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
   env:
-    host: process.env.BUMPER_HOST || userConfig.env.host || 'localhost'
-    port: process.env.BUMPER_PORT || userConfig.env.port || 8383
+    host: process.env.BUMPER_HOST || userConfig.env.host || argv.host
+    port: process.env.BUMPER_PORT || userConfig.env.port || argv.port
     rootPath: rootPath
   libs: userConfig.libs || new Object
 
