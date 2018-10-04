@@ -2,3 +2,7 @@
 .tmp
 node_modules
 yarn-error.log
+
+# ignore all user files, but keep the directory structure
+libs/*
+!libs/_demo

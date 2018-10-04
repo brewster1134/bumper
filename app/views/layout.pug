@@ -4,6 +4,8 @@ html
     title= helpers.buildTitle(config.app.title, locals.view, subtitle)
     if helpers.isProd
       link(rel='stylesheet', href='/app.css')
-  body
+      link(rel='stylesheet', href='/_demo.css')
+  body(id=locals.view)
     block content
     script(src='/app.js')
+    script(src='/_demo.js')

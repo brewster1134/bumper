@@ -1,2 +1,2 @@
-import url from '../styles/app.sass'
+import '../styles/app.sass'
 console.log 'app.coffee'
