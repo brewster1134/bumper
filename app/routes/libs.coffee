@@ -6,7 +6,7 @@ router = express.Router()
 module.exports = (helpers) ->
   # ALL: list all libs
   router.get '/', (req, res, next) ->
-    libsDir = path.join helpers.rootPath, 'libs'
+    libsDir = path.join helpers.rootPath, 'user', 'libs'
     libsDirEntries = fs.readdirSync libsDir
     libs = new Array
 

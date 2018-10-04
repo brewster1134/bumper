@@ -27,7 +27,7 @@ module.exports = (config) ->
     # @return [String] Absolute path to the library
     #
     libsGetPath: (libName) ->
-      path.join @rootPath, 'libs', libName
+      path.join @rootPath, 'user', 'libs', libName
 
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names

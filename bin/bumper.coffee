@@ -21,8 +21,8 @@ yargs
       desc: 'Show tests in the demo (slower)'
       type: 'boolean'
   , (args) ->
-    shell.exec 'yarn run -s coffee --bare --no-header -o ./.tmp/app.js ./app/app.coffee'
-    shell.exec "yarn run -s nodemon .tmp/app.js --host=#{args.host} --port=#{args.port} --tests=#{args.tests}"
+    shell.exec 'yarn run -s coffee --bare --no-header -o ./.tmp/start.js ./app/start.coffee'
+    shell.exec "yarn run -s nodemon .tmp/start.js --host=#{args.host} --port=#{args.port} --tests=#{args.tests}"
 
   .command 'lib', 'Manage your libraries', (yargs) ->
     yargs.command 'new [NAME]', 'Create a new library skeleton', (yargs) ->
