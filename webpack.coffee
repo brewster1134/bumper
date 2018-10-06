@@ -7,10 +7,7 @@ module.exports = (helpers) ->
   mode: 'development'
   target: 'node'
   externals: [nodeExternals()]
-  entry: entry  "#{helpers.rootPath}/app/scripts/app.coffee",
-                "#{helpers.rootPath}/user/app/scripts/user_app.coffee",
-                "#{helpers.rootPath}/user/libs/**/*_demo.coffee",
-                "#{helpers.rootPath}/user/libs/**/*_demo.js"
+  entry: entry helpers.webpackGetEntries()...
   output:
     filename: '[name].js'
   plugins: [

@@ -6,17 +6,8 @@ router = express.Router()
 module.exports = (helpers) ->
   # ALL: list all libs
   router.get '/', (req, res, next) ->
-    libsDir = path.join helpers.rootPath, 'user', 'libs'
-    libsDirEntries = fs.readdirSync libsDir
-    libs = new Array
-
-    # check libs directory for all subdirectories
-    for entry in libsDirEntries
-      if fs.statSync(path.join(libsDir, entry)).isDirectory()
-        libs.push entry
-
     res.render 'libs_index',
-      libs: libs
+      libs: helpers.libsGetPaths()
 
   # SELECT: require user-selected libs
   router.post '/', (req, res, next) ->

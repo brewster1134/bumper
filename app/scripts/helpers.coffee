@@ -20,15 +20,43 @@ module.exports = (config) ->
     buildTitle: (strings...) -> _.compact(strings).join(': ')
 
 
+    # => WEBPACK
+    # ---
+    webpackGetEntries: ->
+      entries = [
+        "#{@rootPath}/app/scripts/app.coffee"
+        "#{@rootPath}/user/app/scripts/user_app.coffee"
+      ]
+    
+      libs = @libsGetPaths()
+      for lib in libs
+        entries.push "#{@rootPath}/user/libs/#{lib}/#{lib}.js"
+        entries.push "#{@rootPath}/user/libs/#{lib}/#{lib}.coffee"
+      
+      return entries
+
+
     # => LIBS
     # ---
+    libsGetPaths: ->
+      libsDir = path.join @rootPath, 'user', 'libs'
+      libsDirEntries = fs.readdirSync libsDir
+      libs = new Array
+
+      # check libs directory for all subdirectories
+      for entry in libsDirEntries
+        if fs.statSync(path.join(libsDir, entry)).isDirectory()
+          libs.push entry
+      
+      return libs
+
     # Get path to a specific lib directory
     # @param libName [String] Name of a library
     # @return [String] Absolute path to the library
     #
     libsGetPath: (libName) ->
       path.join @rootPath, 'user', 'libs', libName
-
+      
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names
     # @return [Object]
@@ -40,7 +68,7 @@ module.exports = (config) ->
         libs[libName] =
 
           # js demo file path
-          js: "/#{libName}_demo.js"
+          js: "/#{libName}.js"
 
           # demo html
           demo: @libsRenderDemoHtml libName
@@ -102,8 +130,11 @@ module.exports = (config) ->
 
       jestConfigFile = path.join @rootPath, 'jest.js'
       testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
-
-      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/libs/#{libName}/#{libName}_test.js'"
+      
+      # # 
+      # if fs.existsSync libFilePath
+      
+      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/user/libs/#{libName}/#{libName}_test.js'"
 
       return fs.readFileSync testReportFile, 'utf8'
 
