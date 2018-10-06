@@ -52,6 +52,7 @@ app.use debMW webpackCompiler
 # routes
 app.use bodyParser.urlencoded
   extended: false
+app.use express.static path.join(rootPath, 'app', 'images')
 app.use (req, res, next) ->
   res.locals = app.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
