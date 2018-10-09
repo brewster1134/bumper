@@ -55,3 +55,24 @@ bumper lib new [LIB_NAME]
 # add dependencies to your library
 bumper lib depend [LIB_NAME] [NPM_PACKAGE(S)]
 ```
+
+# TODO:
+* CLI
+  * bumper lib new
+  * bumper lib depend
+  * bumper version new
+  * bumper version list
+* FEATURES
+  * entire project versioning & individual lib versioning
+  *
+  * feature diff
+  * route for libs/* or libs/all
+  * build all libs seperately
+  * build all libs together
+  * build select libs together
+  * generate config file
+* API
+  * script tag e.g. /bumper.js?foo:1.2.3,bar:latest
+* VENDORED
+  * atrackt
+* make it prettier
