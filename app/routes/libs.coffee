@@ -16,7 +16,7 @@ module.exports = (helpers) ->
 
   router.get '/*', (req, res, next) ->
     libNames = req.params[0].split /\W/
-    libs = helpers.libsBuildObject libNames
+    libs = await helpers.libsBuildObject libNames, req
 
     res.render 'libs',
       subtitle: libNames.join ', '

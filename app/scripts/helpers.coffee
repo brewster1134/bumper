@@ -1,6 +1,8 @@
 _ = require 'lodash'
+async = require 'async'
 consolidate = require 'consolidate'
 fs = require 'fs'
+http = require 'http'
 markdown = require 'marked'
 path = require 'path'
 shell = require 'shelljs'
@@ -20,22 +22,6 @@ module.exports = (config) ->
     buildTitle: (strings...) -> _.compact(strings).join(': ')
 
 
-    # => WEBPACK
-    # ---
-    webpackGetEntries: ->
-      entries = [
-        "#{@rootPath}/app/scripts/app.coffee"
-        "#{@rootPath}/user/app/scripts/user_app.coffee"
-      ]
-    
-      libs = @libsGetPaths()
-      for lib in libs
-        entries.push "#{@rootPath}/user/libs/#{lib}/#{lib}.js"
-        entries.push "#{@rootPath}/user/libs/#{lib}/#{lib}.coffee"
-      
-      return entries
-
-
     # => LIBS
     # ---
     libsGetPaths: ->
@@ -47,7 +33,7 @@ module.exports = (config) ->
       for entry in libsDirEntries
         if fs.statSync(path.join(libsDir, entry)).isDirectory()
           libs.push entry
-      
+
       return libs
 
     # Get path to a specific lib directory
@@ -56,12 +42,12 @@ module.exports = (config) ->
     #
     libsGetPath: (libName) ->
       path.join @rootPath, 'user', 'libs', libName
-      
+
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names
     # @return [Object]
     #
-    libsBuildObject: (libNames) ->
+    libsBuildObject: (libNames, request) ->
       libs = new Object
 
       for libName in libNames
@@ -77,7 +63,7 @@ module.exports = (config) ->
           docs: @libsRenderDocsHtml libName
 
           # test report
-          test: @libsRenderTestHtml libName
+          test: await @libsRenderTestHtml libName, request
 
       return libs
 
@@ -125,17 +111,24 @@ module.exports = (config) ->
     # @param libName [String] Name of a library
     # @return [String] Raw html
     #
-    libsRenderTestHtml: (libName) ->
+    libsRenderTestHtml: (libName, request) ->
       return false unless config.env.tests
 
+      testFileUrl =  "#{request.protocol}://#{config.env.host}:#{config.env.port}/#{libName}_test.js"
+      testFile = fs.createWriteStream path.join @rootPath, '.tmp', "#{libName}_test.js"
       jestConfigFile = path.join @rootPath, 'jest.js'
       testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
-      
-      # # 
-      # if fs.existsSync libFilePath
-      
-      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/user/libs/#{libName}/#{libName}_test.js'"
 
-      return fs.readFileSync testReportFile, 'utf8'
+      # download the test file
+      await new Promise (resolve) ->
+        http.get testFileUrl, (response) ->
+          response.pipe testFile
+          resolve()
+
+      # run the test
+      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
+
+      # get the test results
+      fs.readFileSync testReportFile, 'utf8'
 
   return new Helper
