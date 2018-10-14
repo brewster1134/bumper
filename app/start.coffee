@@ -58,7 +58,7 @@ app.use (req, res, next) ->
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
 app.use '/', require(path.join(rootPath, 'app', 'routes', 'root')) helpers
-app.use '/libs', require(path.join(rootPath, 'app', 'routes', 'libs')) helpers
+app.use '/demo', require(path.join(rootPath, 'app', 'routes', 'demo')) helpers
 
 # listen
 app.listen config.env.port, config.env.host, ->

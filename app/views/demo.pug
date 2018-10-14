@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  each val, lib in libs
+    div(class='lib' id=lib)
+      h1(class='lib__header')= lib
+      div(class='lib__demo')
+        != val.demo
+      div(class='lib__docs')
+        != val.docs
+      if val.test
+        div(class='lib__test')
+          != val.test
+      script(src=val.js)

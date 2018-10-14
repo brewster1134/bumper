@@ -1,9 +1,0 @@
-extends layout
-
-block content
-  form(method='POST')
-    each lib in libs
-      label
-        input(type='checkbox' name=lib value=lib)
-        = lib
-    button(type='submit') Submit

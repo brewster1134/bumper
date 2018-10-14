@@ -22,9 +22,9 @@ module.exports = (config) ->
     buildTitle: (strings...) -> _.compact(strings).join(': ')
 
 
-    # => LIBS
+    # => DEMO
     # ---
-    libsGetPaths: ->
+    demoGetLibPaths: ->
       libsDir = path.join @rootPath, 'user', 'libs'
       libsDirEntries = fs.readdirSync libsDir
       libs = new Array
@@ -40,14 +40,14 @@ module.exports = (config) ->
     # @param libName [String] Name of a library
     # @return [String] Absolute path to the library
     #
-    libsGetPath: (libName) ->
+    demoGetLibPath: (libName) ->
       path.join @rootPath, 'user', 'libs', libName
 
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names
     # @return [Object]
     #
-    libsBuildObject: (libNames, request) ->
+    demoBuildLibObject: (libNames) ->
       libs = new Object
 
       for libName in libNames
@@ -57,13 +57,13 @@ module.exports = (config) ->
           js: "/#{libName}.js"
 
           # demo html
-          demo: @libsRenderDemoHtml libName
+          demo: @demoGetDemoHtml libName
 
           # documentation
-          docs: @libsRenderDocsHtml libName
+          docs: @demoGetDocsHtml libName
 
           # test report
-          test: await @libsRenderTestHtml libName, request
+          test: @demoGetTestHtml libName
 
       return libs
 
@@ -71,11 +71,11 @@ module.exports = (config) ->
     # @param libName [String] Name of a library
     # @return [String] Raw html
     #
-    libsRenderDemoHtml: (libName) ->
+    demoGetDemoHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.app.engines.html
-        libFilePath = path.join @libsGetPath(libName), "#{libName}_demo.#{engine}"
+        libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
           consolidate[engine] libFilePath, config.libs[libName] || {}, (err, html) ->
@@ -88,11 +88,11 @@ module.exports = (config) ->
     # @param libName [String] Name of a library
     # @return [String] Raw html
     #
-    libsRenderDocsHtml: (libName) ->
+    demoGetDocsHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.app.engines.html
-        libFilePath = path.join @libsGetPath(libName), "#{libName}_docs.#{engine}"
+        libFilePath = path.join @demoGetLibPath(libName), "#{libName}_docs.#{engine}"
 
         if fs.existsSync libFilePath
           fileContents = fs.readFileSync libFilePath, 'utf8'
@@ -111,14 +111,14 @@ module.exports = (config) ->
     # @param libName [String] Name of a library
     # @return [String] Raw html
     #
-    libsRenderTestHtml: (libName, request) ->
+    demoGetTestHtml: (libName) ->
       return false unless config.env.tests
 
       jestConfigFile = path.join @rootPath, 'jest.js'
       testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
 
       # run the test
-      shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
+      shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
 
       # get the test results
       fs.readFileSync testReportFile, 'utf8'
