@@ -10,7 +10,6 @@ module.exports = (helpers) ->
   target: 'node'
   externals: [nodeExternals()]
   entry: entry  path.join(helpers.rootPath, 'app', 'scripts', 'app.coffee'),
-                path.join(helpers.rootPath, 'user', 'app', 'scripts', 'user_app.coffee'),
                 path.join(helpers.rootPath, 'user', 'libs', '**', '*.coffee'),
                 path.join(helpers.rootPath, 'user', 'libs', '**', '*.js')
   output:

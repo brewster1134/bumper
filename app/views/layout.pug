@@ -5,9 +5,7 @@ html
     include _favicon
     if helpers.isProd
       link(rel='stylesheet', href='/app.css')
-      link(rel='stylesheet', href='/user_app.css')
   body(id=locals.view)
     include _header.pug
     block content
     script(src='/app.js')
-    script(src='/user_app.js')
