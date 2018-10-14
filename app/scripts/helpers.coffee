@@ -114,16 +114,8 @@ module.exports = (config) ->
     libsRenderTestHtml: (libName, request) ->
       return false unless config.env.tests
 
-      testFileUrl =  "#{request.protocol}://#{config.env.host}:#{config.env.port}/#{libName}_test.js"
-      testFile = fs.createWriteStream path.join @rootPath, '.tmp', "#{libName}_test.js"
       jestConfigFile = path.join @rootPath, 'jest.js'
       testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
-
-      # download the test file
-      await new Promise (resolve) ->
-        http.get testFileUrl, (response) ->
-          response.pipe testFile
-          resolve()
 
       # run the test
       shell.exec "yarn run jest --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"

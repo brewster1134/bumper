@@ -1,6 +1,5 @@
 entry = require 'webpack-glob-entry'
 Extract = require 'mini-css-extract-plugin'
-nodeExternals = require 'webpack-node-externals'
 path = require 'path'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
@@ -8,7 +7,6 @@ Write = require 'write-file-webpack-plugin'
 module.exports = (helpers) ->
   mode: 'development'
   target: 'node'
-  externals: [nodeExternals()]
   entry: entry  path.join(helpers.rootPath, 'app', 'scripts', 'app.coffee'),
                 path.join(helpers.rootPath, 'user', 'libs', '**', '*.coffee'),
                 path.join(helpers.rootPath, 'user', 'libs', '**', '*.js')

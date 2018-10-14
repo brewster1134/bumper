@@ -45,14 +45,14 @@ helpers = require(path.join(rootPath, 'app', 'scripts', 'helpers')) config
 app.locals.helpers = helpers
 
 # webpack
-webpackConfig = require(path.join(rootPath, 'webpack')) helpers
+webpackConfig = require(path.join(rootPath, 'webpack.app')) helpers
 webpackCompiler = webpack(webpackConfig)
 app.use debMW webpackCompiler
 
 # routes
 app.use bodyParser.urlencoded
   extended: false
-app.use express.static path.join(rootPath, 'app', 'images')
+app.use express.static path.join rootPath, 'app', 'images'
 app.use (req, res, next) ->
   res.locals = app.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
