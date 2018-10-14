@@ -4,9 +4,10 @@ yargs = require 'yargs'
 
 yargs
   .scriptName 'bumper'
-  
+  .showHelpOnFail true
+
   # start the server
-  .command ['start'], 'Start your Bumper demo', (yargs) ->
+  .command 'start', 'Start your Bumper demo', (yargs) ->
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
@@ -48,5 +49,8 @@ yargs
     regexLibs = args.libs.join '|'
     child.exec "yarn run jest --colors --testMatch '**/libs/(#{regexLibs})/(#{regexLibs})_test.js'", (error, stdout, stderr) ->
       console.log stderr
-  
+
+  .command '*', '', (yargs) ->
+    yargs.showHelp()
+
   .argv

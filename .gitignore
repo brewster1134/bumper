@@ -1,7 +1,7 @@
 .DS_Store
 .tmp
+*.log
 node_modules
-yarn-error.log
 
 # ignore all user files, but keep the directory structure
 user/libs/**

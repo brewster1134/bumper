@@ -1,21 +1,26 @@
 entry = require 'webpack-glob-entry'
 Extract = require 'mini-css-extract-plugin'
 nodeExternals = require 'webpack-node-externals'
+path = require 'path'
 webpack = require 'webpack'
+Write = require 'write-file-webpack-plugin'
 
 module.exports = (helpers) ->
   mode: 'development'
   target: 'node'
   externals: [nodeExternals()]
-  entry: entry  "#{helpers.rootPath}/app/scripts/app.coffee",
-                "#{helpers.rootPath}/user/app/scripts/user_app.coffee",
-                "#{helpers.rootPath}/user/libs/**/*.coffee"
-                "#{helpers.rootPath}/user/libs/**/*.js"
+  entry: entry  path.join(helpers.rootPath, 'app', 'scripts', 'app.coffee'),
+                path.join(helpers.rootPath, 'user', 'app', 'scripts', 'user_app.coffee'),
+                path.join(helpers.rootPath, 'user', 'libs', '**', '*.coffee'),
+                path.join(helpers.rootPath, 'user', 'libs', '**', '*.js')
   output:
     filename: '[name].js'
+    path: path.join helpers.rootPath, '.tmp'
+
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()
+    new Write()
   ]
   module:
     rules: [
