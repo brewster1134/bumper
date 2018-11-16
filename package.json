@@ -7,13 +7,10 @@
   "repository": "git@github.com:brewster1134/bumper.git",
   "private": true,
   "bin": {
-    "bumper": "./bin/bumper"
-  },
-  "scripts": {
-    "bumper": "./bin/bumper"
+    "bumper": "./cli/bumper"
   },
   "workspaces": [
-    "libs/*"
+    "user/libs/*"
   ],
   "dependencies": {
     "@babel/core": "^7.0.1",
@@ -37,6 +34,7 @@
     "shelljs": "^0.8.2",
     "style-loader": "^0.23.0",
     "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.2",
     "webpack-dev-middleware": "^3.3.0",
     "webpack-glob-entry": "^2.1.1",
     "webpack-node-externals": "^1.7.2",

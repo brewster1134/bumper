@@ -64,7 +64,8 @@ bumper lib depend [LIB_NAME] [NPM_PACKAGE(S)]
   * bumper version list
 * FEATURES
   * entire project versioning & individual lib versioning
-  *
+  * generate & assign permanent identifiers for labeling objects
+    * the idea is for a designer to label e.g. a button with #A1 that represents a particular style
   * feature diff
   * route for libs/* or libs/all
   * build all libs seperately

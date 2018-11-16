@@ -1,4 +1,3 @@
-child = require 'child_process'
 shell = require 'shelljs'
 yargs = require 'yargs'
 
@@ -20,11 +19,10 @@ yargs
       type: 'number'
     yargs.option 'tests',
       default: false
-      desc: 'Show tests in the demo (slower)'
+      desc: 'Enable showing test results in the demo (slower)'
       type: 'boolean'
   , (args) ->
-    shell.exec 'yarn run -s coffee --bare --no-header -o ./.tmp/start.js ./app/start.coffee'
-    shell.exec "yarn run -s nodemon .tmp/start.js --host=#{args.host} --port=#{args.port} --tests=#{args.tests}"
+    shell.exec "yarn run -s nodemon ./app/start.coffee --host=#{args.host} --port=#{args.port} --tests=#{args.tests}"
 
   # libs
   .command 'lib', 'Manage your libraries', (yargs) ->
@@ -42,15 +40,15 @@ yargs
   .command 'test', 'Run your tests', (yargs) ->
     yargs.options 'libs',
       alias: 'l'
-      default: '**'
+      default: '.+'
       desc: 'One or more library names to test'
       type: 'array'
   , (args) ->
     regexLibs = args.libs.join '|'
-    child.exec "yarn run jest --colors --testMatch '**/libs/(#{regexLibs})/(#{regexLibs})_test.js'", (error, stdout, stderr) ->
-      console.log stderr
+    shell.exec 'yarn run -s webpack --silent --config ./webpack.test.coffee'
+    shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
 
-  .command '*', '', (yargs) ->
-    yargs.showHelp()
-
+  # if no command is passed
+  .demandCommand 1, 'No Command was passed'
+  .help()
   .argv

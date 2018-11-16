@@ -6,6 +6,6 @@ html
     if helpers.isProd
       link(rel='stylesheet', href='/app.css')
   body(id=locals.view)
-    include _header.pug
+    include _header
     block content
     script(src='/app.js')
