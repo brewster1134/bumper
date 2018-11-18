@@ -1,11 +1,11 @@
 # see README.md for details
+name:
 app:
-  title:
+  host:
+  port:
+  tests:
   engines:
     css:
     html:
     js:
-env:
-  host:
-  port:
 libs:

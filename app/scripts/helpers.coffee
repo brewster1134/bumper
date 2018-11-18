@@ -12,8 +12,8 @@ module.exports = (config) ->
 
     # => GLOBAL
     # ---
+    config: config
     isProd: process.env.NODE_ENV == 'production'
-    rootPath: config.env.rootPath
 
     # Build a single string from multiple strings
     # @param strings [String] String(s) to be concatenated
@@ -24,8 +24,11 @@ module.exports = (config) ->
 
     # => DEMO
     # ---
-    demoGetLibPaths: ->
-      libsDir = path.join @rootPath, 'user', 'libs'
+    # Get all lib names
+    # @return [Array<String>] Array of lib names
+    #
+    demoGetLibs: ->
+      libsDir = path.join config.rootPath, 'user', 'libs'
       libsDirEntries = fs.readdirSync libsDir
       libs = new Array
 
@@ -41,7 +44,7 @@ module.exports = (config) ->
     # @return [String] Absolute path to the library
     #
     demoGetLibPath: (libName) ->
-      path.join @rootPath, 'user', 'libs', libName
+      path.join config.rootPath, 'user', 'libs', libName
 
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names
@@ -112,10 +115,10 @@ module.exports = (config) ->
     # @return [String] Raw html
     #
     demoGetTestHtml: (libName) ->
-      return false unless config.env.tests
+      return false unless config.app.tests
 
-      jestConfigFile = path.join @rootPath, 'jest.js'
-      testReportFile = path.join @rootPath, '.tmp', 'test-report.html'
+      jestConfigFile = path.join config.rootPath, 'jest.js'
+      testReportFile = path.join config.rootPath, '.tmp', 'test-report.html'
 
       # run the test
       shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"

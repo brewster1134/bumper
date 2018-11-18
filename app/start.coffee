@@ -17,17 +17,16 @@ yaml = require 'js-yaml'
 rootPath = process.cwd()
 userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
 config =
+  name: userConfig.name || 'Bumper'
+  rootPath: rootPath
   app:
-    title: userConfig.app.title || 'Bumper'
+    host: process.env.BUMPER_HOST || userConfig.app.host || argv.host
+    port: process.env.BUMPER_PORT || userConfig.app.port || argv.port
+    tests: userConfig.app.tests || argv.tests == 'true'
     engines:
       css: _.union userConfig.app.engines.css || new Array, ['sass', 'css']
       html: _.union userConfig.app.engines.html || new Array, ['pug', 'md', 'html']
       js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
-  env:
-    host: process.env.BUMPER_HOST || userConfig.env.host || argv.host
-    port: process.env.BUMPER_PORT || userConfig.env.port || argv.port
-    tests: userConfig.env.tests || argv.tests == 'true'
-    rootPath: rootPath
   libs: userConfig.libs || new Object
 
 
@@ -61,5 +60,5 @@ app.use '/', require(path.join(rootPath, 'app', 'routes', 'root')) helpers
 app.use '/demo', require(path.join(rootPath, 'app', 'routes', 'demo')) helpers
 
 # listen
-app.listen config.env.port, config.env.host, ->
-  console.log "Bumper app running at #{config.env.host}:#{config.env.port}"
+app.listen config.app.port, config.app.host, ->
+  console.log "Bumper app running at #{config.app.host}:#{config.app.port}"

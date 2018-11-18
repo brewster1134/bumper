@@ -9,6 +9,9 @@
   "bin": {
     "bumper": "./cli/bumper"
   },
+  "scripts": {
+    "app": "coffee ./cli/bumper.coffee $@"
+  },
   "workspaces": [
     "user/libs/*"
   ],

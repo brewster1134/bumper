@@ -9,12 +9,12 @@ module.exports = (helpers) ->
   mode: 'development'
   target: 'node'
   externals: [nodeExternals()]
-  entry: entry  path.join(helpers.rootPath, 'app', 'scripts', 'app.coffee'),
-                path.join(helpers.rootPath, 'user', 'libs', '**', '*.coffee'),
-                path.join(helpers.rootPath, 'user', 'libs', '**', '*.js')
+  entry: entry  path.join(helpers.config.rootPath, 'app', 'scripts', 'app.coffee'),
+                path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.coffee'),
+                path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.js')
   output:
     filename: '[name].js'
-    path: path.join helpers.rootPath, '.tmp'
+    path: path.join helpers.config.rootPath, '.tmp'
 
   plugins: [
     new Extract()

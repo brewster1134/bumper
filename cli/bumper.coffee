@@ -1,28 +1,43 @@
+fs = require 'fs'
+nodemon = require 'nodemon'
+path = require 'path'
 shell = require 'shelljs'
+yaml = require 'js-yaml'
 yargs = require 'yargs'
+
+rootPath = process.cwd()
+userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
+config =
+  name: userConfig.name || 'Bumper'
 
 yargs
   .scriptName 'bumper'
   .showHelpOnFail true
 
-  # start the server
-  .command 'start', 'Start your Bumper demo', (yargs) ->
+  # start the app
+  .command 'start', "Start your #{config.name} demo", (yargs) ->
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
-      desc: 'Host to run the server on'
+      desc: 'Host to run the app on'
       type: 'string'
     yargs.option 'port',
       alias: 'p'
       default: 8383
-      desc: 'Port to run the server on'
+      desc: 'Port to run the app on'
       type: 'number'
     yargs.option 'tests',
       default: false
       desc: 'Enable showing test results in the demo (slower)'
       type: 'boolean'
   , (args) ->
-    shell.exec "yarn run -s nodemon ./app/start.coffee --host=#{args.host} --port=#{args.port} --tests=#{args.tests}"
+    nodemon
+      script: './app/start.coffee'
+      args: [
+        "--host=#{args.host}"
+        "--port=#{args.port}"
+        "--tests=#{args.tests}"
+      ]
 
   # libs
   .command 'lib', 'Manage your libraries', (yargs) ->

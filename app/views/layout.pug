@@ -1,7 +1,7 @@
 doctype html
 html
   head
-    title= helpers.buildTitle(config.app.title, locals.view, subtitle)
+    title= helpers.buildTitle(config.name, locals.view, subtitle)
     include _favicon
     if helpers.isProd
       link(rel='stylesheet', href='/app.css')
