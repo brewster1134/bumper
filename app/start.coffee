@@ -1,33 +1,16 @@
 # => DEPENDENCIES
 # ---
-_ = require 'lodash'
 argv = require('yargs-parser') process.argv.slice 2
 bodyParser = require 'body-parser'
-coffee = require 'coffeescript/register'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'
-fs = require 'fs'
 path = require 'path'
 webpack = require 'webpack'
-yaml = require 'js-yaml'
 
 
 # => CONFIGURATION
 # ---
-rootPath = process.cwd()
-userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
-config =
-  name: userConfig.name || 'Bumper'
-  rootPath: rootPath
-  app:
-    host: process.env.BUMPER_HOST || userConfig.app.host || argv.host
-    port: process.env.BUMPER_PORT || userConfig.app.port || argv.port
-    tests: userConfig.app.tests || argv.tests == 'true'
-    engines:
-      css: _.union userConfig.app.engines.css || new Array, ['sass', 'css']
-      html: _.union userConfig.app.engines.html || new Array, ['pug', 'md', 'html']
-      js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
-  libs: userConfig.libs || new Object
+config = JSON.parse argv.config
 
 
 # => SERVER
@@ -40,24 +23,25 @@ app.set 'views', path.join('app', 'views')
 app.locals.config = config
 
 # helpers
-helpers = require(path.join(rootPath, 'app', 'scripts', 'helpers')) config
+helpers = require(path.join(config.rootPath, 'app', 'scripts', 'helpers')) config
 app.locals.helpers = helpers
 
 # webpack
-webpackConfig = require(path.join(rootPath, 'webpack.app')) helpers
+webpackConfig = require(path.join(config.rootPath, 'webpack.app')) helpers
 webpackCompiler = webpack(webpackConfig)
 app.use debMW webpackCompiler
 
 # routes
 app.use bodyParser.urlencoded
   extended: false
-app.use express.static path.join rootPath, 'app', 'images'
+app.use express.static path.join config.rootPath, 'app', 'images'
 app.use (req, res, next) ->
   res.locals = app.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
-app.use '/', require(path.join(rootPath, 'app', 'routes', 'root')) helpers
-app.use '/demo', require(path.join(rootPath, 'app', 'routes', 'demo')) helpers
+app.use '/', require(path.join(config.rootPath, 'app', 'routes', 'root')) helpers
+app.use '/build', require(path.join(config.rootPath, 'app', 'routes', 'build')) helpers
+app.use '/demo', require(path.join(config.rootPath, 'app', 'routes', 'demo')) helpers
 
 # listen
 app.listen config.app.port, config.app.host, ->

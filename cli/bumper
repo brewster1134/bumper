@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 bumper_root_dir=$(dirname $(readlink $BASH_SOURCE))/..
-cd $bumper_root_dir && yarn run --silent app $@
+cd $bumper_root_dir && yarn run --silent coffee ./cli/bumper.coffee $@

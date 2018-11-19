@@ -1,21 +1,11 @@
-fs = require 'fs'
-nodemon = require 'nodemon'
-path = require 'path'
-shell = require 'shelljs'
-yaml = require 'js-yaml'
 yargs = require 'yargs'
-
-rootPath = process.cwd()
-userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
-config =
-  name: userConfig.name || 'Bumper'
 
 yargs
   .scriptName 'bumper'
   .showHelpOnFail true
 
   # start the app
-  .command 'start', "Start your #{config.name} demo", (yargs) ->
+  .command 'start', 'Start the Bumper demo', (yargs) ->
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
@@ -31,13 +21,21 @@ yargs
       desc: 'Enable showing test results in the demo (slower)'
       type: 'boolean'
   , (args) ->
+    nodemon = require 'nodemon'
+    config = require('../lib/config')
+      app:
+        host: args.host
+        port: args.port
+        tests: args.tests
+
     nodemon
       script: './app/start.coffee'
-      args: [
-        "--host=#{args.host}"
-        "--port=#{args.port}"
-        "--tests=#{args.tests}"
-      ]
+      args: [ "--config='#{JSON.stringify(config)}'" ]
+    .on 'restart', (files) ->
+      console.log 'App restarted due to changes to', files.toString()
+    .on 'quit', ->
+      console.log "\nApp has quit"
+      process.exit()
 
   # libs
   .command 'lib', 'Manage your libraries', (yargs) ->
@@ -59,6 +57,8 @@ yargs
       desc: 'One or more library names to test'
       type: 'array'
   , (args) ->
+    shell = require 'shelljs'
+
     regexLibs = args.libs.join '|'
     shell.exec 'yarn run -s webpack --silent --config ./webpack.test.coffee'
     shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
