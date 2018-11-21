@@ -5,10 +5,12 @@ yaml = require 'js-yaml'
 
 module.exports = (args) ->
   rootPath = process.cwd()
-  userConfig = yaml.safeLoad fs.readFileSync path.join(rootPath, 'config.yaml')
+  userConfig = yaml.safeLoad fs.readFileSync path.join rootPath, 'config.yaml'
+  name = userConfig.name || 'Bumper'
 
   config =
-    name: userConfig.name || 'Bumper'
+    name: name.replace /\s/g, ''
+    nameSafe: name.toLowerCase().replace /\W/g, ''
     rootPath: rootPath
     demo:
       host: process.env.BUMPER_HOST || userConfig.demo.host || args.demo.host

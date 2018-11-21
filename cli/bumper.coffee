@@ -2,7 +2,11 @@ yargs = require 'yargs'
 
 yargs
   .scriptName 'bumper'
-  .showHelpOnFail true
+
+  # command callback format
+  # * require dependencies
+  # * require config w/ custom options
+  # * require and run associated lib
 
   # start the demo
   .command 'demo', 'Start the Bumper demo', (yargs) ->
@@ -37,6 +41,7 @@ yargs
       console.log "\nDemo has quit"
       process.exit()
 
+
   # libs
   .command 'lib', 'Manage your libraries', (yargs) ->
     yargs.command 'new [NAME]', 'Create a new library skeleton', (yargs) ->
@@ -49,6 +54,7 @@ yargs
       yargs.positional 'packages',
         desc: 'NPM packages the library depends on (seperated by spaces)'
 
+
   # tests
   .command 'test', 'Run your tests', (yargs) ->
     yargs.options 'libs',
@@ -60,10 +66,17 @@ yargs
     shell = require 'shelljs'
 
     regexLibs = args.libs.join '|'
-    shell.exec 'yarn run -s webpack --silent --config ./webpack_test.coffee'
+    shell.exec 'yarn run -s webpack --silent --config ./lib/test_webpack.coffee'
     shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
+
 
   # if no command is passed
   .demandCommand 1, 'No Command was passed'
-  .help()
+
+  # if unsupported command is passed
+  .strict()
+  .fail (msg, err) ->
+    yargs.showHelp()
+    console.log "\n=> #{msg.toUpperCase()} <=\n"
+
   .argv
