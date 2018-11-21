@@ -30,10 +30,10 @@ bumper help
 
 ### Configure
 You can optionally define a custom configuration by editing `config.yaml`
-* _name:_ The name of your app _[default: `Bumper`]_
-* *app:*
-  * _host:_ The host for your app _[default: `localhost`]_
-  * _port:_ The port for your app _[default: `8383`]_
+* _name:_ The name of your demo _[default: `Bumper`]_
+* *demo:*
+  * _host:_ The host for your demo _[default: `localhost`]_
+  * _port:_ The port for your demo _[default: `8383`]_
   * _tests:_ Enables test results in the demo _[default: `false`]_
   * _engines:_ Array of engines (in order of priority) to render your markup - [supported engines](https://github.com/tj/consolidate.js#supported-template-engines)
     * _css:_ _[default: `['sass', 'css']`]_

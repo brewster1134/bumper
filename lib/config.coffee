@@ -10,12 +10,12 @@ module.exports = (args) ->
   config =
     name: userConfig.name || 'Bumper'
     rootPath: rootPath
-    app:
-      host: process.env.BUMPER_HOST || userConfig.app.host || args.app.host
-      port: process.env.BUMPER_PORT || userConfig.app.port || args.app.port
-      tests: userConfig.app.tests || args.app.tests
+    demo:
+      host: process.env.BUMPER_HOST || userConfig.demo.host || args.demo.host
+      port: process.env.BUMPER_PORT || userConfig.demo.port || args.demo.port
+      tests: userConfig.demo.tests || args.demo.tests
       engines:
-        css: _.union userConfig.app.engines.css || new Array, ['sass', 'css']
-        html: _.union userConfig.app.engines.html || new Array, ['pug', 'md', 'html']
-        js: _.union userConfig.app.engines.js || new Array, ['coffee', 'js']
+        css: _.union userConfig.demo.engines.css || new Array, ['sass', 'css']
+        html: _.union userConfig.demo.engines.html || new Array, ['pug', 'md', 'html']
+        js: _.union userConfig.demo.engines.js || new Array, ['coffee', 'js']
     libs: userConfig.libs || new Object

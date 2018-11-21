@@ -9,7 +9,7 @@ module.exports = (helpers) ->
   mode: 'development'
   target: 'node'
   externals: [nodeExternals()]
-  entry: entry  path.join(helpers.config.rootPath, 'app', 'scripts', 'app.coffee'),
+  entry: entry  path.join(helpers.config.rootPath, 'demo', 'scripts', 'demo.coffee'),
                 path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.coffee'),
                 path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.js')
   output:

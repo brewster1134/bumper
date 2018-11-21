@@ -1,6 +1,6 @@
 # see README.md for details
 name:
-app:
+demo:
   host:
   port:
   tests:

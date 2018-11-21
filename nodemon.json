@@ -1,4 +1,4 @@
 {
   "ext": "coffee",
-  "watch": ["app/routes", "app/scripts", "cli", "webpack.coffee"]
+  "watch": ["demo/routes", "demo/scripts", "cli"]
 }

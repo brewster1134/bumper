@@ -77,7 +77,7 @@ module.exports = (config) ->
     demoGetDemoHtml: (libName) ->
       compiledHtml = null
 
-      for engine in config.app.engines.html
+      for engine in config.demo.engines.html
         libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
@@ -94,7 +94,7 @@ module.exports = (config) ->
     demoGetDocsHtml: (libName) ->
       compiledHtml = null
 
-      for engine in config.app.engines.html
+      for engine in config.demo.engines.html
         libFilePath = path.join @demoGetLibPath(libName), "#{libName}_docs.#{engine}"
 
         if fs.existsSync libFilePath
@@ -115,7 +115,7 @@ module.exports = (config) ->
     # @return [String] Raw html
     #
     demoGetTestHtml: (libName) ->
-      return false unless config.app.tests
+      return false unless config.demo.tests
 
       jestConfigFile = path.join config.rootPath, 'jest.js'
       testReportFile = path.join config.rootPath, '.tmp', 'test-report.html'

@@ -1,5 +1,10 @@
 extends layout
 
+block header
+  form(method='POST' action='/build')
+    input(type='hidden' name='libs' value=Object.keys(libs).toString())
+    button(type='submit') Build
+
 block content
   each val, lib in libs
     div.lib(id=lib)

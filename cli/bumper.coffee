@@ -4,17 +4,17 @@ yargs
   .scriptName 'bumper'
   .showHelpOnFail true
 
-  # start the app
-  .command 'start', 'Start the Bumper demo', (yargs) ->
+  # start the demo
+  .command 'demo', 'Start the Bumper demo', (yargs) ->
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
-      desc: 'Host to run the app on'
+      desc: 'Host to run the demo on'
       type: 'string'
     yargs.option 'port',
       alias: 'p'
       default: 8383
-      desc: 'Port to run the app on'
+      desc: 'Port to run the demo on'
       type: 'number'
     yargs.option 'tests',
       default: false
@@ -23,18 +23,18 @@ yargs
   , (args) ->
     nodemon = require 'nodemon'
     config = require('../lib/config')
-      app:
+      demo:
         host: args.host
         port: args.port
         tests: args.tests
 
     nodemon
-      script: './app/start.coffee'
+      script: './lib/demo.coffee'
       args: [ "--config='#{JSON.stringify(config)}'" ]
     .on 'restart', (files) ->
-      console.log 'App restarted due to changes to', files.toString()
+      console.log 'Demo restarted due to changes to', files.toString()
     .on 'quit', ->
-      console.log "\nApp has quit"
+      console.log "\nDemo has quit"
       process.exit()
 
   # libs
@@ -60,7 +60,7 @@ yargs
     shell = require 'shelljs'
 
     regexLibs = args.libs.join '|'
-    shell.exec 'yarn run -s webpack --silent --config ./webpack.test.coffee'
+    shell.exec 'yarn run -s webpack --silent --config ./webpack_test.coffee'
     shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
 
   # if no command is passed
