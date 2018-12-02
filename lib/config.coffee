@@ -8,7 +8,7 @@ module.exports = (args) ->
 
   config =
     rootPath: process.cwd()
-    name: name.replace /\s/g, ''
+    name: name
     nameSafe: name.toLowerCase().replace /\W/g, ''
     demo:
       host: process.env.BUMPER_HOST || userConfig.demo.host || args.demo.host

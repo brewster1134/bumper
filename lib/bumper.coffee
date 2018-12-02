@@ -38,7 +38,7 @@ yargs
 
     nodemon
       script: './lib/demo.coffee'
-      args: [ "--config='#{JSON.stringify(config)}'" ]
+      args: [ "--config=#{JSON.stringify(config)}" ]
     .on 'restart', (files) ->
       console.log 'Demo restarted due to changes to', files.toString()
     .on 'quit', ->
