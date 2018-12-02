@@ -1,4 +1,8 @@
+path = require 'path'
 yargs = require 'yargs'
+
+# run everything from bumper root
+process.chdir path.resolve __dirname, '..'
 
 yargs
   .scriptName 'bumper'

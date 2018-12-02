@@ -28,7 +28,7 @@ module.exports = (config) ->
     # @return [Array<String>] Array of lib names
     #
     demoGetLibs: ->
-      libsDir = path.join config.rootPath, 'user', 'libs'
+      libsDir = path.join 'user', 'libs'
       libsDirEntries = fs.readdirSync libsDir
       libs = new Array
 
@@ -44,7 +44,7 @@ module.exports = (config) ->
     # @return [String] Absolute path to the library
     #
     demoGetLibPath: (libName) ->
-      path.join config.rootPath, 'user', 'libs', libName
+      path.join 'user', 'libs', libName
 
     # Builds libs object required for the libs route
     # @param libNames [Array<String>] Array of lib names
@@ -117,8 +117,8 @@ module.exports = (config) ->
     demoGetTestHtml: (libName) ->
       return false unless config.demo.tests
 
-      jestConfigFile = path.join config.rootPath, 'jest.js'
-      testReportFile = path.join config.rootPath, '.tmp', 'test-report.html'
+      jestConfigFile = path.join 'jest.js'
+      testReportFile = path.join '.tmp', 'test-report.html'
 
       # run the test
       shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
