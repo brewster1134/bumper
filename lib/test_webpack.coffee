@@ -4,16 +4,14 @@ Write = require 'write-file-webpack-plugin'
 
 module.exports = (helpers) ->
   mode: 'none'
-  entry: entry  path.join(__dirname, 'user', 'libs', '**', '*_test.coffee'),
-                path.join(__dirname, 'user', 'libs', '**', '*_test.js')
+  entry: entry  path.join(__dirname, '..', 'user', 'libs', '**', '*_test.coffee'),
+                path.join(__dirname, '..', 'user', 'libs', '**', '*_test.js')
   output:
     filename: '[name].js'
     path: path.join __dirname, '.tmp'
-
   plugins: [
     new Write()
   ]
-
   module:
     rules: [
       test: /\.coffee$/

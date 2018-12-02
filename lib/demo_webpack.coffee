@@ -15,7 +15,6 @@ module.exports = (helpers) ->
   output:
     filename: '[name].js'
     path: path.join helpers.config.rootPath, '.tmp'
-
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()

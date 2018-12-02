@@ -48,7 +48,7 @@ yargs
       yargs.positional 'name',
         desc: 'The name of the new library'
 
-    yargs.command 'depend [LIB_NAME] [PACKAGES]', 'Create a new library skeleton', (yargs) ->
+    yargs.command 'depend [LIB_NAME] [PACKAGES]', 'Add dependencies to your library', (yargs) ->
       yargs.positional 'name',
         desc: 'The name of the library'
       yargs.positional 'packages',
