@@ -19,7 +19,7 @@ demo = express()
 
 # demo
 demo.set 'view engine', 'pug'
-demo.set 'views', path.join('demo', 'views')
+demo.set 'views', path.join 'demo', 'views'
 demo.locals.config = config
 
 # helpers
@@ -28,7 +28,7 @@ demo.locals.helpers = helpers
 
 # webpack
 webpackConfig = require(path.join(config.rootPath, 'lib', 'demo_webpack')) helpers
-webpackCompiler = webpack(webpackConfig)
+webpackCompiler = webpack webpackConfig
 demo.use debMW webpackCompiler
 
 # routes
@@ -40,8 +40,9 @@ demo.use (req, res, next) ->
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
 demo.use '/', require(path.join(config.rootPath, 'demo', 'routes', 'root')) helpers
+demo.use '/build', require(path.join(config.rootPath, 'demo', 'routes', 'build')) helpers
 demo.use '/demo', require(path.join(config.rootPath, 'demo', 'routes', 'demo')) helpers
 
 # listen
 demo.listen config.demo.port, config.demo.host, ->
-  console.log "Bumper demo running at #{config.demo.host}:#{config.demo.port}"
+  console.log "#{config.name} demo running at #{config.demo.host}:#{config.demo.port}"
