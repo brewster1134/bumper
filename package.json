@@ -16,6 +16,7 @@
     "@babel/core": "^7",
     "babel-loader": "^8",
     "body-parser": "^1",
+    "chalk": "^2",
     "coffee-loader": "^0",
     "coffeescript": "^2",
     "consolidate": "^0",

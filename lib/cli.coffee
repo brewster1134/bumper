@@ -1,11 +1,24 @@
+chalk = require 'chalk'
 path = require 'path'
 yargs = require 'yargs'
 
 # run everything from bumper root
 process.chdir path.resolve __dirname, '..'
 
+flair = chalk.bold '------======------'
+
 yargs
-  .scriptName 'bumper'
+  .scriptName chalk.bold 'bumper'
+  .example 'bumper demo help'
+  .usage flair
+  .epilogue flair
+  .strict()
+
+  # if missing or unsupported command is passed
+  .demandCommand 1, 'No Command was passed'
+  .fail (msg, err) ->
+    yargs.showHelp()
+    console.log chalk.red "\n=> #{msg.toUpperCase()} <=\n"
 
   # command callback format
   # * require dependencies
@@ -26,7 +39,7 @@ yargs
       type: 'number'
     yargs.option 'tests',
       default: false
-      desc: 'Enable showing test results in the demo (slower)'
+      desc: 'Show test results (slower)'
       type: 'boolean'
   , (args) ->
     nodemon = require 'nodemon'
@@ -72,15 +85,5 @@ yargs
     regexLibs = args.libs.join '|'
     shell.exec 'yarn run -s webpack --silent --config ./lib/test_webpack.coffee'
     shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
-
-
-  # if no command is passed
-  .demandCommand 1, 'No Command was passed'
-
-  # if unsupported command is passed
-  .strict()
-  .fail (msg, err) ->
-    yargs.showHelp()
-    console.log "\n=> #{msg.toUpperCase()} <=\n"
 
   .argv
