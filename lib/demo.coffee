@@ -27,7 +27,7 @@ helpers = require(path.join(config.rootPath, 'demo', 'scripts', 'helpers')) conf
 demo.locals.helpers = helpers
 
 # webpack
-webpackConfig = require(path.join(config.rootPath, 'lib', 'demo_webpack')) helpers
+webpackConfig = require(path.join(config.rootPath, 'lib', 'demo_webpack')) config
 webpackCompiler = webpack webpackConfig
 demo.use debMW webpackCompiler
 

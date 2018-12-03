@@ -5,16 +5,16 @@ path = require 'path'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
-module.exports = (helpers) ->
+module.exports = (config) ->
   mode: 'development'
   target: 'node'
   externals: [nodeExternals()]
-  entry: entry  path.join(helpers.config.rootPath, 'demo', 'scripts', 'demo.coffee'),
-                path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.coffee'),
-                path.join(helpers.config.rootPath, 'user', 'libs', '**', '*.js')
+  entry: entry  path.join(config.rootPath, 'demo', 'scripts', 'demo.coffee'),
+                path.join(config.rootPath, 'user', 'libs', '**', '*.coffee'),
+                path.join(config.rootPath, 'user', 'libs', '**', '*.js')
   output:
     filename: '[name].js'
-    path: path.join helpers.config.rootPath, '.tmp'
+    path: path.join config.rootPath, '.tmp'
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()
@@ -41,7 +41,7 @@ module.exports = (helpers) ->
     ,
       test: /\.(sass|css)$/
       use: [
-        loader: if helpers.isProd then Extract.loader else 'style-loader'
+        loader: if config.isProd then Extract.loader else 'style-loader'
       ,
         loader: 'css-loader'
       ,

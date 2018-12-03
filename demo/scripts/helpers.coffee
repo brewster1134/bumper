@@ -13,7 +13,6 @@ module.exports = (config) ->
     # => GLOBAL
     # ---
     config: config
-    isProd: process.env.NODE_ENV == 'production'
 
     # Build a single string from multiple strings
     # @param strings [String] String(s) to be concatenated
@@ -55,9 +54,8 @@ module.exports = (config) ->
 
       for libName in libNames
         libs[libName] =
-
-          # js demo file path
-          js: "/#{libName}.js"
+          # css demo file path
+          css: "/#{libName}.css"
 
           # demo html
           demo: @demoGetDemoHtml libName
@@ -67,6 +65,9 @@ module.exports = (config) ->
 
           # test report
           test: @demoGetTestHtml libName
+
+          # js demo file path
+          js: "/#{libName}.js"
 
       return libs
 
