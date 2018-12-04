@@ -1,4 +1,0 @@
-{
-  "ext": "coffee",
-  "watch": ["cli", "demo/routes", "demo/scripts", "lib", "user/libs"]
-}

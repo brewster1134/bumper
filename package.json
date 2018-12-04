@@ -7,7 +7,7 @@
   "repository": "git@github.com:brewster1134/bumper.git",
   "private": true,
   "bin": {
-    "bumper": "./cli/bumper"
+    "bumper": "./bin/bumper"
   },
   "workspaces": [
     "user/libs/*"

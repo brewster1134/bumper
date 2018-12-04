@@ -1,5 +1,7 @@
 # see README.md for details
 name:
+
+# root key for each cli command
 demo:
   host:
   port:
@@ -8,4 +10,7 @@ demo:
     css:
     html:
     js:
+
 libs:
+
+test:

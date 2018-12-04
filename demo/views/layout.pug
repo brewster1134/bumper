@@ -1,9 +1,9 @@
 doctype html
 html
   head
-    title= helpers.buildTitle(config.name, locals.view, subtitle)
+    title= helpers.buildTitle(helpers.config.name, locals.view, subtitle)
     include _favicon
-    if config.isProd
+    if helpers.config.isProd
       link(rel='stylesheet', href='/demo.css')
   body(id=locals.view)
     include _header

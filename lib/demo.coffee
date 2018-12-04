@@ -4,8 +4,12 @@ argv = require('yargs-parser') process.argv.slice 2
 bodyParser = require 'body-parser'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'
+Extract = require 'mini-css-extract-plugin'
+glob = require 'webpack-glob-entry'
+nodeExternals = require 'webpack-node-externals'
 path = require 'path'
 webpack = require 'webpack'
+Write = require 'write-file-webpack-plugin'
 
 
 # => CONFIGURATION
@@ -13,23 +17,64 @@ webpack = require 'webpack'
 config = JSON.parse argv.config
 
 
+# => WEBPACK
+# ---
+webpackCompiler = webpack
+  mode: 'development'
+  target: 'node'
+  externals: [nodeExternals()]
+  entry: glob path.join(config.rootPath, 'demo', 'scripts', 'demo.coffee'),
+              path.join(config.rootPath, 'user', 'libs', '**', '*.coffee'),
+              path.join(config.rootPath, 'user', 'libs', '**', '*.js')
+  output:
+    filename: '[name].js'
+    path: path.join config.rootPath, '.tmp'
+  plugins: [
+    new Extract()
+    new webpack.HotModuleReplacementPlugin()
+    new Write()
+  ]
+  module:
+    rules: [
+      test: /\.pug$/
+      use: [
+        loader: 'pug-loader'
+      ]
+    ,
+      test: /\.coffee$/
+      use: [
+        loader: 'babel-loader'
+      ,
+        loader: 'coffee-loader'
+      ]
+    ,
+      test: /\.js$/
+      use: [
+        loader: 'babel-loader'
+      ]
+    ,
+      test: /\.(sass|css)$/
+      use: [
+        loader: if config.isProd then Extract.loader else 'style-loader'
+      ,
+        loader: 'css-loader'
+      ,
+        loader: 'sass-loader'
+      ]
+    ]
+
 # => SERVER
 # ---
 demo = express()
+demo.use debMW webpackCompiler
 
-# demo
+# config
 demo.set 'view engine', 'pug'
 demo.set 'views', path.join 'demo', 'views'
-demo.locals.config = config
 
 # helpers
 helpers = require(path.join(config.rootPath, 'demo', 'scripts', 'helpers')) config
 demo.locals.helpers = helpers
-
-# webpack
-webpackConfig = require(path.join(config.rootPath, 'lib', 'demo_webpack')) config
-webpackCompiler = webpack webpackConfig
-demo.use debMW webpackCompiler
 
 # routes
 demo.use bodyParser.urlencoded

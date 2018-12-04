@@ -8,7 +8,7 @@ block header
 block content
   each val, lib in libs
     div.lib(id=lib)
-      if config.isProd
+      if helpers.config.isProd
         link(rel='stylesheet' href=val.css)
       h1.lib__header= lib
       div.lib__demo

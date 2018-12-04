@@ -20,13 +20,8 @@ yargs
     yargs.showHelp()
     console.log chalk.red "\n=> #{msg.toUpperCase()} <=\n"
 
-  # command callback format
-  # * require dependencies
-  # * require config w/ custom options
-  # * require and run associated lib
-
   # start the demo
-  .command 'demo', 'Start the Bumper demo', (yargs) ->
+  .command 'demo', 'Start the demo', (yargs) ->
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
@@ -51,13 +46,20 @@ yargs
 
     nodemon
       script: './lib/demo.coffee'
-      args: [ "--config=#{JSON.stringify(config)}" ]
+      ext: 'coffee,js'
+      args: [ "--config='#{JSON.stringify(config)}'" ]
+      watch: [
+        'demo/routes'
+        'demo/scripts'
+        'lib/demo.coffee'
+        'user/demo/scripts'
+        'user/libs'
+      ]
     .on 'restart', (files) ->
-      console.log 'Demo restarted due to changes to', files.toString()
+      console.log "#{config.name} demo restarted due to changes to", files.toString()
     .on 'quit', ->
-      console.log "\nDemo has quit"
+      console.log "\n#{config.name} demo has quit"
       process.exit()
-
 
   # libs
   .command 'lib', 'Manage your libraries', (yargs) ->
@@ -71,7 +73,6 @@ yargs
       yargs.positional 'packages',
         desc: 'NPM packages the library depends on (seperated by spaces)'
 
-
   # tests
   .command 'test', 'Run your tests', (yargs) ->
     yargs.options 'libs',
@@ -80,10 +81,9 @@ yargs
       desc: 'One or more library names to test'
       type: 'array'
   , (args) ->
-    shell = require 'shelljs'
-
-    regexLibs = args.libs.join '|'
-    shell.exec 'yarn run -s webpack --silent --config ./lib/test_webpack.coffee'
-    shell.exec "yarn run jest --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
+    config = require('../lib/config')
+      test:
+        foo: 'bar'
+    require('./test.coffee') config, args
 
   .argv
