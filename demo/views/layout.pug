@@ -3,7 +3,7 @@ html
   head
     title= helpers.buildTitle(helpers.config.name, locals.view, subtitle)
     include _favicon
-    if helpers.config.isProd
+    if helpers.config.prod
       link(rel='stylesheet', href='/demo.css')
   body(id=locals.view)
     include _header

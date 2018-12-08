@@ -82,7 +82,7 @@ module.exports = (config) ->
         libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
-          consolidate[engine] libFilePath, config.libs[libName] || {}, (err, html) ->
+          consolidate[engine] libFilePath, config.libs?[libName] || {}, (err, html) ->
             compiledHtml = html unless err
           break
 

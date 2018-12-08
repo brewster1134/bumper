@@ -1,27 +1,62 @@
+_ = require 'lodash'
 chalk = require 'chalk'
 path = require 'path'
 yargs = require 'yargs'
+fs = require 'fs'
+yaml = require 'js-yaml'
 
 # run everything from bumper root
 process.chdir path.resolve __dirname, '..'
 
+# cli config
 flair = chalk.bold '------======------'
+
+# core config
+configFile = try yaml.safeLoad fs.readFileSync 'config.yaml'
+configFile ||= try JSON.parse fs.readFileSync 'config.json'
+configFile ||= new Object
+
+name = configFile.name || 'Bumper'
+configCore =
+  name: name
+  nameSafe: name.toLowerCase().replace /\W/g, ''
+  prod: process.env.NODE_ENV == 'production'
+  rootPath: process.cwd()
+  libs: configFile.libs || {}
 
 yargs
   .scriptName chalk.bold 'bumper'
-  .example 'bumper demo help'
+  .example chalk.bold 'bumper demo help'
   .usage flair
   .epilogue flair
   .strict()
 
-  # if missing or unsupported command is passed
+  # handle missing or unsupported commands
   .demandCommand 1, 'No Command was passed'
   .fail (msg, err) ->
     yargs.showHelp()
     console.log chalk.red "\n=> #{msg.toUpperCase()} <=\n"
 
-  # start the demo
+  # handle custom key/value pairs
+  .option 'config',
+    alias: 'c'
+    desc: 'Custom key/value pairs (--config foo:bar,bar:baz)'
+    type: 'string'
+    coerce: (configCli) ->
+      # parse key/values in the format of --config key1:value1,key2:value2
+      configObject = new Object
+      keyValuePairStrings = configCli.split ','
+      for keyValuePairString in keyValuePairStrings
+        keyValuePairArray = keyValuePairString.split ':'
+        configObject[keyValuePairArray[0]] = keyValuePairArray[1]
+
+      return configObject
+
+
+  # => DEMO
+  # ---
   .command 'demo', 'Start the demo', (yargs) ->
+    yargs.config configFile.demo || {}
     yargs.option 'host',
       alias: 'h'
       default: 'localhost'
@@ -36,18 +71,27 @@ yargs
       default: false
       desc: 'Show test results (slower)'
       type: 'boolean'
+    yargs.option 'engines',
+      default: configFile.demo?.engines || {}
+      hidden: true
+
   , (args) ->
     nodemon = require 'nodemon'
-    config = require('../lib/config')
-      demo:
-        host: args.host
-        port: args.port
-        tests: args.tests
+
+    configCore.demo =
+      config: args.config
+      host: process.env.BUMPER_HOST || args.host
+      port: process.env.BUMPER_PORT || args.port
+      tests: args.tests
+      engines:
+        css: _.union args.engines.css || new Array, ['sass', 'css']
+        html: _.union args.engines.html || new Array, ['pug', 'md', 'html']
+        js: _.union args.engines.js || new Array, ['coffee', 'js']
 
     nodemon
       script: './lib/demo.coffee'
       ext: 'coffee,js'
-      args: [ "--config='#{JSON.stringify(config)}'" ]
+      args: [ "--config='#{JSON.stringify(configCore)}'" ]
       watch: [
         'demo/routes'
         'demo/scripts'
@@ -56,34 +100,25 @@ yargs
         'user/libs'
       ]
     .on 'restart', (files) ->
-      console.log "#{config.name} demo restarted due to changes to", files.toString()
+      console.log "#{configCore.name} demo restarted due to changes to", files.toString()
     .on 'quit', ->
-      console.log "\n#{config.name} demo has quit"
+      console.log "\n#{configCore.name} demo has quit"
       process.exit()
 
-  # libs
-  .command 'lib', 'Manage your libraries', (yargs) ->
-    yargs.command 'new [NAME]', 'Create a new library skeleton', (yargs) ->
-      yargs.positional 'name',
-        desc: 'The name of the new library'
 
-    yargs.command 'depend [LIB_NAME] [PACKAGES]', 'Add dependencies to your library', (yargs) ->
-      yargs.positional 'name',
-        desc: 'The name of the library'
-      yargs.positional 'packages',
-        desc: 'NPM packages the library depends on (seperated by spaces)'
-
-  # tests
+  # => TEST
+  # ---
   .command 'test', 'Run your tests', (yargs) ->
-    yargs.options 'libs',
+    yargs.config configFile.test || {}
+    yargs.option 'libs',
       alias: 'l'
       default: '.+'
       desc: 'One or more library names to test'
       type: 'array'
   , (args) ->
-    config = require('../lib/config')
-      test:
-        foo: 'bar'
-    require('./test.coffee') config, args
+    configCore.test =
+      libs: args.libs
+    require('./test.coffee') configCore
+
 
   .argv

@@ -1,5 +1,3 @@
-# => DEPENDENCIES
-# ---
 argv = require('yargs-parser') process.argv.slice 2
 bodyParser = require 'body-parser'
 debMW = require 'webpack-dev-middleware'
@@ -55,7 +53,7 @@ webpackCompiler = webpack
     ,
       test: /\.(sass|css)$/
       use: [
-        loader: if config.isProd then Extract.loader else 'style-loader'
+        loader: if config.prod then Extract.loader else 'style-loader'
       ,
         loader: 'css-loader'
       ,

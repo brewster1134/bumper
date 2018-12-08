@@ -13,24 +13,25 @@ yarn install bumper
 # via npm
 npm install bumper -g
 
-# via git... (suggested for bumper developers only)
+# via git... (for bumper developers only)
 git clone git@github.com:brewster1134/bumper.git
 cd bumper
 git checkout express
 yarn
 ```
 
-### Run Server
+### Run Demo
 ```shell
-bumper
+bumper demo
 
 # to see all the options...
 bumper help
 ```
 
 ### Configure
-You can optionally define a custom configuration by editing `config.yaml`
+You can optionally define a custom configuration by editing `config.yaml` _(or if you prefer JSON, you can rename it to `config.json`)_
 * _name:_ The name of your demo _[default: `Bumper`]_
+* *libs:* Optional object to pass into your library demo. e.g. If you want to pass `Hello World` into your `foo` library demo as a variable called `title`, `libs: { foo: { title: 'Hello World' }}`
 * *demo:*
   * _host:_ The host for your demo _[default: `localhost`]_
   * _port:_ The port for your demo _[default: `8383`]_
@@ -39,22 +40,13 @@ You can optionally define a custom configuration by editing `config.yaml`
     * _css:_ _[default: `['sass', 'css']`]_
     * _html:_ _[default: `['pug', 'html']`]_
     * _js:_ _[default: `['coffee', 'js']`]_
-* *libs:* Optional object to pass into your library demo. e.g. If you want to pass `Hello World` into your `foo` library demo as a variable called `title`, `libs: { foo: { title: 'Hello World' }}`
+* *test:* Optional object to pass into your library test. e.g. If you want to pass `Hello World` into your `foo` library test as a variable called `title`, `libs: { foo: { title: 'Hello World' }}`
 
 ### Environment Variables
 * _BUMPER_HOST_ If set, will take precedence over settings in `config.yaml`
 * _BUMPER_PORT_ If set, will take precedence over settings in `config.yaml`
 
 ## BUMPER DEVELOPMENT
-
-## LIBRARY DEVELOPMENT
-```shell
-# create a new library
-bumper lib new [LIB_NAME]
-
-# add dependencies to your library
-bumper lib depend [LIB_NAME] [NPM_PACKAGE(S)]
-```
 
 # TODO:
 * CLI

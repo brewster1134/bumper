@@ -3,7 +3,7 @@ jest = require 'jest'
 path = require 'path'
 webpack = require 'webpack'
 
-module.exports = (config, args) ->
+module.exports = (config) ->
   webpackCompiler = webpack
     mode: 'none'
     entry: glob path.join(config.rootPath, 'user', 'libs', '**', '*_test.coffee'),
@@ -34,5 +34,5 @@ module.exports = (config, args) ->
       ]
 
   webpackCompiler.run ->
-    regexLibs = args.libs.join '|'
+    regexLibs = config.test.libs.join '|'
     jest.run "--verbose --colors --testRegex '\.tmp\/(#{regexLibs})_test.js$'"
