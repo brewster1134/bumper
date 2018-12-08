@@ -6,16 +6,22 @@ block header
     button(type='submit') Build
 
 block content
-  each val, lib in libs
-    div.lib(id=lib)
-      if helpers.config.prod
-        link(rel='stylesheet' href=val.css)
-      h1.lib__header= lib
-      div.lib__demo
-        != val.demo
-      div.lib__docs
-        != val.docs
-      if val.test
-        div.lib__test
-          != val.test
-      script(src=val.js)
+  div#libs
+    each val, lib in libs
+      div.lib(id=lib)
+        if helpers.config.prod
+          link(rel='stylesheet' href=val.css)
+        h1.lib__header= lib
+        div.lib__demo
+          h1.lib__header Demo
+          div(class=lib)
+            != val.demo
+        div.lib__docs
+          h1.lib__header Docs
+          != val.docs
+        if val.test
+          div.lib__test
+            h1.lib__header Test
+            div(class=lib)
+              != val.test
+        script(src=val.js)
