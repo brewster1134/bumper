@@ -31,7 +31,7 @@ bumper help
 ### Configure
 You can optionally define a custom configuration by editing `config.yaml` _(or if you prefer JSON, you can rename it to `config.json`)_
 * _name:_ The name of your demo _[default: `Bumper`]_
-* *libs:* Optional object to pass into your library demo. e.g. If you want to pass `Hello World` into your `foo` library demo as a variable called `title`, `libs: { foo: { title: 'Hello World' }}`
+* *data:* Optional object to pass into your library demo. e.g. If you want to pass `Hello World` into your `foo` library demo as a variable called `title`, `data: { foo: { title: 'Hello World' }}`
 * *demo:*
   * _host:_ The host for your demo _[default: `localhost`]_
   * _port:_ The port for your demo _[default: `8383`]_
@@ -40,7 +40,14 @@ You can optionally define a custom configuration by editing `config.yaml` _(or i
     * _css:_ _[default: `['sass', 'css']`]_
     * _html:_ _[default: `['pug', 'html']`]_
     * _js:_ _[default: `['coffee', 'js']`]_
-* *test:* Optional object to pass into your library test. e.g. If you want to pass `Hello World` into your `foo` library test as a variable called `title`, `libs: { foo: { title: 'Hello World' }}`
+
+You can also pass command specific data to each library
+* *demo:*
+  * *data:*
+    * *key: value*
+* *test:*
+  * *data:*
+    * *key: value*
 
 ### Environment Variables
 * _BUMPER_HOST_ If set, will take precedence over settings in `config.yaml`
@@ -64,10 +71,13 @@ You can optionally define a custom configuration by editing `config.yaml` _(or i
   * build all libs together
   * build select libs together
   * generate config file
+* DEMO
+  * support ALL keyword in get route
 * API
   * script tag e.g. /bumper.js?foo:1.2.3,bar:latest
 * VENDORED
   * atrackt
 * DOCS
+  * documentation generator?
   * library fixtures and assets folders
 * make it prettier

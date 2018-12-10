@@ -15,41 +15,27 @@ module.exports = (config) ->
     config: config
 
     # Build a single string from multiple strings
-    # @param strings [String] String(s) to be concatenated
-    # @return [String]
+    # @arg {...String} strings - 1 or more strings to be concatenated
+    # @return {String} Full title
     #
     buildTitle: (strings...) -> _.compact(strings).join(': ')
 
 
     # => DEMO
     # ---
-    # Get all lib names
-    # @return [Array<String>] Array of lib names
-    #
-    demoGetLibs: ->
-      libsDir = path.join 'user', 'libs'
-      libsDirEntries = fs.readdirSync libsDir
-      libs = new Array
-
-      # check libs directory for all subdirectories
-      for entry in libsDirEntries
-        if fs.statSync(path.join(libsDir, entry)).isDirectory()
-          libs.push entry
-
-      return libs
 
     # Get path to a specific lib directory
-    # @param libName [String] Name of a library
-    # @return [String] Absolute path to the library
+    # @arg {String} libName - Name of a library
+    # @return {String} Path to the library
     #
     demoGetLibPath: (libName) ->
       path.join 'user', 'libs', libName
 
     # Builds libs object required for the libs route
-    # @param libNames [Array<String>] Array of lib names
-    # @return [Object]
+    # @arg {...String} libNames - lib names
+    # @return {Object} Object of all data needed to render the demo page
     #
-    demoBuildLibObject: (libNames) ->
+    demoBuildLibObject: (libNames...) ->
       libs = new Object
 
       for libName in libNames
@@ -72,8 +58,8 @@ module.exports = (config) ->
       return libs
 
     # Renders the demo for a given library
-    # @param libName [String] Name of a library
-    # @return [String] Raw html
+    # @arg {String} libName - Name of a library
+    # @return {String} Raw html of lib demo
     #
     demoGetDemoHtml: (libName) ->
       compiledHtml = null
@@ -82,15 +68,15 @@ module.exports = (config) ->
         libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
-          consolidate[engine] libFilePath, config.libs?[libName] || {}, (err, html) ->
+          consolidate[engine] libFilePath, config.demo.data?[libName] || {}, (err, html) ->
             compiledHtml = html unless err
           break
 
       return compiledHtml
 
     # Renders the documentation for a given library
-    # @param libName [String] Name of a library
-    # @return [String] Raw html
+    # @arg {String} libName - Name of a library
+    # @return {String} Raw html of lib documentation
     #
     demoGetDocsHtml: (libName) ->
       compiledHtml = null
@@ -112,8 +98,8 @@ module.exports = (config) ->
       return compiledHtml
 
     # Renders the test results
-    # @param libName [String] Name of a library
-    # @return [String] Raw html
+    # @arg {String} libName - Name of a library
+    # @return {String} Raw html of lib test results
     #
     demoGetTestHtml: (libName) ->
       return false unless config.demo.tests

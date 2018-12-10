@@ -1,3 +1,3 @@
 import '../styles/user_demo.sass'
 
-# add/import custom javascript for your demo here
+# include js here to customize the demo

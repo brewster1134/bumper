@@ -1,8 +1,8 @@
 # see README.md for details
 # name:
-# libs:
+# data:
 #   foo:
-#     key:
+#     key: value
 # demo:
 #   host:
 #   port:
@@ -11,7 +11,10 @@
 #     css:
 #     html:
 #     js:
-# test:
-#   libs:
+#   data:
 #     foo:
-#       key:
+#       key: new value
+# test:
+#   data:
+#     foo:
+#       key: new value
