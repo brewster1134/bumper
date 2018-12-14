@@ -8,10 +8,9 @@ path = require 'path'
 shell = require 'shelljs'
 
 module.exports = (config) ->
-  class Helper
+  BumperHelpers = require path.join config.rootPath, 'lib', 'helpers'
 
-    # => GLOBAL
-    # ---
+  class Helper extends BumperHelpers
     config: config
 
     # Build a single string from multiple strings
@@ -68,7 +67,7 @@ module.exports = (config) ->
         libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
-          consolidate[engine] libFilePath, config.demo.data?[libName] || {}, (err, html) ->
+          consolidate[engine] libFilePath, config.demo.data[libName], (err, html) ->
             compiledHtml = html unless err
           break
 
@@ -105,7 +104,7 @@ module.exports = (config) ->
       return false unless config.demo.tests
 
       jestConfigFile = path.join 'jest.js'
-      testReportFile = path.join '.tmp', 'test-report.html'
+      testReportFile = path.join '.tmp', 'test-results.html'
 
       # run the test
       shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
