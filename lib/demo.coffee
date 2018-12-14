@@ -26,7 +26,7 @@ webpackCompiler = webpack
               path.join(config.rootPath, 'user', 'libs', '**', '*.js')
   output:
     filename: '[name].js'
-    path: path.join config.rootPath, '.tmp'
+    path: path.join config.rootPath, '.tmp', 'demo'
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()

@@ -8,7 +8,6 @@ yargs = require 'yargs'
 
 # set and clean the root directory
 process.chdir path.resolve __dirname, '..'
-rimraf.sync './.tmp'
 
 # require helpers
 Helpers = require './helpers'
@@ -32,17 +31,22 @@ config =
 
 # build interface
 yargs
-  .scriptName chalk.bold 'bumper'
-  .example chalk.bold 'bumper demo help'
-  .usage flair
   .epilogue flair
+  .example chalk.bold 'bumper demo help'
+  .scriptName chalk.bold 'bumper'
   .strict()
+  .usage flair
 
   # handle missing or unsupported commands
   .demandCommand 1, 'No Command was passed'
   .fail (msg, err) ->
     yargs.showHelp()
     console.log chalk.red "\n=> #{msg.toUpperCase()} <=\n"
+
+  # runs before each command callback
+  .middleware (argv) ->
+    command = argv._[0]
+    rimraf.sync path.join '.tmp', command
 
   # handle data key/value pairs
   .option 'data',

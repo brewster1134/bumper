@@ -1,7 +1,7 @@
 module.exports = {
   reporters: [
     ['./node_modules/jest-html-reporter', {
-      outputPath: './.tmp/test-results.html',
+      outputPath: './.tmp/demo/test-results.html',
       includeFailureMsg: true,
       theme: 'lightTheme'
     }]

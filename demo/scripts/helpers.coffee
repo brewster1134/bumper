@@ -104,10 +104,10 @@ module.exports = (config) ->
       return false unless config.demo.tests
 
       jestConfigFile = path.join 'jest.js'
-      testReportFile = path.join '.tmp', 'test-results.html'
+      testReportFile = path.join '.tmp', 'demo', 'test-results.html'
 
       # run the test
-      shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch '**/.tmp/#{libName}_test.js'"
+      shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch='**/.tmp/demo/#{libName}_test.js'"
 
       # get the test results
       fs.readFileSync testReportFile, 'utf8'
