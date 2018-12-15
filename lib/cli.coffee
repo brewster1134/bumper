@@ -9,10 +9,6 @@ yargs = require 'yargs'
 # set and clean the root directory
 process.chdir path.resolve __dirname, '..'
 
-# require helpers
-Helpers = require './helpers'
-helpers = new Helpers
-
 # cli config
 flair = chalk.bold '------======------'
 
@@ -28,6 +24,10 @@ config =
   nameSafe: name.toLowerCase().replace /\W/g, ''
   prod: process.env.NODE_ENV == 'production'
   rootPath: process.cwd()
+
+# require helpers
+Helpers = require('./helpers') config
+helpers = new Helpers
 
 # build interface
 yargs

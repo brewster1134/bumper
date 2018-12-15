@@ -1,14 +1,12 @@
 _ = require 'lodash'
-async = require 'async'
 consolidate = require 'consolidate'
 fs = require 'fs'
-http = require 'http'
 markdown = require 'marked'
 path = require 'path'
 shell = require 'shelljs'
 
 module.exports = (config) ->
-  BumperHelpers = require path.join config.rootPath, 'lib', 'helpers'
+  BumperHelpers = require(path.join(config.rootPath, 'lib', 'helpers')) config
 
   class Helper extends BumperHelpers
     config: config
@@ -105,6 +103,9 @@ module.exports = (config) ->
 
       jestConfigFile = path.join 'jest.js'
       testReportFile = path.join '.tmp', 'demo', 'test-results.html'
+
+      # interpolate the test
+      @interpolateFile path.join('.tmp', 'demo', "#{libName}_test.js"), config.demo.data[libName]
 
       # run the test
       shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch='**/.tmp/demo/#{libName}_test.js'"
