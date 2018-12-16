@@ -32,7 +32,10 @@ helpers = new Helpers
 # build interface
 yargs
   .epilogue flair
-  .example chalk.bold 'bumper demo help'
+  .example chalk.bold 'bumper [COMMAND] --help'
+  .example chalk.bold 'bumper --version'
+  .hide 'help'
+  .hide 'version'
   .scriptName chalk.bold 'bumper'
   .strict()
   .usage flair
@@ -51,7 +54,7 @@ yargs
   # handle data key/value pairs
   .option 'data',
     alias: 'd'
-    desc: 'Custom key/value pairs (--data foo:bar,bar:baz)'
+    desc: 'Custom key/value pairs (foo:bar,bar:baz)'
     type: 'string'
     coerce: (custom) ->
       # parse key/values in the format of --custom key1:value1,key2:value2

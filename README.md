@@ -31,7 +31,7 @@ bumper help
 ### Configure
 You can optionally define a custom configuration by editing `config.yaml` _(or if you prefer JSON, you can rename it to `config.json`)_
 * _name:_ The name of your demo _[default: `Bumper`]_
-* *data:* Optional object to pass into your library demo. e.g. If you want to pass `Hello World` into your `foo` library demo as a variable called `title`, `data: { foo: { title: 'Hello World' }}`
+* *data:* _* see Data section below_
 * *demo:*
   * _host:_ The host for your demo _[default: `localhost`]_
   * _port:_ The port for your demo _[default: `8383`]_
@@ -41,17 +41,38 @@ You can optionally define a custom configuration by editing `config.yaml` _(or i
     * _html:_ _[default: `['pug', 'html']`]_
     * _js:_ _[default: `['coffee', 'js']`]_
 
-You can also pass command specific data to each library
-* *demo:*
-  * *data:*
-    * *key: value*
-* *test:*
-  * *data:*
-    * *key: value*
-
 ### Environment Variables
-* _BUMPER_HOST_ If set, will take precedence over settings in `config.yaml`
-* _BUMPER_PORT_ If set, will take precedence over settings in `config.yaml`
+For the demo, both the 'host' and 'port' have environment vars that will take precedence over the values in your config file
+* _BUMPER_HOST_
+* _BUMPER_PORT_
+
+### Data
+There are several ways you can pass data to your library's js & css, demo, tests, and even documentation. You can then use {{mustache}} style interpolation to render that data
+
+##### config file
+* The config file supports a root key called `data`
+* There is a root key for each *command*, which also contains a `data` key
+* You can add custom key/values directly into each `data` object that will be added to all your libraries
+* Each `data` object also supports a key named after each *library*
+* As the keys get more specific, they overwrite any more generic values that have the same key name
+
+```yaml
+data:
+  foo: data root
+  lib:
+    foo: data lib
+demo:
+  data:
+    foo: demo data root
+    lib:
+      foo: demo data lib  # this value will be used
+```
+
+And if you want to ignore _ALL_ the config file values, you can pass data via the `--data` option from the command line
+
+```shell
+bumper demo --data foo:cli # this value will always be used
+```
 
 ## BUMPER DEVELOPMENT
 
@@ -61,6 +82,7 @@ You can also pass command specific data to each library
   * bumper lib depend
   * bumper version new
   * bumper version list
+  * support white space in --data
 * FEATURES
   * entire project versioning & individual lib versioning
   * generate & assign permanent identifiers for labeling objects
