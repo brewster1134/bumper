@@ -47,4 +47,4 @@ module.exports = (config) ->
 
     # run tests
     regexLibs = config.test.libs.join '|'
-    jest.run "--verbose --colors --testRegex '\.tmp\/test\/(#{regexLibs})_test.js$'"
+    jest.run "--colors --testRegex='\.tmp\/test\/(#{regexLibs})_test\.js$'"

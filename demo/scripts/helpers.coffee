@@ -1,9 +1,9 @@
 _ = require 'lodash'
 consolidate = require 'consolidate'
 fs = require 'fs'
+jest = require 'jest'
 markdown = require 'marked'
 path = require 'path'
-shell = require 'shelljs'
 
 module.exports = (config) ->
   BumperHelpers = require(path.join(config.rootPath, 'lib', 'helpers')) config
@@ -47,7 +47,7 @@ module.exports = (config) ->
           docs: @demoGetDocsHtml libName
 
           # test report
-          test: @demoGetTestHtml libName
+          test: await @demoGetTestHtml libName
 
           # js demo file path
           js: "/#{libName}.js"
@@ -108,9 +108,7 @@ module.exports = (config) ->
       @interpolateFile path.join('.tmp', 'demo', "#{libName}_test.js"), config.demo.data[libName]
 
       # run the test
-      shell.exec "yarn run jest --silent --config='#{jestConfigFile}' --testMatch='**/.tmp/demo/#{libName}_test.js'"
-
-      # get the test results
-      fs.readFileSync testReportFile, 'utf8'
+      await jest.run("--detectOpenHandles --config='#{jestConfigFile}' --testRegex='\.tmp\/demo\/(#{libName})_test\.js$'").then ->
+        fs.readFileSync testReportFile, 'utf8'
 
   return new Helper
