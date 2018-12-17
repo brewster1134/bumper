@@ -7,7 +7,8 @@ yaml = require 'js-yaml'
 yargs = require 'yargs'
 
 # set and clean the root directory
-process.chdir path.resolve __dirname, '..'
+rootPath = path.resolve __dirname, '..'
+process.chdir rootPath
 
 # cli config
 flair = chalk.bold '------======------'
@@ -23,7 +24,7 @@ config =
   name: name
   nameSafe: name.toLowerCase().replace /\W/g, ''
   prod: process.env.NODE_ENV == 'production'
-  rootPath: process.cwd()
+  rootPath: rootPath
 
 # require helpers
 Helpers = require('./helpers') config

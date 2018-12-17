@@ -29,6 +29,7 @@
     "mini-css-extract-plugin": "^0",
     "node-sass": "^4",
     "nodemon": "^1",
+    "normalize.css": "^8",
     "pug": "^2",
     "pug-loader": "^2",
     "sass-loader": "^7",
