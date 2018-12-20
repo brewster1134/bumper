@@ -1,5 +1,20 @@
 {
-  "scripts": {
-    "preinstall": "npm install -g bower coffee-script testem"
+  "name": "bumper",
+  "version": "0.0.0",
+  "description": "Protect Your Front End npm install -g bower coffee-script testem",
+  "license": "MIT",
+  "author": "Ryan Brewster <brewster1134@gmail.com>",
+  "repository": "git@github.com:brewster1134/bumper.git",
+  "dependencies": {
+    "jquery": "^3"
+  },
+  "devDependencies": {
+    "chai": "^1",
+    "chai-as-promised": "^4",
+    "coffeescript": "^2",
+    "mocha": "^1",
+    "sinon": "^1",
+    "sinon-chai": "^2",
+    "testem": "^2"
   }
 }
