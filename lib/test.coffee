@@ -1,12 +1,10 @@
+chalk = require 'chalk'
 glob = require 'webpack-glob-entry'
 jest = require 'jest'
 path = require 'path'
 webpack = require 'webpack'
 
-module.exports = (config) ->
-  Helpers = require(path.join(config.rootPath, 'lib', 'helpers')) config
-  helpers = new Helpers
-
+module.exports = (config, helpers) ->
   webpackCompiler = webpack
     mode: 'none'
     entry: glob path.join(config.rootPath, 'user', 'libs', '**', '*_test.coffee'),
@@ -36,14 +34,15 @@ module.exports = (config) ->
         ]
       ]
 
-  # console.log webpackCompiler.options.entry
-
   webpackCompiler.run ->
     # interpolate files
     testFiles = glob '.tmp/test/*_test.js'
     for testName, testPath of testFiles
       libName = testName.match(/^(.+)_test$/)[1]
-      helpers.interpolateFile path.join(config.rootPath, testPath), config.test.data[libName]
+      try
+        helpers.interpolateFile path.join(config.rootPath, testPath), config.test.data[libName]
+      catch error
+        helpers.logMessage "template variable #{error.message}", 'error'
 
     # run tests
     regexLibs = config.test.libs.join '|'

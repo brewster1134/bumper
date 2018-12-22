@@ -9,6 +9,8 @@ module.exports = (config) ->
   BumperHelpers = require(path.join(config.rootPath, 'lib', 'helpers')) config
 
   class Helper extends BumperHelpers
+    # => GLOBAL
+    # ---
     config: config
 
     # Build a single string from multiple strings
@@ -18,15 +20,8 @@ module.exports = (config) ->
     buildTitle: (strings...) -> _.compact(strings).join(': ')
 
 
-    # => DEMO
+    # => ROUTE:DEMO
     # ---
-
-    # Get path to a specific lib directory
-    # @arg {String} libName - Name of a library
-    # @return {String} Path to the library
-    #
-    demoGetLibPath: (libName) ->
-      path.join 'user', 'libs', libName
 
     # Builds libs object required for the libs route
     # @arg {...String} libNames - lib names
@@ -41,28 +36,35 @@ module.exports = (config) ->
           css: "/#{libName}.css"
 
           # demo html
-          demo: @demoGetDemoHtml libName
+          demo: @_demoGetDemoHtml libName
 
           # documentation
-          docs: @demoGetDocsHtml libName
+          docs: @_demoGetDocsHtml libName
 
           # test report
-          test: await @demoGetTestHtml libName
+          test: await @_demoGetTestHtml libName
 
           # js demo file path
           js: "/#{libName}.js"
 
       return libs
 
+    # Get path to a specific lib directory
+    # @arg {String} libName - Name of a library
+    # @return {String} Path to the library
+    #
+    _demoGetLibPath: (libName) ->
+      path.join 'user', 'libs', libName
+
     # Renders the demo for a given library
     # @arg {String} libName - Name of a library
     # @return {String} Raw html of lib demo
     #
-    demoGetDemoHtml: (libName) ->
+    _demoGetDemoHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.demo.engines.html
-        libFilePath = path.join @demoGetLibPath(libName), "#{libName}_demo.#{engine}"
+        libFilePath = path.join @_demoGetLibPath(libName), "#{libName}_demo.#{engine}"
 
         if fs.existsSync libFilePath
           consolidate[engine] libFilePath, config.demo.data[libName], (err, html) ->
@@ -75,11 +77,11 @@ module.exports = (config) ->
     # @arg {String} libName - Name of a library
     # @return {String} Raw html of lib documentation
     #
-    demoGetDocsHtml: (libName) ->
+    _demoGetDocsHtml: (libName) ->
       compiledHtml = null
 
       for engine in config.demo.engines.html
-        libFilePath = path.join @demoGetLibPath(libName), "#{libName}_docs.#{engine}"
+        libFilePath = path.join @_demoGetLibPath(libName), "#{libName}_docs.#{engine}"
 
         if fs.existsSync libFilePath
           fileContents = fs.readFileSync libFilePath, 'utf8'
@@ -98,7 +100,7 @@ module.exports = (config) ->
     # @arg {String} libName - Name of a library
     # @return {String} Raw html of lib test results
     #
-    demoGetTestHtml: (libName) ->
+    _demoGetTestHtml: (libName) ->
       return false unless config.demo.tests
 
       jestConfigFile = path.join 'jest.js'

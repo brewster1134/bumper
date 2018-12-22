@@ -1,12 +1,13 @@
 _ = require 'lodash'
 chalk = require 'chalk'
 fs = require 'fs'
+packageJson = require '../package.json'
 path = require 'path'
 rimraf = require 'rimraf'
 yaml = require 'js-yaml'
 yargs = require 'yargs'
 
-# set and clean the root directory
+# set the root directory
 rootPath = path.resolve __dirname, '..'
 process.chdir rootPath
 
@@ -25,6 +26,7 @@ config =
   nameSafe: name.toLowerCase().replace /\W/g, ''
   prod: process.env.NODE_ENV == 'production'
   rootPath: rootPath
+  version: packageJson.version
 
 # require helpers
 Helpers = require('./helpers') config
@@ -45,7 +47,7 @@ yargs
   .demandCommand 1, 'No Command was passed'
   .fail (msg, err) ->
     yargs.showHelp()
-    console.log chalk.red "\n=> #{msg.toUpperCase()} <=\n"
+    helpers.logMessage msg, 'error'
 
   # runs before each command callback
   .middleware (argv) ->
@@ -54,25 +56,52 @@ yargs
 
   # handle data key/value pairs
   .option 'data',
-    alias: 'd'
-    desc: 'Custom key/value pairs (foo:bar,bar:baz)'
-    type: 'string'
-    coerce: (custom) ->
-      # parse key/values in the format of --custom key1:value1,key2:value2
-      customObject = new Object
-      keyValuePairStrings = custom.split ','
-      for keyValuePairString in keyValuePairStrings
+    alias: 'D'
+    desc: 'Custom key:value pairs, splitd by a :'
+    type: 'array'
+    coerce: (data) ->
+      # parse key/values in the format of --data key1:value1 key2:value2
+      dataObject = new Object
+      for keyValuePairString in data
         keyValuePairArray = keyValuePairString.split ':'
-        customObject[keyValuePairArray[0]] = keyValuePairArray[1]
+        dataObject[keyValuePairArray[0]] = keyValuePairArray[1]
 
-      return customObject
+      return dataObject
+
+
+  # => BUILD
+  # ---
+  .command 'build', 'Build bundles from your libraries', (yargs) ->
+    yargs.option 'development',
+      alias: 'd'
+      default: false
+      desc: 'Build un-minified bundles'
+      type: 'boolean'
+    yargs.option 'libs',
+      alias: 'l'
+      default: helpers.libs
+      desc: 'One or more library names to build'
+      type: 'array'
+    yargs.option 'split',
+      alias: 's'
+      default: false
+      desc: 'Build each lib separately'
+      type: 'boolean'
+  , (args) ->
+    config.build =
+      data: helpers.buildDataObject configFile, 'build', args.data
+      development: args.development
+      libs: args.libs
+      split: args.split
+
+    require('./build.coffee') config, helpers
 
 
   # => DEMO
   # ---
   .command 'demo', 'Start the demo', (yargs) ->
     yargs.option 'engines',
-      default: configFile.demo?.engines || {}
+      default: configFile.demo?.engines || new Object
       hidden: true
     yargs.option 'host',
       alias: 'h'
@@ -86,7 +115,7 @@ yargs
       type: 'number'
     yargs.option 'tests',
       default: false
-      desc: 'Show test results (slower)'
+      desc: 'Show test results in the demo (slower)'
       type: 'boolean'
   , (args) ->
     config.demo =
@@ -108,6 +137,7 @@ yargs
         'demo/routes'
         'demo/scripts'
         'lib/demo.coffee'
+        'lib/helpers.coffee'
         'user/demo/scripts'
         'user/libs'
       ]
@@ -123,7 +153,7 @@ yargs
   .command 'test', 'Run your tests', (yargs) ->
     yargs.option 'libs',
       alias: 'l'
-      default: '.+'
+      default: helpers.libs
       desc: 'One or more library names to test'
       type: 'array'
   , (args) ->
@@ -131,7 +161,7 @@ yargs
       data: helpers.buildDataObject configFile, 'test', args.data
       libs: args.libs
 
-    require('./test.coffee') config
+    require('./test.coffee') config, helpers
 
 
   .argv

@@ -1,16 +1,28 @@
 _ = require 'lodash'
+chalk = require 'chalk'
 fs = require 'fs'
 path = require 'path'
 
 module.exports = (config) ->
   class Helpers
     constructor: ->
-      @libs = @getLibs()
+      @libs ||= @_getLibs()
+
+    # log a formatted message
+    # @arg message {String} The message to log
+    # @arg type {String} The type of message to log
+    #
+    logMessage: (message, type) ->
+      switch type
+        when 'error'
+          console.log chalk.red "\n=> #{message.toUpperCase()} <=\n"
+        else
+          console.log message
 
     # get all lib names
     # @return {String[]} Array of all lib names
     #
-    getLibs: ->
+    _getLibs: ->
       libsDir = path.join 'user', 'libs'
       libsDirEntries = fs.readdirSync libsDir
       libs = new Array
@@ -35,8 +47,11 @@ module.exports = (config) ->
       contents = fs.readFileSync filePath
 
       # create and interpolate the file
-      compiled = _.template contents
-      interpolated = compiled locals
+      try
+        compiled = _.template contents
+        interpolated = compiled locals
+      catch er
+        interpolated = contents
 
       # write back to the same file
       fs.writeFileSync filePath, interpolated

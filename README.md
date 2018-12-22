@@ -77,6 +77,9 @@ bumper demo --data foo:cli # this value will always be used
 ## BUMPER DEVELOPMENT
 
 # TODO:
+* require > import
+* module.exports > export
+* babel - disable modules
 * CLI
   * bumper lib new
   * bumper lib depend
