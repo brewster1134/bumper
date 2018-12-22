@@ -1,4 +1,3 @@
-_ = require 'lodash'
 chalk = require 'chalk'
 fs = require 'fs'
 packageJson = require '../package.json'
@@ -118,6 +117,9 @@ yargs
       desc: 'Show test results in the demo (slower)'
       type: 'boolean'
   , (args) ->
+    _ = require 'lodash'
+    nodemon = require 'nodemon'
+
     config.demo =
       data: helpers.buildDataObject configFile, 'demo', args.data
       host: args.host
@@ -128,7 +130,6 @@ yargs
         html: _.union args.engines.html || new Array, ['pug', 'md', 'html']
         js: _.union args.engines.js || new Array, ['coffee', 'js']
 
-    nodemon = require 'nodemon'
     nodemon
       script: './lib/demo.coffee'
       ext: 'coffee,js'
@@ -136,15 +137,16 @@ yargs
       watch: [
         'demo/routes'
         'demo/scripts'
+        'lib/cli.coffee'
         'lib/demo.coffee'
         'lib/helpers.coffee'
         'user/demo/scripts'
         'user/libs'
       ]
     .on 'restart', (files) ->
-      console.log "#{config.name} demo restarted due to changes to", files.toString()
+      helpers.logMessage "#{config.name} demo restarted due to changes to #{files.toString()}", 'info'
     .on 'quit', ->
-      console.log "\n#{config.name} demo has quit"
+      helpers.logMessage "#{config.name} demo has quit", 'info'
       process.exit()
 
 

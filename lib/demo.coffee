@@ -20,6 +20,7 @@ config = JSON.parse argv.config
 webpackCompiler = webpack
   mode: 'development'
   target: 'node'
+  devtool: if config.prod then 'eval' else false
   externals: [nodeExternals()]
   entry: glob path.join(config.rootPath, 'demo', 'scripts', 'demo.coffee'),
               path.join(config.rootPath, 'user', 'libs', '**', '*.coffee'),
@@ -78,7 +79,7 @@ demo.locals.helpers = helpers
 # routes
 demo.use bodyParser.urlencoded
   extended: false
-demo.use express.static path.join config.rootPath, 'demo', 'images'
+demo.use express.static path.join 'demo', 'images'
 demo.use (req, res, next) ->
   res.locals = demo.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
@@ -89,4 +90,4 @@ demo.use '/demo', require(path.join(config.rootPath, 'demo', 'routes', 'demo')) 
 
 # listen
 demo.listen config.demo.port, config.demo.host, ->
-  console.log "#{config.name} demo running at #{config.demo.host}:#{config.demo.port}"
+  helpers.logMessage "#{config.name} demo running at #{config.demo.host}:#{config.demo.port}", 'info'

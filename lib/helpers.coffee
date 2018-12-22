@@ -9,18 +9,30 @@ module.exports = (config) ->
       @libs ||= @_getLibs()
 
     # log a formatted message
-    # @arg message {String} The message to log
-    # @arg type {String} The type of message to log
+    # @arg message {String} the message to log
+    # @arg type {String} the type of message to log
     #
     logMessage: (message, type) ->
       switch type
-        when 'error'
+        when 'error', 'fail'
           console.log chalk.red "\n=> #{message.toUpperCase()} <=\n"
+        when 'info', 'warning'
+          console.log chalk.yellow "\n=> #{message.toUpperCase()} <=\n"
+        when 'success', 'pass'
+          console.log chalk.green "\n=> #{message.toUpperCase()} <=\n"
         else
           console.log message
 
+    # get the source file for a given lib
+    # @arg lib {String} the name of a lib
+    # @return {String} absolute path to lib source
+    #
+    getLibSourceFile = (lib) ->
+      glob(path.join('user', 'libs', lib, "#{lib}.js"),
+        path.join('user', 'libs', lib, "#{lib}.coffee"))[lib]
+
     # get all lib names
-    # @return {String[]} Array of all lib names
+    # @return {String[]} array of all lib names
     #
     _getLibs: ->
       libsDir = path.join 'user', 'libs'
@@ -35,9 +47,9 @@ module.exports = (config) ->
       return libs
 
     # interpolate template placeholders with values
-    # @arg filePath {String} Full path to a file
-    # @arg locals {Object} Locals object with key/value pairs of placeholders and values
-    # @return {Object} Full path to the interpolated file
+    # @arg filePath {String} full path to a file
+    # @arg locals {Object} locals object with key/value pairs of placeholders and values
+    # @return {Object} full path to the interpolated file
     #
     interpolateFile: (filePath, locals) ->
       # use mustache style interpolation
@@ -64,8 +76,8 @@ module.exports = (config) ->
     # => CLI
     # ---
     # assemble all data into each lib data
-    # @arg originalData {Object} Data to inject into each lib data
-    # @return {Object} Object with original data for each lib
+    # @arg originalData {Object} data to inject into each lib data
+    # @return {Object} object with original data for each lib
     #
     addGenericDataToLibs: (originalData) ->
       libData = new Object
@@ -89,9 +101,9 @@ module.exports = (config) ->
       return libData
 
     # build the data object
-    # @arg command {String} Name of command
-    # @arg argsData {Object} Data passed from cli
-    # @return {Object} Object with full data for each lib
+    # @arg command {String} name of command
+    # @arg argsData {Object} data passed from cli
+    # @return {Object} object with full data for each lib
     #
     buildDataObject: (configFile, command, argsData) ->
       libData = new Object
@@ -114,7 +126,3 @@ module.exports = (config) ->
           _.merge libData[lib], argsData
 
       return libData
-
-
-    # => TEST
-    # ---
