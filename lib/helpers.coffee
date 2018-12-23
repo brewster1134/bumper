@@ -9,8 +9,8 @@ module.exports = (config) ->
       @libs ||= @_getLibs()
 
     # log a formatted message
-    # @arg message {String} the message to log
-    # @arg type {String} the type of message to log
+    # @arg {String} message - the message to log
+    # @arg {String} type - the type of message to log
     #
     logMessage: (message, type) ->
       switch type
@@ -24,7 +24,7 @@ module.exports = (config) ->
           console.log message
 
     # get the source file for a given lib
-    # @arg lib {String} the name of a lib
+    # @arg {String} lib - the name of a lib
     # @return {String} absolute path to lib source
     #
     getLibSourceFile = (lib) ->
@@ -47,8 +47,8 @@ module.exports = (config) ->
       return libs
 
     # interpolate template placeholders with values
-    # @arg filePath {String} full path to a file
-    # @arg locals {Object} locals object with key/value pairs of placeholders and values
+    # @arg {String} filePath - full path to a file
+    # @arg {Object} locals - locals object with key/value pairs of placeholders and values
     # @return {Object} full path to the interpolated file
     #
     interpolateFile: (filePath, locals) ->
@@ -76,7 +76,7 @@ module.exports = (config) ->
     # => CLI
     # ---
     # assemble all data into each lib data
-    # @arg originalData {Object} data to inject into each lib data
+    # @arg {Object} originalData - data to inject into each lib data
     # @return {Object} object with original data for each lib
     #
     addGenericDataToLibs: (originalData) ->
@@ -101,8 +101,8 @@ module.exports = (config) ->
       return libData
 
     # build the data object
-    # @arg command {String} name of command
-    # @arg argsData {Object} data passed from cli
+    # @arg {String} command - name of command
+    # @arg {Object} argsData - data passed from cli
     # @return {Object} object with full data for each lib
     #
     buildDataObject: (configFile, command, argsData) ->
