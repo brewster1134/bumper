@@ -1,0 +1,17 @@
+language: node_js
+script:
+  - ./bin/bumper test
+os:
+  - osx
+  - linux
+  - windows
+node_js:
+  - node
+  - 11
+  - 10
+  - 9
+  - 8
+  - 7
+  - 6
+  - 5
+  - 4
