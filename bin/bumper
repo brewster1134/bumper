@@ -1,3 +1,7 @@
 #!/usr/bin/env node
 require('coffeescript/register');
-require('../lib/cli.coffee');
+
+// Initialize command line interface
+var Cli = require('../lib/cli.coffee');
+var cli = new Cli;
+cli.argv;

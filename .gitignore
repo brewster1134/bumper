@@ -1,8 +1,4 @@
 .DS_Store
-.tmp
-*.log
 node_modules
-
-# ignore all user files, but keep the directory structure
-user/libs/**
-!user/libs/.gitkeep
+package-lock.json
+yarn-error.log

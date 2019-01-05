@@ -6,7 +6,7 @@ module.exports = (helpers) ->
   # list all libs
   router.get '/', (req, res) ->
     res.render 'libs',
-      libs: helpers.libs
+      libs: Object.keys helpers.libs
 
   # render selected libs
   router.get '/*', (req, res) ->
