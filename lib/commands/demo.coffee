@@ -22,12 +22,13 @@ webpackCompiler = webpack
   target: 'node'
   devtool: if config.prod then 'eval' else false
   externals: [nodeExternals()]
-  entry: glob path.join(config.rootPath, 'demo', 'scripts', 'demo.coffee'),
-              path.join(config.rootPath, 'user', 'libs', '**', '*.coffee'),
-              path.join(config.rootPath, 'user', 'libs', '**', '*.js')
+  entry: glob path.join(config.bumperPath, 'demo', 'scripts', 'demo.coffee'),
+              path.join(config.packagePath, 'demo', 'user_demo.coffee'),
+              path.join(config.packagePath, 'libs', '**', '*.coffee'),
+              path.join(config.packagePath, 'libs', '**', '*.js')
   output:
-    filename: '[name].js'
-    path: path.join config.rootPath, '.tmp', 'demo'
+    filename: "[name].js"
+    path: path.join config.packagePath, '.tmp', 'demo'
   plugins: [
     new Extract()
     new webpack.HotModuleReplacementPlugin()
@@ -70,24 +71,23 @@ demo.use debMW webpackCompiler
 
 # config
 demo.set 'view engine', 'pug'
-demo.set 'views', path.join 'demo', 'views'
+demo.set 'views', path.join config.bumperPath, 'demo', 'views'
 
 # helpers
-helpers = require(path.join(config.rootPath, 'demo', 'scripts', 'helpers')) config
+helpers = require(path.join(config.bumperPath, 'demo', 'scripts', 'helpers')) config
 demo.locals.helpers = helpers
 
 # routes
 demo.use bodyParser.urlencoded
   extended: false
-demo.use express.static path.join 'demo', 'images'
+demo.use express.static path.join config.bumperPath, 'demo', 'images'
 demo.use (req, res, next) ->
   res.locals = demo.locals
   res.locals.view = req.url.match(/^\/(\w+)?/)[1]
   next()
-demo.use '/', require(path.join(config.rootPath, 'demo', 'routes', 'root')) helpers
-demo.use '/build', require(path.join(config.rootPath, 'demo', 'routes', 'build')) helpers
-demo.use '/demo', require(path.join(config.rootPath, 'demo', 'routes', 'demo')) helpers
+demo.use '/', require(path.join(config.bumperPath, 'demo', 'routes', 'root')) helpers
+demo.use '/build', require(path.join(config.bumperPath, 'demo', 'routes', 'build')) helpers
+demo.use '/demo', require(path.join(config.bumperPath, 'demo', 'routes', 'demo')) helpers
 
 # listen
-demo.listen config.demo.port, config.demo.host, ->
-  helpers.logMessage "#{config.name} demo running at #{config.demo.host}:#{config.demo.port}", 'info'
+demo.listen config.demo.port, config.demo.host

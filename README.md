@@ -53,8 +53,8 @@ A Bumper library is simply a collection of files in the given format
 * **docs:** md
 
 ###### Directory Structure
-* The `demo` folder contains custom scripts & styles to customize the demo site
-* The `lib` folder contains separate folders for each library
+* The `demo` directory contains custom scripts & styles to customize the demo site
+* The `lib` directory contains separate directories for each library
 * Each library must contain a script file that matches the directory name
 * Any optional library files must be named according to the example below...
 
