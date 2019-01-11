@@ -2,16 +2,15 @@
   "name": "bumper",
   "version": "0.0.0",
   "description": "Protect Your Front End",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "repository": "git@github.com:brewster1134/bumper.git",
-  "private": true,
   "bin": {
     "bumper": "./bin/bumper"
   },
-  "workspaces": [
-    "user/libs/*"
-  ],
+  "scripts": {
+    "test": "yarn run mocha"
+  },
   "dependencies": {
     "@babel/core": "^7",
     "babel-loader": "^8",
@@ -22,8 +21,7 @@
     "consolidate": "^0",
     "css-loader": "^2",
     "express": "^4",
-    "jest": "^23",
-    "jest-html-reporter": "^2",
+    "fs-extra": "^7",
     "js-yaml": "^3",
     "marked": "^0",
     "mini-css-extract-plugin": "^0",
@@ -40,5 +38,11 @@
     "webpack-node-externals": "^1",
     "write-file-webpack-plugin": "^4",
     "yargs": "^12"
+  },
+  "devDependencies": {
+    "chai": "^4",
+    "mocha": "^5",
+    "sinon": "^7",
+    "sinon-chai": "^3"
   }
 }

@@ -126,7 +126,6 @@ bumper demo --globals foo:cli # this value will overwrite `lib`
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
 * BUMPER
   * create workspace for demo and cli?
-  * jest testing
   * ci (travis)
   * badges support (badgen)
   * documentation generator?

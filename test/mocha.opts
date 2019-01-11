@@ -1,0 +1,4 @@
+ --require coffeescript/register
+ --watch
+ --watch --watch-extensions coffee
+test/**/*_test.coffee
