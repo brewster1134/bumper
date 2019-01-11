@@ -3,6 +3,7 @@ chalk = require 'chalk'
 consolidate = require 'consolidate'
 fs = require 'fs-extra'
 glob = require 'glob'
+Helpers = require './helpers'
 path = require 'path'
 yaml = require 'js-yaml'
 yargs = require 'yargs'
@@ -11,14 +12,17 @@ module.exports =
   class Cli
     constructor: ->
       # get environment configuration
-      @VERBOSE = process.argv.includes('-V') || process.argv.includes('--verbose')
+      @verbose = process.argv.includes('-V') || process.argv.includes('--verbose')
       packagePath = process.cwd()
+
+      # get helpers
+      @helpers = new Helpers @verbose
 
       # get package.json
       try
         @packageJson = require "#{packagePath}/package.json"
       catch err
-        @logMessage 'No `package.json` found', 'fail', err
+        @helpers.logMessage 'No `package.json` found', 'fail', err
 
       # get user configuration
       @configFile = @_getConfigFile packagePath
@@ -31,41 +35,15 @@ module.exports =
         @libs = @_getlibs()
 
         if !Object.keys(@libs).length
-          @logMessage 'No valid Bumper libraries found', 'fail', true
+          @helpers.logMessage 'No valid Bumper libraries found', 'fail', true
       catch err
-        @logMessage 'No `libs` directory found', 'fail', err
+        @helpers.logMessage 'No `libs` directory found', 'fail', err
 
       # get cli
       return @_buildCli()
 
-    # Log a formatted message
-    # @arg {String} message - the message to log
-    # @arg {String} type - the type of message to log
-    # @arg {Error|true} exception
-    #
-    logMessage: (message, type, exception) ->
-      # log based on message type
-      switch type
-        when 'error', 'fail'
-          console.error chalk.red "\n=> #{message} <=\n"
-        when 'alert', 'info', 'warning'
-          console.warn chalk.yellow "\n=> #{message} <=\n"
-        when 'success', 'pass'
-          console.log chalk.green "\n=> #{message} <=\n"
-        else
-          console.log message
-
-      # log full stack trace if a developer
-      if exception && @VERBOSE
-        if exception == true
-          throw new Error message
-        else
-          throw exception
-
-      # exit node if exception
-      process.exit 1 if exception
-
     # Get user configuration
+    # @arg {String} packagePath - path to bumper package
     # @return {Object}
     #
     _getConfigFile: (packagePath) ->
@@ -78,6 +56,7 @@ module.exports =
       return configFile || new Object
 
     # Get core configuration
+    # @arg {String} packagePath - path to bumper package
     # @return {Object}
     #
     _getConfigCore: (packagePath) ->
@@ -98,16 +77,8 @@ module.exports =
           html: Object.keys consolidate
           js: [ 'coffee', 'js' ]
 
-    # # Require core helpers
-    # # @return {Object}
-    # #
-    # _getHelpers: ->
-    #   Helpers = require './helpers'
-    #   return new Helpers @configCore
-
     # Get all current package libraries
     # @return {Object} key: library name, value: library source path
-    # @return {null} if no libs directory exists
     #
     _getlibs: ->
       libFormats = @configCore.formats.js.join '|'
@@ -123,7 +94,9 @@ module.exports =
 
       return libs
 
-    # Reference for command defaults
+    # Lookup command option defaults
+    # @arg {String} command
+    # @arg {String} option
     # @return {Object}
     #
     _getOptionDefault: (command, option) ->
@@ -145,61 +118,56 @@ module.exports =
       else
         return defaults[option]
 
-
-    # Build full config
-    # @arg {Object} configFile
-    # @arg {Object} configCore
-    # @return {Object}
-    #
-    # _getConfigObject: (configFile, configCore) ->
-    #   _.mergeWith configFile, configCore, (fileVal, coreVal) ->
-    #     # if merging arrays, combine values from both
-    #     if _.isArray(fileVal) && _.isArray(coreVal)
-    #       _.union fileVal, coreVal
-
-
-    # Search for value from all configuration locations
+    # Search for an option's value
     # @arg {String} command
     # @arg {String} option
-    # @arg defaultVal - the default value if no other value is found
+    # @return {*}
     #
     _getOptionValue: (command, option) ->
       defaultVal = @_getOptionDefault command, option
       optionType = defaultVal.constructor
 
+      # search for an environment variable
       envVarVal = @_getEnvVarValue command, option, optionType
-      configVal = @_getConfigValue command, option
-
       if envVarVal?
         return envVarVal
-      else if configVal?
+
+      # search in the configuration
+      configVal = @_getConfigValue command, option
+      if configVal?
         return configVal
-      else
-        return defaultVal
 
-    # Build the globals object
-    # @arg {Array} cliVal - array of globals from cli
-    # @return {Object} object with full globals for each lib
+      # if no value was found, return the default
+      return defaultVal
+
+    # Build the entire config object to be passed to each command script
+    # @arg {String} command
+    # @arg {Object} args - the cli argument object
     #
-    _buildGlobals: (cliVal) ->
-      envVarVal = @_getEnvVarValue 'demo', 'globals', Object
-      configVal = @_getConfigValue 'demo', 'globals'
-      cliVal = @_getGlobalsFromString cliVal
+    _buildCommandConfig: (command, args) ->
+      config = new Object
 
-      # Create skeleton of lib
-      libGlobals = new Object
-      for lib, path of @libs
-        libGlobals[lib] = new Object
+      _.merge config, @configCore, @_getGlobalOptions command, args
+      config[command] = args
 
-      # Merge all globals together
-      if envVarVal
-        _.merge libGlobals, @_buildLibGlobals envVarVal
-      if configVal
-        _.merge libGlobals, @_buildLibGlobals configVal
-      if cliVal
-        _.merge libGlobals, @_buildLibGlobals cliVal
+      return config
 
-      return libGlobals
+    # Look for command-specific global options
+    # @arg {String} command
+    # @arg {Object} args - the cli argument object
+    #
+    _getGlobalOptions: (command, args) ->
+      globalOptions =
+        develop: null
+        verbose: null
+
+      for option, value of globalOptions
+        globalOptions[option] = @_getOptionValue command, option
+
+        # update app-level verbose flag
+        @verbose = globalOptions.verbose if option == 'verbose'
+
+      return globalOptions
 
     # Get value from an environment variable
     # @arg {String} command - the command passed
@@ -241,6 +209,30 @@ module.exports =
       else
         return @configFile[option]
 
+    # Build the globals object
+    # @arg {Array} cliVal - array of globals from cli
+    # @return {Object} object with full globals for each lib
+    #
+    _buildGlobals: (cliVal) ->
+      envVarVal = @_getEnvVarValue 'demo', 'globals', Object
+      configVal = @_getConfigValue 'demo', 'globals'
+      cliVal = @_getGlobalsFromString cliVal
+
+      # Create skeleton of lib
+      libGlobals = new Object
+      for lib, path of @libs
+        libGlobals[lib] = new Object
+
+      # Merge all globals together
+      if envVarVal
+        _.merge libGlobals, @_buildLibGlobals envVarVal
+      if configVal
+        _.merge libGlobals, @_buildLibGlobals configVal
+      if cliVal
+        _.merge libGlobals, @_buildLibGlobals cliVal
+
+      return libGlobals
+
     # Parse globals from command line into key/value pairs
     # @arg {String[]} stringGlobals - array of key/value pairs in the format 'key:value'
     # @return {Object}
@@ -281,16 +273,8 @@ module.exports =
 
       return libGlobals
 
-    _buildCommandConfig: (command, args) ->
-      config = new Object
-
-      _.merge config, @configCore, @_getGlobalOptions command, args
-      config[command] = args
-
-      return config
-
     # => COMMANDS
-    # Runs command-specific script with command-specific configuration
+    # Run command-specific script with command-specific configuration
     # @arg {Object} config - command-specific configuration
     #
     # => BUILD
@@ -313,35 +297,21 @@ module.exports =
           'lib'
         ]
       .on 'crash', =>
-        @logMessage "#{config.name} demo has crashed", 'fail'
+        @helpers.logMessage "#{config.name} demo has crashed", 'fail'
         process.exit 1
       .on 'quit', =>
-        @logMessage "#{config.name} demo has quit", 'alert'
+        @helpers.logMessage "#{config.name} demo has quit", 'alert'
         process.exit 0
       .on 'restart', (files) =>
-        @logMessage "#{config.name} demo restarted due to changes to #{files.toString()}", 'alert'
+        @helpers.logMessage "#{config.name} demo restarted due to changes to #{files.toString()}", 'alert'
       .on 'start', =>
-        @logMessage "#{config.name} demo is running at http://#{config.demo.host}:#{config.demo.port}", 'success'
+        @helpers.logMessage "#{config.name} demo is running at http://#{config.demo.host}:#{config.demo.port}", 'success'
 
     # => TEST
     # ---
     _runTest: (config) ->
       Test = require './commands/test.coffee'
       new Test config
-
-    _getGlobalOptions: (command, args) ->
-      globalOptions =
-        develop: null
-        verbose: null
-
-      for option, value of globalOptions
-        globalOptions[option] = @_getOptionValue command, option
-
-        # update app-level verbose flag
-        @VERBOSE = globalOptions.verbose if option == 'verbose'
-
-      return globalOptions
-
 
     # Build cli interface
     #
@@ -360,7 +330,7 @@ module.exports =
         .demandCommand 1, 'no command was passed'
         .fail (msg, err) =>
           yargs.showHelp()
-          @logMessage msg, 'error'
+          @helpers.logMessage msg, 'error'
 
         # run before each command
         .middleware (argv) =>
@@ -389,7 +359,6 @@ module.exports =
           type: 'boolean'
 
         # => COMMANDS
-        # Build command-specific options
         # * Use _buildCommandConfig to build the command-specific configuration object
         # * Call the command-specific run method and pass the cli arguments
         #
