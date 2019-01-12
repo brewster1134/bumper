@@ -147,27 +147,27 @@ module.exports =
     _buildCommandConfig: (command, args) ->
       config = new Object
 
-      _.merge config, @configCore, @_getGlobalOptions command, args
+      _.merge config, @configCore, @_getCommonOptions command, args
       config[command] = args
 
       return config
 
-    # Look for command-specific global options
+    # Look for command-specific common options
     # @arg {String} command
     # @arg {Object} args - the cli argument object
     #
-    _getGlobalOptions: (command, args) ->
-      globalOptions =
+    _getCommonOptions: (command, args) ->
+      commonOptions =
         develop: null
         verbose: null
 
-      for option, value of globalOptions
-        globalOptions[option] = @_getOptionValue command, option
+      for option, value of commonOptions
+        commonOptions[option] = @_getOptionValue command, option
 
         # update app-level verbose flag
-        @verbose = globalOptions.verbose if option == 'verbose'
+        @verbose = commonOptions.verbose if option == 'verbose'
 
-      return globalOptions
+      return commonOptions
 
     # Get value from an environment variable
     # @arg {String} command - the command passed
@@ -209,6 +209,21 @@ module.exports =
       else
         return @configFile[option]
 
+    # Parse object from command line into key/value pairs
+    # @arg {String[]} keyValueStrings - array of key/value pairs in the format 'key:value'
+    # @return {Object}
+    #
+    _getGlobalsFromString: (keyValueStrings) ->
+      return unless keyValueStrings.length
+
+      objekt = new Object
+      for keyValueString in keyValueStrings
+        objectArray = keyValueString.split ':'
+        if objectArray[0]
+          objekt[objectArray[0]] = objectArray[1]
+
+      return objekt
+
     # Build the globals object
     # @arg {Array} cliVal - array of globals from cli
     # @return {Object} object with full globals for each lib
@@ -232,21 +247,6 @@ module.exports =
         _.merge libGlobals, @_buildLibGlobals cliVal
 
       return libGlobals
-
-    # Parse globals from command line into key/value pairs
-    # @arg {String[]} stringGlobals - array of key/value pairs in the format 'key:value'
-    # @return {Object}
-    #
-    _getGlobalsFromString: (stringGlobals) ->
-      return unless stringGlobals.length
-
-      globals = new Object
-      for stringGlobal in stringGlobals
-        globalArray = stringGlobal.split ':'
-        if globalArray[0]
-          globals[globalArray[0]] = globalArray[1]
-
-      return globals
 
     # Duplicate all non-lib globals into each lib's globals
     # @arg {Object} originalGlobals - globals to inject into each lib globals

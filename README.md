@@ -1,19 +1,19 @@
 # Bumper
 ###### Protect Your Front End
-**Bumper** provides a platform for managing your front end library, with a live demo, and a command line interface, that both document, build, test, and release your libraries
+**Bumper** provides a platform for managing your front end library, with a live demo and command line interface, that can both document, build, test, and release your libraries
 
 ##### Demo
-* Run a single library, or any combination of libraries to see how they interact
-* Interactively change library settings on-the-fly
+>* Run a single library, or any combination of libraries to see how they interact
+* Interactively change settings on-the-fly
 * Display api documentation for developers
 * Display style-guide details for designers
 * See test results in the browser alongside each library demo
 
 ##### CLI
-* Test your libraries with continuous integration support
+>* Test your libraries with continuous integration support
 
 ##### Both
-* Build production-ready assets with all, or select libraries
+>* Build production-ready assets with all, or select libraries
 * Release semantic versions of all or individual libraries
 
 ---
@@ -29,18 +29,20 @@
 
 ---
 #### Install
-* Create a new directory for your Bumper libraries
-
 ```shell
 # install Bumper
-yarn add bumper -D
-# create the initial framework
+yarn global add bumper
+# create the package
 bumper init
 # create a library
 bumper lib --create
 # run the demo
 bumper demo
 ```
+
+---
+#### Package
+A Bumper package mainly contains your Bumper libraries, but can also have custom scripts and styles for the demo.
 
 ---
 #### Libraries
@@ -79,22 +81,24 @@ A Bumper library is simply a collection of files in the given format
 ```
 
 ---
-##### Commands
+#### Commands
 > run `bumper help` to see available commands & options
-run `bumper [COMMAND] help` to see available options
+> run `bumper [COMMAND] help` to see available options
 
----
-#### Environment Variables
-Command line options can be set as environment variables in the format of `[NAME]_[COMMAND]_[OPTION]`
+##### Command Line
+>* Object keys & values should be separated by a colon (:), and key:value pairs should be separated by a space  
+e.g. `--object foo:bar bar:baz`
+
+##### Environment Variables
+>Command line options can be set as environment variables in the format of `[NAME]_[COMMAND]_[OPTION]`
 * Array elements should be separated by a comma (,)
-* Object keys & values should be separated by a colon (:), and key:value pairs should be separated by a comma (,)
-> e.g. `BUMPER_NAME`, `BUMPER_DEMO_HOST`
-> e.g. `BUMPER_ARRAY=foo,bar`
-> e.g. `BUMPER_OBJECT=foo:bar,bar:baz`
+* Object keys & values should be separated by a colon (:), and key:value pairs should be separated by a comma (,)  
+e.g. `BUMPER_NAME`, `BUMPER_DEMO_HOST`  
+e.g. `BUMPER_ARRAY=foo,bar`  
+e.g. `BUMPER_OBJECT=foo:bar,bar:baz`  
 
----
-#### Configuration
-Command line options, and [Globals](#globals), can be defined in a `config.yaml`/`config.json` file at the root of your libraries directory
+##### Config File
+Command line options can be defined in a `config.yaml`/`config.json` file at the root of your libraries directory
 
 ___
 #### Globals
