@@ -1,71 +1,68 @@
+<!--- topics: api build demo deploy documentation frontend release styleguide test -->
 # Bumper
+![logo](https://github.com/brewster1134/bumper/blob/express/demo/images/favicon/apple-icon.png?raw=true)
 ###### Protect Your Front End
+
+---
 **Bumper** provides a platform for managing your front end library, with a live demo and command line interface, that can both document, build, test, and release your libraries
+### Features
+* Build production-ready assets with all, or select libraries
+* Release semantic versions of all or individual libraries
 
 ##### Demo
->* Run a single library, or any combination of libraries to see how they interact
+* Run a single library, or any combination of libraries to see how they interact
 * Interactively change settings on-the-fly
 * Display api documentation for developers
 * Display style-guide details for designers
 * See test results in the browser alongside each library demo
 
 ##### CLI
->* Test your libraries with continuous integration support
-
-##### Both
->* Build production-ready assets with all, or select libraries
-* Release semantic versions of all or individual libraries
+* Test your libraries with continuous integration support
 
 ---
-#### Dependencies
-* [node](nodejs.org)
+### Dependencies
+* [node](nodejs.org) >= 8.x
 * [yarn](yarnpkg.com)
 
 ---
-#### Quick Usage
-* [Install Bumper](#install)
-* [Create Libraries](#libraries)
-* [Run Bumper Commands](#commands)
-
----
-#### Install
+### Usage
 ```shell
 # install Bumper
 yarn global add bumper
 # create the package
 bumper init
 # create a library
-bumper lib --create
-# run the demo
+bumper lib create --name foo
+# run the demo, or other commands
 bumper demo
 ```
-
+    
 ---
-#### Package
-A Bumper package mainly contains your Bumper libraries, but can also have custom scripts and styles for the demo.
+### Details
 
----
-#### Libraries
-A Bumper library is simply a collection of files in the given format
+**Package:** A Bumper package will mainly be your Bumper libraries, but can also have scripts and styles to customize the demo  
+**Library:** A Bumper library is a collection of files as defined below
 
-###### Supported File Formats
+##### Supported File Formats
 * **js:** coffee, js
 * **css:** sass, scss, css
-* **html:** see [consolidatejs](github.com/tj/consolidate.js#supported-template-engines)
-* **docs:** md
+* **html:** _see [consolidatejs](github.com/tj/consolidate.js#supported-template-engines)_
+* **configuration:** yaml, json
+* **documentation:** md
 
-###### Directory Structure
+##### Directory Structure
 * The `demo` directory contains custom scripts & styles to customize the demo site
 * The `lib` directory contains separate directories for each library
 * Each library must contain a script file that matches the directory name
 * Any optional library files must be named according to the example below...
 
 ```shell
+# package structure
 ├── demo
 │   ├── demo.js
 │   ├── demo.css
-├── lib
-│   ├── [LIBNAME]
+├── libs
+│   ├── [LIBNAME] # library structure
 │   │   ├── [LIBNAME]_demo.html   # markup to demo the library
 │   │   ├── [LIBNAME]_demo.css    # styles for the library demo
 │   │   ├── [LIBNAME]_demo.js     # scripts to initialize the library
@@ -76,35 +73,37 @@ A Bumper library is simply a collection of files in the given format
 │   │   ├── [LIBNAME].js          # actual library script
 │   │   ├── package.json          # package.json for this library only
 │   │   ├── README.md             # readme for this library only
+├── config.yaml                   # custom configuration
 ├── package.json                  # package.json for the entire library collection
 └── README.md                     # readme for the entire library collection
 ```
 
 ---
-#### Commands
-> run `bumper help` to see available commands & options
-> run `bumper [COMMAND] help` to see available options
-
+### Options
 ##### Command Line
->* Object keys & values should be separated by a colon (:), and key:value pairs should be separated by a space  
-e.g. `--object foo:bar bar:baz`
+run `bumper help` to see available commands & options  
+run `bumper [COMMAND] help` to see available command options
+* Object keys & values should be separated by a colon _(:)_, and key:value pairs should be separated by a space
+> e.g. `--object foo:bar bar:baz`
 
 ##### Environment Variables
->Command line options can be set as environment variables in the format of `[NAME]_[COMMAND]_[OPTION]`
-* Array elements should be separated by a comma (,)
-* Object keys & values should be separated by a colon (:), and key:value pairs should be separated by a comma (,)  
-e.g. `BUMPER_NAME`, `BUMPER_DEMO_HOST`  
-e.g. `BUMPER_ARRAY=foo,bar`  
-e.g. `BUMPER_OBJECT=foo:bar,bar:baz`  
+Options can be set as environment variables in the format of `[NAME]_[COMMAND]_[OPTION]`
+> e.g. `BUMPER_NAME`, `BUMPER_DEMO_HOST`
+
+* Array elements should be separated by a comma _(,)_
+> e.g. `BUMPER_ARRAY=foo,bar`
+* Object keys & values should be separated by a colon _(:)_, and key:value pairs should be separated by a comma (,)
+> e.g. `BUMPER_OBJECT=foo:bar,bar:baz`
 
 ##### Config File
-Command line options can be defined in a `config.yaml`/`config.json` file at the root of your libraries directory
+Options can be defined in a `config.yaml`/`config.json` file at the root of your package directory
 
-___
-#### Globals
-Custom values can be passed to your library demo files, to allow customizing copy, styles, or settings. By default, Bumper use the `{{mustache}}` style interpolation
+---
+### Demo Globals
+Custom values can be passed to your library demo files, to allow customizing copy, styles, or settings  
+By default, Bumper use the `{{mustache}}` style interpolation
 
-###### Config file
+##### Config file
 * Key/value pairs can be added to the `demo` section of your config file under a key called `globals`
 * Key/value pairs directly under `globals` will be added to _all_ your libraries
 * Key/value pairs for a specific library, can be added to a key named after the library
@@ -113,17 +112,13 @@ Custom values can be passed to your library demo files, to allow customizing cop
 ```yaml
 demo:
   globals:
-    foo: global
-    lib1:
-      foo: lib    # this value will overwrite `global`
+    foo: global   # will be added to all library globals
+    [LIBNAME]:
+      key: val    # will only be added to this library globals
+      foo: lib    # will take precedence over `foo: global`
 ```
 
-Additionally, you can overwrite _all_ values from the config file by passing globals via the command line
-
-```shell
-bumper demo --globals foo:cli # this value will overwrite `lib`
-```
-
+---
 ---
 ---
 ## TODO:
