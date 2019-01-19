@@ -32,9 +32,10 @@ module.exports =
 
       # get package libraries
       try
-        @libs = @_getlibs()
+        libs = @_getlibs()
+        @configCore.libs = libs
 
-        if !Object.keys(@libs).length
+        if !Object.keys(libs).length
           @helpers.logMessage 'No valid Bumper libraries found', 'fail', true
       catch err
         @helpers.logMessage 'No `libs` directory found', 'fail', err
@@ -68,7 +69,7 @@ module.exports =
         bumperPath: path.resolve __dirname, '..'
         flair: chalk.bold '------======------'
         name: name
-        nameSafe: name.toLowerCase().replace /\W/g, ''
+        nameSafe: name.toLowerCase().replace /\W/g, '_'
         packagePath: packagePath
         version: @packageJson.version
         formats:
@@ -102,9 +103,10 @@ module.exports =
     _getOptionDefault: (command, option) ->
       defaults =
         develop: false
-        libs: Object.keys @libs
+        libs: Object.keys @configCore.libs
         verbose: false
         build:
+          compress: false
           split: false
         demo:
           host: 'localhost'
@@ -147,25 +149,22 @@ module.exports =
     _buildCommandConfig: (command, args) ->
       config = new Object
 
-      _.merge config, @configCore, @_getCommonOptions command, args
+      _.merge config, @configCore, @_getCommonOptions(command)
       config[command] = args
 
       return config
 
     # Look for command-specific common options
     # @arg {String} command
-    # @arg {Object} args - the cli argument object
+    # @return {Object} commonOptions
     #
-    _getCommonOptions: (command, args) ->
+    _getCommonOptions: (command) ->
       commonOptions =
         develop: null
         verbose: null
 
       for option, value of commonOptions
         commonOptions[option] = @_getOptionValue command, option
-
-        # update app-level verbose flag
-        @verbose = commonOptions.verbose if option == 'verbose'
 
       return commonOptions
 
@@ -235,7 +234,7 @@ module.exports =
 
       # Create skeleton of lib
       libGlobals = new Object
-      for lib, path of @libs
+      for lib, path of @configCore.libs
         libGlobals[lib] = new Object
 
       # Merge all globals together
@@ -257,12 +256,12 @@ module.exports =
       nonLibGlobals = new Object
 
       # create empty objects for each lib
-      for lib, path of @libs
+      for lib, path of @configCore.libs
         libGlobals[lib] = new Object
 
       # separate lib and non-lib globals
       for key, val of originalGlobals
-        if @libs[key]
+        if @configCore.libs[key]
           libGlobals[key] = val
         else
           nonLibGlobals[key] = val
@@ -281,7 +280,7 @@ module.exports =
     # ---
     _runBuild: (config) ->
       Build = require './commands/build.coffee'
-      new Build config
+      new Build config, @helpers
 
     # => DEMO
     # ---
@@ -311,7 +310,7 @@ module.exports =
     # ---
     _runTest: (config) ->
       Test = require './commands/test.coffee'
-      new Test config
+      new Test config, @helpers
 
     # Build cli interface
     #
@@ -365,6 +364,11 @@ module.exports =
         # => BUILD
         # ---
         .command 'build', 'Build assets from your libraries', (yargs) =>
+          yargs.option 'compress',
+            alias: 'c'
+            default: @_getOptionValue 'build', 'compress'
+            desc: 'Compress assets into a single archive file'
+            type: 'boolean'
           yargs.option 'libs',
             alias: 'l'
             default: @_getOptionValue 'build', 'libs'

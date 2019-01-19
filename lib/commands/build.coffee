@@ -1,3 +1,4 @@
+downloadsFolder = require 'downloads-folder'
 Extract = require 'mini-css-extract-plugin'
 fs = require 'fs-extra'
 nodeExternals = require 'webpack-node-externals'
@@ -7,50 +8,69 @@ Write = require 'write-file-webpack-plugin'
 module.exports =
   class Build
     constructor: (@config, @helpers) ->
-      @runWebpack()
+      @bundleName = "#{@config.nameSafe}_#{@config.version}"
+      @downloadsDir = downloadsFolder()
+      @tmpDir = "#{@config.packagePath}/.tmp/build"
+
+      @_runWebpack()
 
     # Get webpack entries based on the split option
-    # @arg {Array} libs - an array of the lib to get entries for
-    # @arg {Boolean} split - the split option
     # @return {String|Object} lib path or object of multiple lib paths
     #
-    getEntries: ->
-      entries = new Object
-
+    _getEntries: ->
+      # build object of each library to build separately
       if @config.build.split
+        entries = new Object
         for lib in @config.build.libs
-          entries[lib] = @helpers.getLibSource lib
-      else
-        bundlePath = "#{@config.packagePath}/.tmp/build/#{@config.nameSafe}_#{@config.version}.js"
-        bundleWrite = fs.createWriteStream bundlePath
-        for lib in @config.build.libs
-          bundleWrite.write "import #{lib} from '#{@helpers.getLibSource(lib)}'\n"
-        bundleWrite.end()
+          entries[lib] = @config.libs[lib]
 
-        entries = bundlePath
+      # write js file with import for each library to build
+      else
+        entries = "#{@tmpDir}/#{@bundleName}.js"
+        bundleWrite = fs.createWriteStream entries
+        for lib in @config.build.libs
+          bundleWrite.write "import #{lib} from '#{@config.libs[lib]}'\n"
+        bundleWrite.end()
 
       return entries
 
     # Get combined bundle file name
+    # @arg {String} extension
     # @return {String} the name of the bundle file
     #
-    getOutputFile: ->
-      if @config.build.split then "[name].js" else "#{@config.nameSafe}_#{@config.version}.js"
+    _getOutputFile: (extension) ->
+      if @config.build.split
+        "[name].#{extension}"
+      else
+        "#{@bundleName}.#{extension}"
+
+    # Compress library and create archive in Downloads directory
+    #
+    _compressLib: ->
+      archiver = require 'archiver'
+      archive = archiver 'zip',
+        zlib:
+          level: 9
+
+      archive.pipe fs.createWriteStream "#{@downloadsDir}/#{@bundleName}.zip"
+      archive.directory @tmpDir, false
+      archive.finalize()
 
     # Compile the bundles with webpack
     # @return {Boolean}
     #
-    runWebpack: ->
+    _runWebpack: ->
       webpackCompiler = webpack
-        mode: @helpers.getMode @helpers.getConfigFileValue 'build', 'develop'
+        mode: @helpers.getWebpackMode @config.develop
         target: 'web'
         externals: [nodeExternals()]
-        entry: @getEntries()
+        entry: @_getEntries()
         output:
-          filename: @getOutputFile()
-          path: "#{@config.packagePath}/.tmp/build"
+          filename: @_getOutputFile 'js'
+          path: @tmpDir
         plugins: [
-          new Extract()
+          new Extract
+            filename: @_getOutputFile 'css'
           new Write()
         ]
         module:
@@ -77,12 +97,14 @@ module.exports =
             ]
           ]
 
-      webpackCompiler.run ->
-        console.log 'runnn'
-        # Interpolate files
-        # BuildFiles = glob '.tmp/build/*.js'
-        # For buildName, buildPath of buildFiles
-        #   try
-        #     @helpers.interpolateFile path.join(@config.packagePath, buildPath), @config.build.globals[buildName]
-        #   catch error
-        #     @helpers.logMessage "template variable #{error.message}", 'error'
+      webpackCompiler.run =>
+        # handle assets
+        if @config.build.compress
+          @_compressLib()
+        else
+          fs.copy @tmpDir, "#{@downloadsDir}/#{@bundleName}"
+
+        # log output
+        libs = if @config.build.split then @config.build.libs.join(', ') else @config.name
+        ext = if @config.build.compress then '.zip' else ''
+        @helpers.logMessage "#{libs} libraries built to: #{@bundleName}#{ext}", 'success'

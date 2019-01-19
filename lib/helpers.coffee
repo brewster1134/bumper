@@ -30,3 +30,14 @@ module.exports =
 
       # exit node if exception
       process.exit 1 if exception
+
+    # Get webpack mode configuration value
+    # https://webpack.js.org/concepts/mode/
+    # @arg {Boolean} develop
+    # @return {String}
+    #
+    getWebpackMode: (develop) ->
+      if develop == true
+        return 'development'
+      else
+        return 'production'

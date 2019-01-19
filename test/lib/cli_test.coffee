@@ -196,9 +196,10 @@ describe 'Cli', ->
       cli._buildLibGlobals.restore()
 
     it 'should move shared globals into library globals', ->
-      cli.libs =
-        fooLib: 'path/to/fooLib'
-        barLib: 'path/to/barLib'
+      cli.configCore =
+        libs:
+          fooLib: 'path/to/fooLib'
+          barLib: 'path/to/barLib'
 
       globals = cli._buildLibGlobals
         keyOne: 'valOne'
@@ -213,8 +214,9 @@ describe 'Cli', ->
           keyTwo: 'valTwo'
 
     it 'should not overwrite existing lib globals', ->
-      cli.libs =
-        fooLib: 'path/to/fooLib'
+      cli.configCore =
+        libs:
+          fooLib: 'path/to/fooLib'
 
       globals = cli._buildLibGlobals
         fooLib:
