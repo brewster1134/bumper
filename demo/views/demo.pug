@@ -1,7 +1,7 @@
 extends layout
 
 block header
-  form(method='POST' action='/build')
+  form(method='post' action='/build')
     input(type='hidden' name='libs' value=Object.keys(libs).toString())
     button(type='submit') Build
 
@@ -9,7 +9,7 @@ block content
   div#libs
     each val, lib in libs
       div.lib(id=lib)
-        if helpers.config.prod
+        if !config.develop
           link(rel='stylesheet' href=val.css)
         h1.lib__header= lib
         div.lib__demo

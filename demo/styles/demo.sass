@@ -13,37 +13,3 @@ body
 
   // /demo
   &#demo
-    #libs
-      .lib__test
-        > div
-          header,
-          #metadata-container,
-          .suite-info
-            display: none
-          table.suite-table
-            width: 100%
-            tr
-              &.failed
-                td.test
-                  border-color: rgb(255,0,0)
-                  background-color: rgba(255,0,0,0.1)
-              &.passed
-                td.test
-                  border-color: rgb(0,128,0)
-                  background-color: rgba(0,128,0,0.1)
-              &.pending
-                td.test
-                  border-color: rgb(255,255,0)
-                  background-color: rgba(255,255,0,0.1)
-              td
-                padding: 1em
-                &.suite,
-                &.result
-                  display: none
-                &.test
-                  border-left: 1em solid
-                  .failureMessages
-                    margin-left: 1em
-                    font-size: 0.8em
-                    .failureMsg
-                      white-space: pre-wrap

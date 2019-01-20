@@ -1,12 +1,12 @@
 express = require 'express'
 
-module.exports = (helpers) ->
+module.exports = (config, helpers) ->
   router = express.Router()
 
   # list all libs
   router.get '/', (req, res) ->
     res.render 'libs',
-      libs: Object.keys helpers.libs
+      libs: Object.keys config.libs
 
   # render selected libs
   router.get '/*', (req, res) ->

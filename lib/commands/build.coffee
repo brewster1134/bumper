@@ -44,7 +44,7 @@ module.exports =
       else
         "#{@bundleName}.#{extension}"
 
-    # Compress library and create archive in Downloads directory
+    # Compress library and create archive in downloads directory
     #
     _compressLib: ->
       archiver = require 'archiver'
@@ -56,55 +56,72 @@ module.exports =
       archive.directory @tmpDir, false
       archive.finalize()
 
+    # Move built assets to downloads directory
+    #
+    _moveLib: ->
+      fs.copy @tmpDir, "#{@downloadsDir}/#{@bundleName}"
+
+    # Log output to user
+    #
+    _logOutput: ->
+      builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
+      fileExt = if @config.build.compress then '.zip' else ''
+
+      @helpers.logMessage "#{builtName} libraries built to: #{@bundleName}#{fileExt}", 'success'
+
+    # The webpack configuration object
+    # @return {Object}
+    #
+    _webpackConfig: ->
+      mode: @helpers.getWebpackMode @config.develop
+      target: 'web'
+      externals: [nodeExternals()]
+      entry: @_getEntries()
+      output:
+        filename: @_getOutputFile 'js'
+        path: @tmpDir
+      plugins: [
+        new Extract
+          filename: @_getOutputFile 'css'
+        new Write()
+      ]
+      module:
+        rules: [
+          test: /\.coffee$/
+          use: [
+            loader: 'babel-loader'
+          ,
+            loader: 'coffee-loader'
+          ]
+        ,
+          test: /\.js$/
+          use: [
+            loader: 'babel-loader'
+          ]
+        ,
+          test: /\.(sass|css)$/
+          use: [
+            loader: Extract.loader
+          ,
+            loader: 'css-loader'
+          ,
+            loader: 'sass-loader'
+          ]
+        ]
+
     # Compile the bundles with webpack
     # @return {Boolean}
     #
     _runWebpack: ->
-      webpackCompiler = webpack
-        mode: @helpers.getWebpackMode @config.develop
-        target: 'web'
-        externals: [nodeExternals()]
-        entry: @_getEntries()
-        output:
-          filename: @_getOutputFile 'js'
-          path: @tmpDir
-        plugins: [
-          new Extract
-            filename: @_getOutputFile 'css'
-          new Write()
-        ]
-        module:
-          rules: [
-            test: /\.coffee$/
-            use: [
-              loader: 'babel-loader'
-            ,
-              loader: 'coffee-loader'
-            ]
-          ,
-            test: /\.js$/
-            use: [
-              loader: 'babel-loader'
-            ]
-          ,
-            test: /\.(sass|css)$/
-            use: [
-              loader: Extract.loader
-            ,
-              loader: 'css-loader'
-            ,
-              loader: 'sass-loader'
-            ]
-          ]
+      compiler = webpack @_webpackConfig()
 
-      webpackCompiler.run =>
+      # webpack success callback
+      compiler.run =>
         # handle assets
         if @config.build.compress
           @_compressLib()
         else
-          fs.copy @tmpDir, "#{@downloadsDir}/#{@bundleName}"
+          @_moveLib()
 
         # log output
-        libs = if @config.build.split then @config.build.libs.join(', ') else @config.name
-        ext = if @config.build.compress then '.zip' else ''
-        @helpers.logMessage "#{libs} libraries built to: #{@bundleName}#{ext}", 'success'
+        @_logOutput()

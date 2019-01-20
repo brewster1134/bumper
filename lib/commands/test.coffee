@@ -1,8 +1,8 @@
-chalk = require 'chalk'
-glob = require 'webpack-glob-entry'
-jest = require 'jest'
-path = require 'path'
+glob = require 'glob'
+globEntries = require 'webpack-glob-entry'
+Mocha = require 'mocha'
 webpack = require 'webpack'
+Write = require 'write-file-webpack-plugin'
 
 module.exports =
   class Tests
@@ -11,11 +11,15 @@ module.exports =
 
     runWebpack: ->
       webpackCompiler = webpack
-        mode: 'none'
-        entry: glob path.join(@config.packagePath, 'libs', '**', '*_test.+(coffee|js)')
+        mode: 'development'
+        target: 'node'
+        entry: globEntries "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})"
         output:
           filename: '[name].js'
-          path: path.join @config.packagePath, '.tmp', 'test'
+          path: "#{@config.packagePath}/.tmp/test"
+        plugins: [
+          new Write()
+        ]
         module:
           rules: [
             test: /\.coffee$/
@@ -39,6 +43,12 @@ module.exports =
           ]
 
       webpackCompiler.run =>
-        # run tests
-        regexlib = @config.test.libs.join '|'
-        jest.run "--watch --colors --testRegex='\.tmp\/test\/(#{regexlib})_test\.js$'"
+        mocha = new Mocha
+          ui: 'bdd'
+          reporter: 'spec'
+
+        tests = glob.sync "#{@config.packagePath}/.tmp/test/*_test.js"
+        for test in tests
+          mocha.addFile test
+
+        mocha.run()

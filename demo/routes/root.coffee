@@ -1,6 +1,6 @@
 express = require 'express'
 
-module.exports = ->
+module.exports = (config, helpers) ->
   router = express.Router()
 
   router.get '/', (req, res) ->

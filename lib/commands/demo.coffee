@@ -5,89 +5,103 @@ express = require 'express'
 Extract = require 'mini-css-extract-plugin'
 glob = require 'webpack-glob-entry'
 nodeExternals = require 'webpack-node-externals'
-path = require 'path'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
+class Demo
+  constructor: ->
+    @config = JSON.parse argv.config
 
-# => CONFIGURATION
-# ---
-config = JSON.parse argv.config
+    # helpers
+    Helpers = require("#{@config.bumperPath}/demo/scripts/helpers") @config
+    @helpers = new Helpers @config
 
+    # webpack
+    webpackConfig = @_webpackConfig()
+    webpackCompiler = @_webpackCompiler webpackConfig
 
-# => WEBPACK
-# ---
-webpackCompiler = webpack
-  mode: 'development'
-  target: 'node'
-  devtool: if config.prod then 'eval' else false
-  externals: [nodeExternals()]
-  entry: glob path.join(config.bumperPath, 'demo', 'scripts', 'demo.coffee'),
-              path.join(config.packagePath, 'demo', 'user_demo.coffee'),
-              path.join(config.packagePath, 'libs', '**', '*.coffee'),
-              path.join(config.packagePath, 'libs', '**', '*.js')
-  output:
-    filename: "[name].js"
-    path: path.join config.packagePath, '.tmp', 'demo'
-  plugins: [
-    new Extract()
-    new webpack.HotModuleReplacementPlugin()
-    new Write()
-  ]
-  module:
-    rules: [
-      test: /\.pug$/
-      use: [
-        loader: 'pug-loader'
-      ]
-    ,
-      test: /\.coffee$/
-      use: [
-        loader: 'babel-loader'
-      ,
-        loader: 'coffee-loader'
-      ]
-    ,
-      test: /\.js$/
-      use: [
-        loader: 'babel-loader'
-      ]
-    ,
-      test: /\.(sass|css)$/
-      use: [
-        loader: if config.prod then Extract.loader else 'style-loader'
-      ,
-        loader: 'css-loader'
-      ,
-        loader: 'sass-loader'
-      ]
+    # start server
+    @_runServer webpackCompiler
+
+  # The webpack configuration object
+  # @return {Object}
+  #
+  _webpackConfig: ->
+    mode: 'development'
+    target: 'node'
+    devtool: if @config.develop then false else 'eval'
+    externals: [nodeExternals()]
+    entry: glob "#{@config.bumperPath}/demo/scripts/demo.coffee",
+                "#{@config.packagePath}/demo/user_demo.coffee",
+                "#{@config.packagePath}/libs/**/*.coffee",
+                "#{@config.packagePath}/libs/**/*.js"
+    output:
+      filename: "[name].js"
+      path: "#{@config.packagePath}/.tmp/demo"
+    plugins: [
+      new Extract()
+      new webpack.HotModuleReplacementPlugin()
+      new Write()
     ]
+    module:
+      rules: [
+        test: /\.pug$/
+        use: [
+          loader: 'pug-loader'
+        ]
+      ,
+        test: /\.coffee$/
+        use: [
+          loader: 'babel-loader'
+        ,
+          loader: 'coffee-loader'
+        ]
+      ,
+        test: /\.js$/
+        use: [
+          loader: 'babel-loader'
+        ]
+      ,
+        test: /\.(sass|css)$/
+        use: [
+          loader: if @config.develop then 'style-loader' else Extract.loader
+        ,
+          loader: 'css-loader'
+        ,
+          loader: 'sass-loader'
+        ]
+      ]
 
+  # Get a webpack compiler instance
+  #
+  _webpackCompiler: (webpackConfig) ->
+    webpack webpackConfig
 
-# => SERVER
-# ---
-demo = express()
-demo.use debMW webpackCompiler
+  # Setup and run the web server
+  #
+  _runServer: (compiler) ->
+    demo = express()
+    demo.use debMW compiler
 
-# config
-demo.set 'view engine', 'pug'
-demo.set 'views', path.join config.bumperPath, 'demo', 'views'
+    # config
+    demo.set 'view engine', 'pug'
+    demo.set 'views', "#{@config.bumperPath}/demo/views"
 
-# helpers
-helpers = require(path.join(config.bumperPath, 'demo', 'scripts', 'helpers')) config
-demo.locals.helpers = helpers
+    # routes
+    demo.use bodyParser.urlencoded
+      extended: false
+    demo.use express.static "#{@config.bumperPath}/demo/images"
+    demo.use (req, res, next) =>
+      res.locals.config = @config
+      res.locals.helpers = @helpers
+      res.locals.view = req.url.match(/^\/(\w+)?/)[1]
+      next()
+    demo.use '/', require("#{@config.bumperPath}/demo/routes/root") @config, @helpers
+    demo.use '/build', require("#{@config.bumperPath}/demo/routes/build") @config, @helpers
+    demo.use '/demo', require("#{@config.bumperPath}/demo/routes/demo") @config, @helpers
 
-# routes
-demo.use bodyParser.urlencoded
-  extended: false
-demo.use express.static path.join config.bumperPath, 'demo', 'images'
-demo.use (req, res, next) ->
-  res.locals = demo.locals
-  res.locals.view = req.url.match(/^\/(\w+)?/)[1]
-  next()
-demo.use '/', require(path.join(config.bumperPath, 'demo', 'routes', 'root')) helpers
-demo.use '/build', require(path.join(config.bumperPath, 'demo', 'routes', 'build')) helpers
-demo.use '/demo', require(path.join(config.bumperPath, 'demo', 'routes', 'demo')) helpers
+    # listen
+    demo.listen @config.demo.port, @config.demo.host
 
-# listen
-demo.listen config.demo.port, config.demo.host
+# Run demo
+new Demo

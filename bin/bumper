@@ -7,5 +7,5 @@ var Cli = require('../lib/cli.coffee');
 // Get Cli instance
 var cli = new Cli;
 
-// Initialize Cli
+// Initialize the interface
 cli.argv;

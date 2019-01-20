@@ -9,7 +9,7 @@
 ---
 # Bumper
 ![logo](https://github.com/brewster1134/bumper/blob/express/demo/images/favicon/apple-icon.png?raw=true)
-###### Protect Your Front End
+###### Protect Your Frontend
 
 ---
 **Bumper** provides a platform for managing your front end library, with a live demo and command line interface, that can both document, build, test, and release your libraries
@@ -124,6 +124,19 @@ demo:
     [LIBNAME]:
       key: val    # will only be added to this library globals
       foo: lib    # will take precedence over `foo: global`
+```
+
+---
+### Development
+```shell
+# show code coverage report
+yarn coverage
+
+# run unit tests and show code coverage
+yarn test
+
+# watch files and run tests on changes
+yarn watch
 ```
 
 ---

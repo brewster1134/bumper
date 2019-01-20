@@ -1,11 +1,11 @@
 doctype html
 html
   head
-    title= helpers.buildTitle(helpers.config.name, locals.view, subtitle)
+    title= helpers.buildTitle(config.name, view, subtitle)
     include _favicon
-    if helpers.config.prod
+    if !config.develop
       link(rel='stylesheet', href='/demo.css')
-  body(id=locals.view)
+  body(id=view)
     include _header
     block content
     script(src='/demo.js')

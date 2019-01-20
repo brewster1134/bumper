@@ -287,8 +287,8 @@ module.exports =
     _runDemo: (config) ->
       nodemon = require 'nodemon'
       nodemon
-        script: "#{@configCore.bumperPath}/lib/commands/demo.coffee"
-        ext: @configCore.formats.js.join ' '
+        script: "#{config.bumperPath}/lib/commands/demo.coffee"
+        ext: config.formats.js.join ' '
         args: [ "--config='#{JSON.stringify(config)}'" ]
         watch: [
           'demo/routes'
