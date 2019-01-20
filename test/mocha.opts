@@ -1,2 +1,2 @@
- --require coffeescript/register
+--require coffeescript/register
 test/**/*_test.coffee

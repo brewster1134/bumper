@@ -9,7 +9,9 @@
     "bumper": "./bin/bumper"
   },
   "scripts": {
-    "test": "yarn run mocha"
+    "coverage": "nyc report",
+    "test": "nyc mocha --colors",
+    "watch": "nyc mocha --colors --watch-extensions coffee --watch"
   },
   "dependencies": {
     "@babel/core": "^7",
@@ -43,8 +45,24 @@
   },
   "devDependencies": {
     "chai": "^4",
+    "istanbul": "^0",
     "mocha": "^5",
+    "nyc": "^13",
     "sinon": "^7",
     "sinon-chai": "^3"
+  },
+  "nyc": {
+    "all": true,
+    "check-coverage": true,
+    "per-file": true,
+    "extension": [
+      ".coffee"
+    ],
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "report-dir": "./.tmp/coverage",
+    "temp-dir": "./.tmp/coverage"
   }
 }
