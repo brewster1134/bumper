@@ -1,4 +1,12 @@
 <!--- topics: api build demo deploy documentation frontend release styleguide test -->
+![github: release](https://badgen.net/github/release/brewster1134/bumper)
+![github: status](https://badgen.net/github/status/brewster1134/bumper)
+![github: open prs](https://badgen.net/github/open-prs/brewster1134/bumper)
+![npm: version](https://badgen.net/npm/v/bumper)
+![travis](https://badgen.net/travis/brewster1134/bumper)
+![codecov](https://badgen.net/codecov/c/github/brewster1134/bumper)
+
+---
 # Bumper
 ![logo](https://github.com/brewster1134/bumper/blob/express/demo/images/favicon/apple-icon.png?raw=true)
 ###### Protect Your Front End
@@ -128,6 +136,7 @@ demo:
   * ci (travis)
   * badges support (badgen)
   * documentation generator?
+  * jsdoc (enable github pages for /docs)
 * DEMO
   * separate documentation for developers and designers
   * shorthand route for showing all libs (lib/* or lib/all)
