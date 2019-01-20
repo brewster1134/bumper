@@ -146,22 +146,19 @@ yarn watch
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
 * BUMPER
   * create workspace for demo and cli?
-  * ci (travis)
-  * badges support (badgen)
-  * documentation generator?
+  * code coverage
   * jsdoc (enable github pages for /docs)
+  * postcss
+  * semantic versioning (entire project vs individual libs)
+  * view diff between versions
 * DEMO
   * separate documentation for developers and designers
   * shorthand route for showing all libs (lib/* or lib/all)
   * cdn (bumper.js?foo:1.2.3,bar:latest)
-  * make it prettier
+  * demo design
+  * generate & assign permanent identifiers for labeling objects (the idea is for a designer to label e.g. a button with #A1 that represents a particular style)
 * BUMPER PACKAGE
   * browserslist
-* FEATURES
-  * semantic versioning (entire project vs individual libs)
-  * generate & assign permanent identifiers for labeling objects (the idea is for a designer to label e.g. a button with #A1 that represents a particular style)
-  * view diff between versions
-* PACKAGES
   * atrackt
   * old bumper stuff
 * CLI
