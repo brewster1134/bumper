@@ -19,7 +19,8 @@ module.exports = (config) ->
     # @arg {...String} strings - 1 or more strings to be concatenated
     # @return {String} Full title
     #
-    buildTitle: (strings...) -> _.compact(strings).join(': ')
+    buildTitle: (strings...) ->
+      _.compact(strings).join ': '
 
     # Builds lib object required for the lib route
     # @arg {...String} libNames - lib names
@@ -142,8 +143,8 @@ module.exports = (config) ->
       # create mocha instance
       Mocha = require 'mocha'
       mocha = new Mocha
-        ui: 'bdd'
         reporter: 'doc'
+        ui: 'bdd'
 
       # add single lib test to mocha
       mocha.addFile "#{@config.packagePath}/.tmp/demo/#{libName}_test.js"
@@ -153,14 +154,11 @@ module.exports = (config) ->
       html = fs.createWriteStream htmlFile,
         flags: 'a'
 
-      # backup console.log
+      # have console.log write to the the html file
       ogLog = console.log
-
-      # force console.log to write to file
       console.log = (data, args...) ->
         val = require('util').format(data, args...)
         html.write val
-        ogLog val
 
       # run tests and generate reports
       await mocha.run()

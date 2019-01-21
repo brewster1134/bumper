@@ -12,11 +12,11 @@ module.exports =
   class Cli
     constructor: ->
       # get environment configuration
-      @verbose = process.argv.includes('-V') || process.argv.includes('--verbose')
+      verbose = process.argv.includes('-V') || process.argv.includes('--verbose')
       packagePath = process.cwd()
 
       # get helpers
-      @helpers = new Helpers @verbose
+      @helpers = new Helpers verbose
 
       # get package.json
       try

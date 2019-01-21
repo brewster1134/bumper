@@ -3,8 +3,8 @@
 ![github: status](https://badgen.net/github/status/brewster1134/bumper)
 ![github: open prs](https://badgen.net/github/open-prs/brewster1134/bumper)
 ![npm: version](https://badgen.net/npm/v/bumper)
-![travis](https://badgen.net/travis/brewster1134/bumper)
-![codecov](https://badgen.net/codecov/c/github/brewster1134/bumper)
+[![travis](https://travis-ci.com/brewster1134/bumper.svg?branch=express)](https://travis-ci.com/brewster1134/bumper)
+[![codecov](https://codecov.io/gh/brewster1134/bumper/branch/express/graph/badge.svg)](https://codecov.io/gh/brewster1134/bumper)
 
 ---
 # Bumper
@@ -145,27 +145,31 @@ yarn watch
 ## TODO:
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
 * BUMPER
-  * create workspace for demo and cli?
-  * code coverage
-  * jsdoc (enable github pages for /docs)
   * postcss
   * semantic versioning (entire project vs individual libs)
   * view diff between versions
+  * jsdoc (enable github pages for /docs)
+  * create workspace for demo and cli?
+  * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
+  * code coverage
 * DEMO
-  * separate documentation for developers and designers
   * shorthand route for showing all libs (lib/* or lib/all)
-  * cdn (bumper.js?foo:1.2.3,bar:latest)
   * demo design
+  * separate documentation for developers and designers
   * generate & assign permanent identifiers for labeling objects (the idea is for a designer to label e.g. a button with #A1 that represents a particular style)
+  * cdn (bumper.js?foo:1.2.3,bar:latest)
 * BUMPER PACKAGE
   * browserslist
   * atrackt
   * old bumper stuff
 * CLI
-  * bumper init (create skeleton for package)
   * bumper build (single asset, or individual libs)
+  * bumper init (create skeleton for package)
   * bumper lib new (create new blank lib)
   * bumper lib depend (add dependencies to lib) - will it work with workspaces?
   * bumper version new (release a new semantic version)
   * bumper version list (list existing semantic versions)
   * support white space in --globals keys & values
+* BUGS
+  * demo/scripts/helpers.coffee - `mocha.run()` running asynchronously [3682](https://github.com/mochajs/mocha/issues/3682)
+  * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)

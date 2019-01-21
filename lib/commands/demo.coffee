@@ -23,7 +23,7 @@ class Demo
     # start server
     @_runServer webpackCompiler
 
-  # The webpack configuration object
+  # the webpack configuration object
   # @return {Object}
   #
   _webpackConfig: ->
@@ -72,12 +72,12 @@ class Demo
         ]
       ]
 
-  # Get a webpack compiler instance
+  # get a webpack compiler instance
   #
   _webpackCompiler: (webpackConfig) ->
     webpack webpackConfig
 
-  # Setup and run the web server
+  # setup and run the web server
   #
   _runServer: (compiler) ->
     demo = express()
@@ -103,5 +103,5 @@ class Demo
     # listen
     demo.listen @config.demo.port, @config.demo.host
 
-# Run demo
+# run demo
 new Demo
