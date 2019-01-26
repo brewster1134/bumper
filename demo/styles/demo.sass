@@ -1,6 +1,9 @@
 @import '../../node_modules/normalize.css/normalize.css'
 
+$fontSize: 16px
+
 body
+  font-size: $fontSize
   font-family: Helvetica,sans-serif
   padding: 1em
   h1,
@@ -13,3 +16,14 @@ body
 
   // /demo
   &#demo
+    .lib__test--suite
+      // hides any console.logs from the library from rendering in the test report
+      font-size: 0
+      section.suite
+        font-size: $fontSize
+        > h1
+          display: none
+        > dl
+          margin: 0
+          dt.error
+            color: red

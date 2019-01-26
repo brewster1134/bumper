@@ -2,12 +2,30 @@
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "description": "Protect Your Frontend",
   "license": "GPL-3.0-or-later",
+  "main": "./lib/main",
   "name": "bumper",
-  "repository": "git@github.com:brewster1134/bumper.git",
+  "repository": "brewster1134/bumper",
   "version": "0.0.0",
   "bin": {
     "bumper": "./bin/bumper"
   },
+  "directories": {
+    "bin": "bin",
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "keywords": [
+    "api",
+    "build",
+    "demo",
+    "deploy",
+    "documentation",
+    "frontend",
+    "release",
+    "styleguide",
+    "test"
+  ],
   "scripts": {
     "coverage": "nyc report",
     "test": "nyc mocha",
@@ -50,31 +68,5 @@
   "devDependencies": {
     "istanbul": "^0",
     "nyc": "^13"
-  },
-  "nyc": {
-    "all": true,
-    "check-coverage": true,
-    "instrument": true,
-    "per-file": false,
-    "report-dir": "./.tmp/coverage",
-    "sourceMap": true,
-    "temp-dir": "./.tmp/coverage",
-    "lines": 50,
-    "statements": 50,
-    "functions": 50,
-    "branches": 50,
-    "extension": [
-      ".coffee"
-    ],
-    "reporter": [
-      "lcov",
-      "text"
-    ],
-    "watermarks": {
-      "lines": [50, 80],
-      "functions": [50, 80],
-      "branches": [50, 80],
-      "statements": [50, 80]
-    }
   }
 }

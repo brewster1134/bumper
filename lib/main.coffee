@@ -1,4 +1,5 @@
 _ = require 'lodash'
+argv = require('yargs-parser') process.argv.slice 2
 chalk = require 'chalk'
 consolidate = require 'consolidate'
 fs = require 'fs-extra'
@@ -9,10 +10,11 @@ yaml = require 'js-yaml'
 yargs = require 'yargs'
 
 module.exports =
-  class Cli
+  class Main
     constructor: ->
       # get environment configuration
-      verbose = process.argv.includes('-V') || process.argv.includes('--verbose')
+      @argv = argv
+      verbose = @argv.V? || @argv.verbose?
       packagePath = process.cwd()
 
       # get helpers
@@ -40,8 +42,8 @@ module.exports =
       catch err
         @helpers.logMessage 'No `libs` directory found', 'fail', err
 
-      # get cli
-      return @_buildCli()
+      # get main
+      return @_buildMain()
 
     # Get user configuration
     # @arg {String} packagePath - path to bumper package
@@ -144,29 +146,60 @@ module.exports =
 
     # Build the entire config object to be passed to each command script
     # @arg {String} command
-    # @arg {Object} args - the cli argument object
+    # @arg {Object} args - the main argument object
     #
     _buildCommandConfig: (command, args) ->
       config = new Object
 
-      _.merge config, @configCore, @_getCommonOptions(command)
-      config[command] = args
+      # merge global options into config core
+      _.merge config, @configCore, @_getGlobalOptions(command, args)
+
+      # add command options into command namespace
+      config[command] = @_cleanupCommandConfig args
 
       return config
 
-    # Look for command-specific common options
-    # @arg {String} command
-    # @return {Object} commonOptions
+    # cleanup unnecessary keys
+    # @arg {Object} args
+    # @return {Object}
     #
-    _getCommonOptions: (command) ->
-      commonOptions =
-        develop: null
-        verbose: null
+    _cleanupCommandConfig: (args) ->
+      # remove args keys
+      delete args.$0
+      delete args._
 
-      for option, value of commonOptions
-        commonOptions[option] = @_getOptionValue command, option
+      # remove global options from command object
+      delete args.develop
+      delete args.verbose
 
-      return commonOptions
+      # remove aliases
+      for key, val of args
+        if key.length == 1
+          delete args[key]
+
+      return args
+
+    # Look for command-specific values for global options
+    # @arg {String} command
+    # @arg {Object} args
+    # @return {Object}
+    #
+    _getGlobalOptions: (command, args) ->
+      globalOptions = new Object
+      commandOptions =
+        D: 'develop'
+        V: 'verbose'
+
+      for alias, option of commandOptions
+        # check if a value was passed in from the main
+        fromMain = @argv[alias]? || @argv[option]?
+
+        if fromMain
+          globalOptions[option] = args[option]
+        else
+          globalOptions[option] = @_getOptionValue command, option
+
+      return globalOptions
 
     # Get value from an environment variable
     # @arg {String} command - the command passed
@@ -224,13 +257,13 @@ module.exports =
       return objekt
 
     # Build the globals object
-    # @arg {Array} cliVal - array of globals from cli
+    # @arg {Array} mainVal - array of globals from main
     # @return {Object} object with full globals for each lib
     #
-    _buildGlobals: (cliVal) ->
+    _buildGlobals: (mainVal) ->
       envVarVal = @_getEnvVarValue 'demo', 'globals', Object
       configVal = @_getConfigValue 'demo', 'globals'
-      cliVal = @_getGlobalsFromString cliVal
+      mainVal = @_getGlobalsFromString mainVal
 
       # Create skeleton of lib
       libGlobals = new Object
@@ -242,8 +275,8 @@ module.exports =
         _.merge libGlobals, @_buildLibGlobals envVarVal
       if configVal
         _.merge libGlobals, @_buildLibGlobals configVal
-      if cliVal
-        _.merge libGlobals, @_buildLibGlobals cliVal
+      if mainVal
+        _.merge libGlobals, @_buildLibGlobals mainVal
 
       return libGlobals
 
@@ -291,9 +324,9 @@ module.exports =
         ext: config.formats.js.join ' '
         args: [ "--config='#{JSON.stringify(config)}'" ]
         watch: [
-          'demo/routes'
-          'demo/scripts'
-          'lib'
+          "#{config.bumperPath}/demo/routes"
+          "#{config.bumperPath}/demo/scripts"
+          "#{config.bumperPath}/lib"
         ]
       .on 'crash', =>
         @helpers.logMessage "#{config.name} demo has crashed", 'fail'
@@ -312,9 +345,9 @@ module.exports =
       Test = require './commands/test.coffee'
       new Test config, @helpers
 
-    # Build cli interface
+    # Build main interface
     #
-    _buildCli: ->
+    _buildMain: ->
       return yargs
         .epilogue @configCore.flair
         .example chalk.bold 'bumper [COMMAND] --help'
@@ -359,7 +392,7 @@ module.exports =
 
         # => COMMANDS
         # * Use _buildCommandConfig to build the command-specific configuration object
-        # * Call the command-specific run method and pass the cli arguments
+        # * Call the command-specific run method and pass the main arguments
         #
         # => BUILD
         # ---
@@ -378,7 +411,6 @@ module.exports =
             alias: 's'
             default: @_getOptionValue 'build', 'split'
             desc: 'Build each library separately'
-            type: 'boolean'
         , (args) =>
           config = @_buildCommandConfig 'build', args
           @_runBuild config

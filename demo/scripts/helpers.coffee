@@ -11,6 +11,11 @@ Write = require 'write-file-webpack-plugin'
 module.exports = (config) ->
   BumperHelpers = require "#{config.bumperPath}/lib/helpers"
 
+  if config.demo.tests
+    format = require('util').format
+    Mocha = require 'mocha'
+    promisify = require('util').promisify
+
   class Helper extends BumperHelpers
     constructor: (@config) ->
       super config.verbose
@@ -140,31 +145,38 @@ module.exports = (config) ->
     _demoGetTestHtml: (libName) ->
       return false unless @config.demo.tests
 
+      # start write stream to html report
+      htmlFile = "#{@config.packagePath}/.tmp/demo/#{libName}_test.html"
+      fs.removeSync htmlFile
+      html = fs.createWriteStream htmlFile,
+        flags: 'a'
+
       # create mocha instance
-      Mocha = require 'mocha'
       mocha = new Mocha
         reporter: 'doc'
         ui: 'bdd'
 
       # add single lib test to mocha
-      mocha.addFile "#{@config.packagePath}/.tmp/demo/#{libName}_test.js"
+      testFile = "#{@config.packagePath}/.tmp/demo/#{libName}_test.js"
+      delete require.cache[testFile]
+      mocha.addFile testFile
 
-      # start write stream to html report
-      htmlFile = "#{@config.packagePath}/.tmp/demo/#{libName}_test.html"
-      html = fs.createWriteStream htmlFile,
-        flags: 'a'
+      # create promise to run mocha
+      mochaRunPromise = promisify(mocha.run).bind mocha
 
       # have console.log write to the the html file
-      ogLog = console.log
+      consoleLogBackup = console.log
       console.log = (data, args...) ->
-        val = require('util').format(data, args...)
+        val = format data, args...
         html.write val
 
-      # run tests and generate reports
-      await mocha.run()
-
-      # restore console.log
-      console.log = ogLog
+      # run mocha
+      try
+        await mochaRunPromise()
+      catch
+      finally
+        html.close()
+        console.log = consoleLogBackup
 
       # return html
       return fs.readFileSync htmlFile, 'utf8'

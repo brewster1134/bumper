@@ -28,7 +28,7 @@
 * Test your libraries with continuous integration support
 
 ---
-### Dependencies
+### Requirements
 * [node](nodejs.org) >= 8.x
 * [yarn](yarnpkg.com)
 
@@ -145,13 +145,15 @@ yarn watch
 ## TODO:
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
 * BUMPER
+  * nconf ?
+  * code coverage
   * postcss
   * semantic versioning (entire project vs individual libs)
   * view diff between versions
-  * jsdoc (enable github pages for /docs)
-  * create workspace for demo and cli?
+  * [docco](http://ashkenas.com/docco) & enable github pages for `/docs`
+  * create workspace for demo and main?
+  * source maps
   * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
-  * code coverage
 * DEMO
   * shorthand route for showing all libs (lib/* or lib/all)
   * demo design
@@ -164,6 +166,7 @@ yarn watch
   * old bumper stuff
 * CLI
   * bumper build (single asset, or individual libs)
+  * bumper deploy (build assets, docs, prod demo)
   * bumper init (create skeleton for package)
   * bumper lib new (create new blank lib)
   * bumper lib depend (add dependencies to lib) - will it work with workspaces?
@@ -173,3 +176,4 @@ yarn watch
 * BUGS
   * demo/scripts/helpers.coffee - `mocha.run()` running asynchronously [3682](https://github.com/mochajs/mocha/issues/3682)
   * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
+  * better way to check if default is used [95](https://github.com/yargs/yargs/pull/95)

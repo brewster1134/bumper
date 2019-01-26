@@ -1,15 +1,16 @@
 { expect, sinon, helpers } = require '../test_helpers'
-Cli = require '../../lib/cli'
+
+Main = require '../../lib/main'
 fs = require 'fs-extra'
 glob = require 'glob'
 yaml = require 'js-yaml'
 
-describe 'Cli', ->
-  cli = null
+describe 'Main', ->
+  main = null
   sandbox = sinon.createSandbox()
 
   beforeEach ->
-    cli = sandbox.createStubInstance Cli
+    main = sandbox.createStubInstance Main
 
   after ->
     sandbox.restore()
@@ -18,21 +19,21 @@ describe 'Cli', ->
     readFileStub = sandbox.stub fs, 'readFileSync'
 
     beforeEach ->
-      cli._getConfigFile.restore()
+      main._getConfigFile.restore()
 
     afterEach ->
       readFileStub.reset()
 
     context 'with a yaml config file', ->
       it 'should check the right file path', ->
-        cli._getConfigFile 'packagePath'
+        main._getConfigFile 'packagePath'
 
         expect(readFileStub).to.have.been.calledWith 'packagePath/config.yaml'
 
       it 'should return a json object', ->
         readFileStub.returns 'yaml: true'
 
-        configFile = cli._getConfigFile 'packagePath'
+        configFile = main._getConfigFile 'packagePath'
 
         expect(configFile).to.deep.equal
           yaml: true
@@ -41,7 +42,7 @@ describe 'Cli', ->
       it 'should check the right file path', ->
         readFileStub.onCall(0).throws()
 
-        cli._getConfigFile 'packagePath'
+        main._getConfigFile 'packagePath'
 
         expect(readFileStub.getCall(1)).to.have.been.calledWith 'packagePath/config.json'
 
@@ -49,7 +50,7 @@ describe 'Cli', ->
         readFileStub.onCall(0).throws()
         readFileStub.onCall(1).returns '{"json": true}'
 
-        configFile = cli._getConfigFile 'packagePath'
+        configFile = main._getConfigFile 'packagePath'
 
         expect(configFile).to.deep.equal
           json: true
@@ -59,7 +60,7 @@ describe 'Cli', ->
         # readFileStub.reset()
         readFileStub.throws()
 
-        configFile = cli._getConfigFile 'packagePath'
+        configFile = main._getConfigFile 'packagePath'
 
         expect(configFile).to.deep.equal {}
 
@@ -67,10 +68,10 @@ describe 'Cli', ->
     readdirSyncStub = sandbox.stub fs, 'readdirSync'
 
     beforeEach ->
-      cli._getlibs.restore()
+      main._getlibs.restore()
 
     it 'should check the current working directory for valid libraries', ->
-      cli.configCore =
+      main.configCore =
         packagePath: 'packagePath'
         formats:
           js: [
@@ -87,7 +88,7 @@ describe 'Cli', ->
         .onCall(0).returns ['one']
         .onCall(1).returns ['two']
 
-      libs = cli._getlibs()
+      libs = main._getlibs()
 
       expect(readdirSyncStub).to.be.calledWith 'packagePath/libs'
       expect(globSyncStub.getCall(0)).to.be.calledWith 'packagePath/libs/libFoo/libFoo.+(formatFoo|formatBar)'
@@ -98,36 +99,36 @@ describe 'Cli', ->
 
   describe '#_getOptionValue', ->
     beforeEach ->
-      cli._getOptionValue.restore()
+      main._getOptionValue.restore()
 
     it 'should check for values in the right order', ->
-      cli._getOptionDefault.returns 'default'
+      main._getOptionDefault.returns 'default'
 
-      cli._getOptionValue()
+      main._getOptionValue()
 
-      expect(cli._getOptionDefault).to.have.been.called
-      expect(cli._getEnvVarValue).to.have.been.calledAfter cli._getOptionDefault
-      expect(cli._getConfigValue).to.have.been.calledAfter cli._getEnvVarValue
+      expect(main._getOptionDefault).to.have.been.called
+      expect(main._getEnvVarValue).to.have.been.calledAfter main._getOptionDefault
+      expect(main._getConfigValue).to.have.been.calledAfter main._getEnvVarValue
 
     it 'should use the default value type to lookup the environment variable', ->
-      cli._getOptionDefault.returns true
+      main._getOptionDefault.returns true
 
-      cli._getOptionValue 'command', 'option'
+      main._getOptionValue 'command', 'option'
 
-      expect(cli._getEnvVarValue).to.be.calledWith 'command', 'option', Boolean
+      expect(main._getEnvVarValue).to.be.calledWith 'command', 'option', Boolean
 
     it 'should return the environment variable immediately if found', ->
-      cli._getEnvVarValue.returns 'value'
-      cli._getOptionDefault.returns 'default'
+      main._getEnvVarValue.returns 'value'
+      main._getOptionDefault.returns 'default'
 
-      cli._getOptionValue 'command', 'option'
+      main._getOptionValue 'command', 'option'
 
-      expect(cli._getConfigValue).to.have.not.been.called
+      expect(main._getConfigValue).to.have.not.been.called
 
   describe '#_getEnvVarValue', ->
     beforeEach ->
-      cli._getEnvVarValue.restore()
-      cli.configCore =
+      main._getEnvVarValue.restore()
+      main.configCore =
         nameSafe: 'bumpertest'
 
     afterEach ->
@@ -141,51 +142,51 @@ describe 'Cli', ->
       delete process.env.BUMPERTEST_OPTION
       delete process.env.BUMPER_COMMAND_OPTION
       process.env.BUMPER_OPTION = 'BO'
-      expect(cli._getEnvVarValue('command', 'option')).to.equal 'BO'
+      expect(main._getEnvVarValue('command', 'option')).to.equal 'BO'
 
       delete process.env.BUMPERTEST_COMMAND_OPTION
       delete process.env.BUMPERTEST_OPTION
       process.env.BUMPER_COMMAND_OPTION = 'BCO'
       process.env.BUMPER_OPTION = 'BO'
-      expect(cli._getEnvVarValue('command', 'option')).to.equal 'BCO'
+      expect(main._getEnvVarValue('command', 'option')).to.equal 'BCO'
 
       delete process.env.BUMPERTEST_COMMAND_OPTION
       process.env.BUMPERTEST_OPTION = 'BTO'
       process.env.BUMPER_COMMAND_OPTION = 'BCO'
       process.env.BUMPER_OPTION = 'BO'
-      expect(cli._getEnvVarValue('command', 'option')).to.equal 'BTO'
+      expect(main._getEnvVarValue('command', 'option')).to.equal 'BTO'
 
       process.env.BUMPERTEST_COMMAND_OPTION = 'BTCO'
       process.env.BUMPERTEST_OPTION = 'BTO'
       process.env.BUMPER_COMMAND_OPTION = 'BCO'
       process.env.BUMPER_OPTION = 'BO'
-      expect(cli._getEnvVarValue('command', 'option')).to.equal 'BTCO'
+      expect(main._getEnvVarValue('command', 'option')).to.equal 'BTCO'
 
     it 'should type-cast non-string values', ->
       process.env.BUMPER_COMMAND_OPTION = 'foo,bar'
-      expect(cli._getEnvVarValue('command', 'option', Array)).to.deep.equal [ 'foo', 'bar' ]
+      expect(main._getEnvVarValue('command', 'option', Array)).to.deep.equal [ 'foo', 'bar' ]
 
       process.env.BUMPER_COMMAND_OPTION = 'true'
-      expect(cli._getEnvVarValue('command', 'option', Boolean)).to.equal true
+      expect(main._getEnvVarValue('command', 'option', Boolean)).to.equal true
 
       process.env.BUMPER_COMMAND_OPTION = 'false'
-      expect(cli._getEnvVarValue('command', 'option', Boolean)).to.equal false
+      expect(main._getEnvVarValue('command', 'option', Boolean)).to.equal false
 
       process.env.BUMPER_COMMAND_OPTION = '138'
-      expect(cli._getEnvVarValue('command', 'option', Number)).to.equal 138
+      expect(main._getEnvVarValue('command', 'option', Number)).to.equal 138
 
-      cli._getGlobalsFromString.restore()
+      main._getGlobalsFromString.restore()
       process.env.BUMPER_COMMAND_OPTION = 'foo:bar,bar:baz'
-      expect(cli._getEnvVarValue('command', 'option', Object)).to.deep.equal
+      expect(main._getEnvVarValue('command', 'option', Object)).to.deep.equal
         foo: 'bar'
         bar: 'baz'
 
   describe '#_getGlobalsFromString', ->
     beforeEach ->
-      cli._getGlobalsFromString.restore()
+      main._getGlobalsFromString.restore()
 
     it 'should convert a properly formatted strings to an object', ->
-      globals = cli._getGlobalsFromString ['foo:bar', 'bar:baz']
+      globals = main._getGlobalsFromString ['foo:bar', 'bar:baz']
 
       expect(globals).to.deep.equal
         foo: 'bar'
@@ -193,15 +194,15 @@ describe 'Cli', ->
 
   describe '#_buildLibGlobals', ->
     beforeEach ->
-      cli._buildLibGlobals.restore()
+      main._buildLibGlobals.restore()
 
     it 'should move shared globals into library globals', ->
-      cli.configCore =
+      main.configCore =
         libs:
           fooLib: 'path/to/fooLib'
           barLib: 'path/to/barLib'
 
-      globals = cli._buildLibGlobals
+      globals = main._buildLibGlobals
         keyOne: 'valOne'
         keyTwo: 'valTwo'
 
@@ -214,11 +215,11 @@ describe 'Cli', ->
           keyTwo: 'valTwo'
 
     it 'should not overwrite existing lib globals', ->
-      cli.configCore =
+      main.configCore =
         libs:
           fooLib: 'path/to/fooLib'
 
-      globals = cli._buildLibGlobals
+      globals = main._buildLibGlobals
         fooLib:
           key: 'fooVal'
         key: 'val'

@@ -39,9 +39,9 @@ class Demo
       filename: "[name].js"
       path: "#{@config.packagePath}/.tmp/demo"
     plugins: [
-      new Extract()
-      new webpack.HotModuleReplacementPlugin()
-      new Write()
+      new Write
+      new Extract
+      new webpack.HotModuleReplacementPlugin
     ]
     module:
       rules: [

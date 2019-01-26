@@ -81,9 +81,9 @@ module.exports =
         filename: @_getOutputFile 'js'
         path: @tmpDir
       plugins: [
+        new Write
         new Extract
           filename: @_getOutputFile 'css'
-        new Write()
       ]
       module:
         rules: [

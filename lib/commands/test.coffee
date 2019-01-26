@@ -18,7 +18,7 @@ module.exports =
           filename: '[name].js'
           path: "#{@config.packagePath}/.tmp/test"
         plugins: [
-          new Write()
+          new Write
         ]
         module:
           rules: [

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 require('coffeescript/register');
 
-// Get Cli class
-var Cli = require('../lib/cli.coffee');
+// Get Main class
+var Main = require('../lib/main.coffee');
 
-// Get Cli instance
-var cli = new Cli;
+// Get Main instance
+var main = new Main;
 
 // Initialize the interface
-cli.argv;
+main.argv;

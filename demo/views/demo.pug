@@ -22,6 +22,6 @@ block content
         if val.test
           div.lib__test
             h1.lib__header Test
-            div(class=lib)
+            div(class='lib__test--suite ' + lib)
               != val.test
         script(src=val.js)
