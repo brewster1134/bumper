@@ -155,6 +155,7 @@ yarn watch
   * source maps
   * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
 * DEMO
+  * interpolate
   * shorthand route for showing all libs (lib/* or lib/all)
   * demo design
   * separate documentation for developers and designers
@@ -165,6 +166,7 @@ yarn watch
   * atrackt
   * old bumper stuff
 * CLI
+  * detect if running in bumper vs bumper package
   * bumper build (single asset, or individual libs)
   * bumper deploy (build assets, docs, prod demo)
   * bumper init (create skeleton for package)

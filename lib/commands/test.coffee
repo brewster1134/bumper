@@ -7,41 +7,54 @@ Write = require 'write-file-webpack-plugin'
 module.exports =
   class Tests
     constructor: (@config, @helpers) ->
-      @runWebpack()
+      webpackConfig = @_getWebpackConfig()
+      webpackCompiler = @_getWebpackCompiler webpackConfig
+      @_runWebpack webpackCompiler
 
-    runWebpack: ->
-      webpackCompiler = webpack
-        mode: 'development'
-        target: 'node'
-        entry: globEntries "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})"
-        output:
-          filename: '[name].js'
-          path: "#{@config.packagePath}/.tmp/test"
-        plugins: [
-          new Write
+    _getWebpackConfig: ->
+      mode: 'development'
+      target: 'node'
+      entry: globEntries  "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})",
+                          "#{@config.bumperPath}/test/test_helpers.coffee"
+      output:
+        filename: '[name].js'
+        path: "#{@config.packagePath}/.tmp/test"
+      plugins: [
+        new Write
+      ]
+      resolve:
+        alias:
+          Bumper$: @config.bumperPath
+        modules: [
+          'test'
+          'node_modules'
         ]
-        module:
-          rules: [
-            test: /\.coffee$/
-            use: [
-              loader: 'babel-loader'
-            ,
-              loader: 'coffee-loader'
-            ]
+      module:
+        rules: [
+          test: /\.coffee$/
+          use: [
+            loader: 'babel-loader'
           ,
-            test: /\.js$/
-            use: [
-              loader: 'babel-loader'
-            ]
-          ,
-            test: /\.(sass|css)$/
-            use: [
-              loader: 'css-loader'
-            ,
-              loader: 'sass-loader'
-            ]
+            loader: 'coffee-loader'
           ]
+        ,
+          test: /\.js$/
+          use: [
+            loader: 'babel-loader'
+          ]
+        ,
+          test: /\.(sass|css)$/
+          use: [
+            loader: 'css-loader'
+          ,
+            loader: 'sass-loader'
+          ]
+        ]
 
+    _getWebpackCompiler: (webpackConfig) ->
+      webpack webpackConfig
+
+    _runWebpack: (webpackCompiler) ->
       webpackCompiler.run =>
         mocha = new Mocha
           ui: 'bdd'
