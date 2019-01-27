@@ -43,6 +43,11 @@ class Demo
       new Extract
       new webpack.HotModuleReplacementPlugin
     ]
+    resolve:
+      modules: [
+        @config.bumperPath
+        'node_modules'
+      ]
     module:
       rules: [
         test: /\.pug$/

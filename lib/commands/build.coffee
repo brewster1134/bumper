@@ -85,6 +85,11 @@ module.exports =
         new Extract
           filename: @_getOutputFile 'css'
       ]
+      resolve:
+        modules: [
+          @config.bumperPath
+          'node_modules'
+        ]
       module:
         rules: [
           test: /\.coffee$/

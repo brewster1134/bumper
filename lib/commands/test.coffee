@@ -1,6 +1,7 @@
 glob = require 'glob'
 globEntries = require 'webpack-glob-entry'
 Mocha = require 'mocha'
+nodeExternals = require 'webpack-node-externals'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
@@ -14,8 +15,8 @@ module.exports =
     _getWebpackConfig: ->
       mode: 'development'
       target: 'node'
-      entry: globEntries  "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})",
-                          "#{@config.bumperPath}/test/test_helpers.coffee"
+      entry: globEntries  "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})"
+      externals: [nodeExternals()]
       output:
         filename: '[name].js'
         path: "#{@config.packagePath}/.tmp/test"
@@ -23,10 +24,8 @@ module.exports =
         new Write
       ]
       resolve:
-        alias:
-          Bumper$: @config.bumperPath
         modules: [
-          'test'
+          @config.bumperPath
           'node_modules'
         ]
       module:
