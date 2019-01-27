@@ -7,7 +7,7 @@ Write = require 'write-file-webpack-plugin'
 
 module.exports =
   class Build
-    constructor: (@config, @helpers) ->
+    constructor: (@config) ->
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
       @downloadsDir = downloadsFolder()
       @tmpDir = "#{@config.packagePath}/.tmp/build"
@@ -67,13 +67,24 @@ module.exports =
       builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
       fileExt = if @config.build.compress then '.zip' else ''
 
-      @helpers.logMessage "#{builtName} libraries built to: #{@bundleName}#{fileExt}", 'success'
+      @config.log "#{builtName} libraries built to: #{@bundleName}#{fileExt}", 'success', false, @config.verbose
+
+    # Get webpack mode configuration value
+    # https://webpack.js.org/concepts/mode/
+    # @arg {Boolean} develop
+    # @return {String}
+    #
+    _getWebpackMode: (develop) ->
+      if develop == true
+        return 'development'
+      else
+        return 'production'
 
     # The webpack configuration object
     # @return {Object}
     #
     _webpackConfig: ->
-      mode: @helpers.getWebpackMode @config.develop
+      mode: @_getWebpackMode @config.develop
       target: 'web'
       externals: [nodeExternals()]
       entry: @_getEntries()

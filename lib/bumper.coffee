@@ -1,101 +1,20 @@
 _ = require 'lodash'
 argv = require('yargs-parser') process.argv.slice 2
 chalk = require 'chalk'
-consolidate = require 'consolidate'
 fs = require 'fs-extra'
-glob = require 'glob'
-Helpers = require './helpers'
 path = require 'path'
-yaml = require 'js-yaml'
 yargs = require 'yargs'
 
+Config = require './config'
+
 module.exports =
-  class Main
+  class Bumper
     constructor: ->
-      # get environment configuration
-      @argv = argv
-      verbose = @argv.V? || @argv.verbose?
-      packagePath = process.cwd()
+      # get config
+      @config = new Config
 
-      # get helpers
-      @helpers = new Helpers verbose
-
-      # get package.json
-      try
-        @packageJson = require "#{packagePath}/package.json"
-      catch err
-        @helpers.logMessage 'No `package.json` found', 'fail', err
-
-      # get user configuration
-      @configFile = @_getConfigFile packagePath
-
-      # get core configuration
-      @configCore = @_getConfigCore packagePath
-
-      # get package libraries
-      try
-        libs = @_getlibs()
-        @configCore.libs = libs
-
-        if !Object.keys(libs).length
-          @helpers.logMessage 'No valid Bumper libraries found', 'fail', true
-      catch err
-        @helpers.logMessage 'No `libs` directory found', 'fail', err
-
-      # get main
-      return @_buildMain()
-
-    # Get user configuration
-    # @arg {String} packagePath - path to bumper package
-    # @return {Object}
-    #
-    _getConfigFile: (packagePath) ->
-      # look for yaml file
-      configFile = try yaml.safeLoad fs.readFileSync "#{packagePath}/config.yaml"
-
-      # look for json file
-      configFile ||= try JSON.parse fs.readFileSync "#{packagePath}/config.json"
-
-      return configFile || new Object
-
-    # Get core configuration
-    # @arg {String} packagePath - path to bumper package
-    # @return {Object}
-    #
-    _getConfigCore: (packagePath) ->
-      # shared defaults
-      name = @configFile.name || @packageJson.name || 'Bumper'
-
-      return
-        # core defaults
-        bumperPath: path.resolve __dirname, '..'
-        flair: chalk.bold '------======------'
-        name: name
-        nameSafe: name.toLowerCase().replace /\W/g, '_'
-        packagePath: packagePath
-        version: @packageJson.version
-        formats:
-          css: [ 'css', 'sass', 'scss' ]
-          docs: [ 'md' ]
-          html: Object.keys consolidate
-          js: [ 'coffee', 'js' ]
-
-    # Get all current package libraries
-    # @return {Object} key: library name, value: library source path
-    #
-    _getlibs: ->
-      libFormats = @configCore.formats.js.join '|'
-      libs = new Object
-      files = fs.readdirSync "#{@configCore.packagePath}/libs"
-
-      for file in files
-        libGlobPath = "#{@configCore.packagePath}/libs/#{file}/#{file}.+(#{libFormats})"
-        libPath = glob.sync(libGlobPath)[0]
-
-        if libPath
-          libs[file] = libPath
-
-      return libs
+      # get cli
+      return @_buildCli()
 
     # Lookup command option defaults
     # @arg {String} command
@@ -105,7 +24,7 @@ module.exports =
     _getOptionDefault: (command, option) ->
       defaults =
         develop: false
-        libs: Object.keys @configCore.libs
+        libs: Object.keys @config.libs
         verbose: false
         build:
           compress: false
@@ -146,13 +65,13 @@ module.exports =
 
     # Build the entire config object to be passed to each command script
     # @arg {String} command
-    # @arg {Object} args - the main argument object
+    # @arg {Object} args - the command line argument object
     #
     _buildCommandConfig: (command, args) ->
       config = new Object
 
       # merge global options into config core
-      _.merge config, @configCore, @_getGlobalOptions(command, args)
+      _.merge config, @config, @_getGlobalOptions(command, args)
 
       # add command options into command namespace
       config[command] = @_cleanupCommandConfig args
@@ -191,10 +110,10 @@ module.exports =
         V: 'verbose'
 
       for alias, option of commandOptions
-        # check if a value was passed in from the main
-        fromMain = @argv[alias]? || @argv[option]?
+        # check if a value was passed in from the command line
+        fromCli = argv[alias]? || argv[option]?
 
-        if fromMain
+        if fromCli
           globalOptions[option] = args[option]
         else
           globalOptions[option] = @_getOptionValue command, option
@@ -208,8 +127,8 @@ module.exports =
     #
     _getEnvVarValue: (command, option, type) ->
       # search all variations of environment variable names
-      customCommandEnvVar = "#{@configCore.nameSafe}_#{command}_#{option}".toUpperCase()
-      customEnvVar = "#{@configCore.nameSafe}_#{option}".toUpperCase()
+      customCommandEnvVar = "#{@config.nameSafe}_#{command}_#{option}".toUpperCase()
+      customEnvVar = "#{@config.nameSafe}_#{option}".toUpperCase()
       bumperCommandEnvVar = "bumper_#{command}_#{option}".toUpperCase()
       bumperEnvVar = "bumper_#{option}".toUpperCase()
       envVar =  process.env[customCommandEnvVar] ||
@@ -227,7 +146,7 @@ module.exports =
           when Number
             envVar = parseInt envVar
           when Object
-            envVar = @_getGlobalsFromString envVar.split ','
+            envVar = @_getGlobalsFromArray envVar.split ','
 
       return envVar
 
@@ -236,38 +155,38 @@ module.exports =
     # @arg {String} option
     #
     _getConfigValue: (command, option) ->
-      if @configFile[command]?[option]?
-        return @configFile[command][option]
+      if @config.file[command]?[option]?
+        return @config.file[command][option]
       else
-        return @configFile[option]
+        return @config.file[option]
 
     # Parse object from command line into key/value pairs
-    # @arg {String[]} keyValueStrings - array of key/value pairs in the format 'key:value'
+    # @arg {String[]} globalsArray - array of key/value pairs in the format 'key:value'
     # @return {Object}
     #
-    _getGlobalsFromString: (keyValueStrings) ->
-      return unless keyValueStrings.length
+    _getGlobalsFromArray: (globalsArray) ->
+      return unless globalsArray.length
 
       objekt = new Object
-      for keyValueString in keyValueStrings
-        objectArray = keyValueString.split ':'
+      for globalString in globalsArray
+        objectArray = globalString.split ':'
         if objectArray[0]
           objekt[objectArray[0]] = objectArray[1]
 
       return objekt
 
     # Build the globals object
-    # @arg {Array} mainVal - array of globals from main
+    # @arg {Array} cliGlobals - array of globals from command line
     # @return {Object} object with full globals for each lib
     #
-    _buildGlobals: (mainVal) ->
+    _buildGlobals: (cliGlobals) ->
       envVarVal = @_getEnvVarValue 'demo', 'globals', Object
       configVal = @_getConfigValue 'demo', 'globals'
-      mainVal = @_getGlobalsFromString mainVal
+      cliGlobals = @_getGlobalsFromArray cliGlobals
 
       # Create skeleton of lib
       libGlobals = new Object
-      for lib, path of @configCore.libs
+      for lib, path of @config.libs
         libGlobals[lib] = new Object
 
       # Merge all globals together
@@ -275,8 +194,8 @@ module.exports =
         _.merge libGlobals, @_buildLibGlobals envVarVal
       if configVal
         _.merge libGlobals, @_buildLibGlobals configVal
-      if mainVal
-        _.merge libGlobals, @_buildLibGlobals mainVal
+      if cliGlobals
+        _.merge libGlobals, @_buildLibGlobals cliGlobals
 
       return libGlobals
 
@@ -289,12 +208,12 @@ module.exports =
       nonLibGlobals = new Object
 
       # create empty objects for each lib
-      for lib, path of @configCore.libs
+      for lib, path of @config.libs
         libGlobals[lib] = new Object
 
       # separate lib and non-lib globals
       for key, val of originalGlobals
-        if @configCore.libs[key]
+        if @config.libs[key]
           libGlobals[key] = val
         else
           nonLibGlobals[key] = val
@@ -313,7 +232,7 @@ module.exports =
     # ---
     _runBuild: (config) ->
       Build = require './commands/build.coffee'
-      new Build config, @helpers
+      new Build config
 
     # => DEMO
     # ---
@@ -329,40 +248,40 @@ module.exports =
           "#{config.bumperPath}/lib"
         ]
       .on 'crash', =>
-        @helpers.logMessage "#{config.name} demo has crashed", 'fail'
+        @config.log "#{config.name} demo has crashed", 'fail'
         process.exit 1
       .on 'quit', =>
-        @helpers.logMessage "#{config.name} demo has quit", 'alert'
+        @config.log "#{config.name} demo has quit", 'alert'
         process.exit 0
       .on 'restart', (files) =>
-        @helpers.logMessage "#{config.name} demo restarted due to changes to #{files.toString()}", 'alert'
+        @config.log "#{config.name} demo restarted due to changes to #{files.toString()}", 'alert'
       .on 'start', =>
-        @helpers.logMessage "#{config.name} demo is running at http://#{config.demo.host}:#{config.demo.port}", 'success'
+        @config.log "#{config.name} demo is running at http://#{config.demo.host}:#{config.demo.port}", 'success'
 
     # => TEST
     # ---
     _runTest: (config) ->
       Test = require './commands/test.coffee'
-      new Test config, @helpers
+      new Test config
 
-    # Build main interface
+    # Build command line interface
     #
-    _buildMain: ->
+    _buildCli: ->
       return yargs
-        .epilogue @configCore.flair
+        .epilogue @config.flair
         .example chalk.bold 'bumper [COMMAND] --help'
         .example chalk.bold 'bumper --version'
         .hide 'help'
         .hide 'version'
         .scriptName chalk.bold 'bumper'
         .strict()
-        .usage @configCore.flair
+        .usage @config.flair
 
         # handle missing or unsupported commands
         .demandCommand 1, 'no command was passed'
         .fail (msg, err) =>
           yargs.showHelp()
-          @helpers.logMessage msg, 'error'
+          @config.log msg, 'error'
 
         # run before each command
         .middleware (argv) =>
@@ -370,7 +289,7 @@ module.exports =
           command = argv._[0]
 
           # get path to command cache directory
-          tmpDir = "#{@configCore.packagePath}/.tmp/#{command}"
+          tmpDir = "#{@config.packagePath}/.tmp/#{command}"
 
           # ensure command cache directory exists & is empty
           fs.ensureDirSync tmpDir
@@ -392,7 +311,7 @@ module.exports =
 
         # => COMMANDS
         # * Use _buildCommandConfig to build the command-specific configuration object
-        # * Call the command-specific run method and pass the main arguments
+        # * Call the command-specific run method and pass the bumper arguments
         #
         # => BUILD
         # ---

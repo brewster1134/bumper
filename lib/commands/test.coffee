@@ -7,7 +7,7 @@ Write = require 'write-file-webpack-plugin'
 
 module.exports =
   class Tests
-    constructor: (@config, @helpers) ->
+    constructor: (@config) ->
       webpackConfig = @_getWebpackConfig()
       webpackCompiler = @_getWebpackCompiler webpackConfig
       @_runWebpack webpackCompiler
@@ -15,7 +15,7 @@ module.exports =
     _getWebpackConfig: ->
       mode: 'development'
       target: 'node'
-      entry: globEntries  "#{@config.packagePath}/libs/**/*_test.+(#{@config.formats.js.join('|')})"
+      entry: globEntries  "#{@config.packagePath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
       externals: [nodeExternals()]
       output:
         filename: '[name].js'
@@ -59,7 +59,7 @@ module.exports =
           ui: 'bdd'
           reporter: 'spec'
 
-        tests = glob.sync "#{@config.packagePath}/.tmp/test/*_test.js"
+        tests = glob.sync "#{@config.packagePath}/.tmp/test/+(#{@config.test.libs.join('|')})_test.js"
         for test in tests
           mocha.addFile test
 

@@ -1,101 +1,19 @@
-{ expect, sinon, helpers } = require '../test_helpers'
+{ expect, sinon } = require '../test_helpers'
 
-Main = require '../../lib/main'
+Bumper = require '../../lib/bumper'
 fs = require 'fs-extra'
 glob = require 'glob'
 yaml = require 'js-yaml'
 
-describe 'Main', ->
+describe 'Bumper', ->
   main = null
   sandbox = sinon.createSandbox()
 
   beforeEach ->
-    main = sandbox.createStubInstance Main
+    main = sandbox.createStubInstance Bumper
 
   after ->
     sandbox.restore()
-
-  describe '#_getConfigFile', ->
-    readFileStub = sandbox.stub fs, 'readFileSync'
-
-    beforeEach ->
-      main._getConfigFile.restore()
-
-    afterEach ->
-      readFileStub.reset()
-
-    context 'with a yaml config file', ->
-      it 'should check the right file path', ->
-        main._getConfigFile 'packagePath'
-
-        expect(readFileStub).to.have.been.calledWith 'packagePath/config.yaml'
-
-      it 'should return a json object', ->
-        readFileStub.returns 'yaml: true'
-
-        configFile = main._getConfigFile 'packagePath'
-
-        expect(configFile).to.deep.equal
-          yaml: true
-
-    context 'with a json config file', ->
-      it 'should check the right file path', ->
-        readFileStub.onCall(0).throws()
-
-        main._getConfigFile 'packagePath'
-
-        expect(readFileStub.getCall(1)).to.have.been.calledWith 'packagePath/config.json'
-
-      it 'should return a json object', ->
-        readFileStub.onCall(0).throws()
-        readFileStub.onCall(1).returns '{"json": true}'
-
-        configFile = main._getConfigFile 'packagePath'
-
-        expect(configFile).to.deep.equal
-          json: true
-
-    context 'with no config file', ->
-      it 'should return an empty object', ->
-        # readFileStub.reset()
-        readFileStub.throws()
-
-        configFile = main._getConfigFile 'packagePath'
-
-        expect(configFile).to.deep.equal {}
-
-  describe '#_getlibs', ->
-    readdirSyncStub = sandbox.stub fs, 'readdirSync'
-
-    beforeEach ->
-      main._getlibs.restore()
-
-    it 'should check the current working directory for valid libraries', ->
-      main.configCore =
-        packagePath: 'packagePath'
-        formats:
-          js: [
-            'formatFoo'
-            'formatBar'
-          ]
-
-      readdirSyncStub.returns [
-        'libFoo'
-        'libBar'
-      ]
-
-      globSyncStub = sandbox.stub(glob, 'sync')
-        .onCall(0).returns ['one']
-        .onCall(1).returns ['two']
-
-      libs = main._getlibs()
-
-      expect(readdirSyncStub).to.be.calledWith 'packagePath/libs'
-      expect(globSyncStub.getCall(0)).to.be.calledWith 'packagePath/libs/libFoo/libFoo.+(formatFoo|formatBar)'
-      expect(globSyncStub.getCall(1)).to.be.calledWith 'packagePath/libs/libBar/libBar.+(formatFoo|formatBar)'
-      expect(libs).to.deep.equal
-        libFoo: 'one'
-        libBar: 'two'
 
   describe '#_getOptionValue', ->
     beforeEach ->
@@ -128,7 +46,7 @@ describe 'Main', ->
   describe '#_getEnvVarValue', ->
     beforeEach ->
       main._getEnvVarValue.restore()
-      main.configCore =
+      main.config =
         nameSafe: 'bumpertest'
 
     afterEach ->
@@ -175,18 +93,18 @@ describe 'Main', ->
       process.env.BUMPER_COMMAND_OPTION = '138'
       expect(main._getEnvVarValue('command', 'option', Number)).to.equal 138
 
-      main._getGlobalsFromString.restore()
+      main._getGlobalsFromArray.restore()
       process.env.BUMPER_COMMAND_OPTION = 'foo:bar,bar:baz'
       expect(main._getEnvVarValue('command', 'option', Object)).to.deep.equal
         foo: 'bar'
         bar: 'baz'
 
-  describe '#_getGlobalsFromString', ->
+  describe '#_getGlobalsFromArray', ->
     beforeEach ->
-      main._getGlobalsFromString.restore()
+      main._getGlobalsFromArray.restore()
 
     it 'should convert a properly formatted strings to an object', ->
-      globals = main._getGlobalsFromString ['foo:bar', 'bar:baz']
+      globals = main._getGlobalsFromArray ['foo:bar', 'bar:baz']
 
       expect(globals).to.deep.equal
         foo: 'bar'
@@ -197,7 +115,7 @@ describe 'Main', ->
       main._buildLibGlobals.restore()
 
     it 'should move shared globals into library globals', ->
-      main.configCore =
+      main.config =
         libs:
           fooLib: 'path/to/fooLib'
           barLib: 'path/to/barLib'
@@ -215,7 +133,7 @@ describe 'Main', ->
           keyTwo: 'valTwo'
 
     it 'should not overwrite existing lib globals', ->
-      main.configCore =
+      main.config =
         libs:
           fooLib: 'path/to/fooLib'
 

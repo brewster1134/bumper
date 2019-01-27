@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 require('coffeescript/register');
 
-// Get Main class
-var Main = require('../lib/main.coffee');
+// Get Bumper class
+var Bumper = require('../lib/bumper.coffee');
 
-// Get Main instance
-var main = new Main;
+// Get bumper instance
+var bumper = new Bumper;
 
 // Initialize the interface
-main.argv;
+bumper.argv;

@@ -1,24 +1,17 @@
 _ = require 'lodash'
 consolidate = require 'consolidate'
 fs = require 'fs-extra'
-glob = require 'glob'
-globEntries = require 'webpack-glob-entry'
 markdown = require 'marked'
 path = require 'path'
-webpack = require 'webpack'
-Write = require 'write-file-webpack-plugin'
 
 module.exports = (config) ->
-  BumperHelpers = require "#{config.bumperPath}/lib/helpers"
-
   if config.demo.tests
     format = require('util').format
     Mocha = require 'mocha'
     promisify = require('util').promisify
 
-  class Helper extends BumperHelpers
+  class Helper
     constructor: (@config) ->
-      super config.verbose
 
     # Build a single string from multiple strings
     # @arg {...String} strings - 1 or more strings to be concatenated

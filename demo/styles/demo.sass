@@ -25,5 +25,22 @@ body
           display: none
         > dl
           margin: 0
-          dt.error
-            color: red
+          dt,
+          dd
+            font-size: 0.8em
+            opacity: 0.4
+            &.error
+              font-size: 1.2em
+              opacity: 1
+          dt
+            margin-top: 0.5em
+            color: green
+            &.error
+              color: red
+            &:first-child
+              margin-top: 0
+          dd
+            pre
+              display: none
+            &.error + dd.error
+              font-size: 1em
