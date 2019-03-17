@@ -42,7 +42,7 @@ describe 'Bumper', ->
     it 'should initialize the cli', ->
       expect(stubCli).to.be.calledOnce
 
-  describe.skip '#_log', ->
+  describe '#_log', ->
     before ->
       bumper = sandbox.createStubInstance Bumper
       bumper._log.restore()
@@ -61,10 +61,11 @@ describe 'Bumper', ->
 
       expect(verbose).to.equal 'global'
 
-    it.skip 'should check if passed via cli', ->
+    it 'should check if passed via cli', ->
       global.bumper =
         config: undefined
-      process.argv.push '--verbose'
+      unless process.argv.includes '--verbose'
+        process.argv.push '--verbose'
 
       verbose = bumper._getVerbose()
 
