@@ -13,5 +13,8 @@ os:
   - windows
 script:
   - yarn test
-after_success:
-  - yarn coveralls
+jobs:
+  include:
+    - stage: coveralls
+      install: yarn add coveralls
+      script: yarn coveralls
