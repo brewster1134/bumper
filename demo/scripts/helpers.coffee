@@ -4,12 +4,7 @@ fs = require 'fs-extra'
 markdown = require 'marked'
 path = require 'path'
 
-module.exports = (config) ->
-  if config.demo.tests
-    format = require('util').format
-    Mocha = require 'mocha'
-    promisify = require('util').promisify
-
+module.exports = ->
   class Helper
     constructor: (@config) ->
 
@@ -59,7 +54,7 @@ module.exports = (config) ->
       # if tmp set, create a tmp file to interpolate rather than modify the original
       unless modifyOriginal
         fileName = path.basename filePath
-        tmpFile = "#{@config.packagePath}/.tmp/demo/#{fileName}"
+        tmpFile = "#{@config.projectPath}/.tmp/demo/#{fileName}"
         fs.copySync filePath, tmpFile
         filePath = tmpFile
 
@@ -85,7 +80,7 @@ module.exports = (config) ->
     # @return {String} Path to the library
     #
     _demoGetLibPath: (libName) ->
-      "#{@config.packagePath}/libs/#{libName}"
+      "#{@config.projectPath}/libs/#{libName}"
 
     # Renders the demo for a given library
     # @arg {String} libName - Name of a library
@@ -113,7 +108,7 @@ module.exports = (config) ->
 
       for engine in @config.formats.html
         libDocsPath = "#{@_demoGetLibPath(libName)}/#{libName}_docs.#{engine}"
-        tmpDocsPath = "#{@config.packagePath}/.tmp/demo/#{libName}_docs.#{engine}"
+        tmpDocsPath = "#{@config.projectPath}/.tmp/demo/#{libName}_docs.#{engine}"
 
         continue unless fs.pathExistsSync libDocsPath
 
@@ -138,8 +133,13 @@ module.exports = (config) ->
     _demoGetTestHtml: (libName) ->
       return false unless @config.demo.tests
 
+      # require testing dependencies
+      format = require('util').format
+      Mocha = require 'mocha'
+      promisify = require('util').promisify
+
       # start write stream to html report
-      htmlFile = "#{@config.packagePath}/.tmp/demo/#{libName}_test.html"
+      htmlFile = "#{@config.projectPath}/.tmp/demo/#{libName}_test.html"
       fs.removeSync htmlFile
       html = fs.createWriteStream htmlFile,
         flags: 'a'
@@ -150,7 +150,7 @@ module.exports = (config) ->
         ui: 'bdd'
 
       # add single lib test to mocha
-      testFile = "#{@config.packagePath}/.tmp/demo/#{libName}_test.js"
+      testFile = "#{@config.projectPath}/.tmp/demo/#{libName}_test.js"
       delete require.cache[testFile]
       mocha.addFile testFile
 

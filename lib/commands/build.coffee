@@ -10,7 +10,7 @@ module.exports =
     constructor: (@config) ->
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
       @downloadsDir = downloadsFolder()
-      @tmpDir = "#{@config.packagePath}/.tmp/build"
+      @tmpDir = "#{@config.projectPath}/.tmp/build"
 
       @_runWebpack()
 
@@ -67,7 +67,9 @@ module.exports =
       builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
       fileExt = if @config.build.compress then '.zip' else ''
 
-      @config.log "#{builtName} libraries built to: #{@bundleName}#{fileExt}", 'success', false, @config.verbose
+      global.bumper.log "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
+        exit: 0
+        type: 'success'
 
     # Get webpack mode configuration value
     # https://webpack.js.org/concepts/mode/

@@ -1,16 +1,14 @@
 { expect, sinon } = require '../test_helpers'
 
-Config = require '../../lib/config'
 fs = require 'fs-extra'
 glob = require 'glob'
 yaml = require 'js-yaml'
 
+Config = require '../../lib/config'
+
 describe 'Config', ->
   config = null
   sandbox = sinon.createSandbox()
-
-  beforeEach ->
-    config = sandbox.createStubInstance Config
 
   after ->
     sandbox.restore()
@@ -18,7 +16,8 @@ describe 'Config', ->
   describe '#_getConfigFile', ->
     readFileStub = sandbox.stub fs, 'readFileSync'
 
-    beforeEach ->
+    before ->
+      config = sandbox.createStubInstance Config
       config._getConfigFile.restore()
 
     afterEach ->
@@ -26,14 +25,14 @@ describe 'Config', ->
 
     context 'with a yaml config file', ->
       it 'should check the right file path', ->
-        config._getConfigFile 'packagePath'
+        config._getConfigFile 'projectPath'
 
-        expect(readFileStub).to.have.been.calledWith 'packagePath/config.yaml'
+        expect(readFileStub).to.have.been.calledWith 'projectPath/config.yaml'
 
       it 'should return a json object', ->
         readFileStub.returns 'yaml: true'
 
-        configFile = config._getConfigFile 'packagePath'
+        configFile = config._getConfigFile 'projectPath'
 
         expect(configFile).to.deep.equal
           yaml: true
@@ -42,15 +41,15 @@ describe 'Config', ->
       it 'should check the right file path', ->
         readFileStub.onCall(0).throws()
 
-        config._getConfigFile 'packagePath'
+        config._getConfigFile 'projectPath'
 
-        expect(readFileStub.getCall(1)).to.have.been.calledWith 'packagePath/config.json'
+        expect(readFileStub.getCall(1)).to.have.been.calledWith 'projectPath/config.json'
 
       it 'should return a json object', ->
         readFileStub.onCall(0).throws()
         readFileStub.onCall(1).returns '{"json": true}'
 
-        configFile = config._getConfigFile 'packagePath'
+        configFile = config._getConfigFile 'projectPath'
 
         expect(configFile).to.deep.equal
           json: true
@@ -60,14 +59,15 @@ describe 'Config', ->
         # readFileStub.reset()
         readFileStub.throws()
 
-        configFile = config._getConfigFile 'packagePath'
+        configFile = config._getConfigFile 'projectPath'
 
         expect(configFile).to.deep.equal {}
 
   describe '#_getlibs', ->
     readdirSyncStub = sandbox.stub fs, 'readdirSync'
 
-    beforeEach ->
+    before ->
+      config = sandbox.createStubInstance Config
       config._getlibs.restore()
 
     it 'should check the current working directory for valid libraries', ->
@@ -80,14 +80,14 @@ describe 'Config', ->
         .onCall(0).returns ['one']
         .onCall(1).returns ['two']
 
-      libs = config._getlibs 'packagePath', [
+      libs = config._getlibs 'projectPath', [
         'formatFoo'
         'formatBar'
       ]
 
-      expect(readdirSyncStub).to.be.calledWith 'packagePath/libs'
-      expect(globSyncStub.getCall(0)).to.be.calledWith 'packagePath/libs/libFoo/libFoo.+(formatFoo|formatBar)'
-      expect(globSyncStub.getCall(1)).to.be.calledWith 'packagePath/libs/libBar/libBar.+(formatFoo|formatBar)'
+      expect(readdirSyncStub).to.be.calledWith 'projectPath/libs'
+      expect(globSyncStub.getCall(0)).to.be.calledWith 'projectPath/libs/libFoo/libFoo.+(formatFoo|formatBar)'
+      expect(globSyncStub.getCall(1)).to.be.calledWith 'projectPath/libs/libBar/libBar.+(formatFoo|formatBar)'
       expect(libs).to.deep.equal
         libFoo: 'one'
         libBar: 'two'

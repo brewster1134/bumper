@@ -1,5 +1,3 @@
-_ = require 'lodash'
-argv = require('yargs-parser') process.argv.slice 2
 chalk = require 'chalk'
 consolidate = require 'consolidate'
 fs = require 'fs-extra'
@@ -9,27 +7,28 @@ yaml = require 'js-yaml'
 
 module.exports =
   class Config
-    constructor: ->
+    build: ->
       # get npm json files
       bumperPath = path.resolve __dirname, '..'
-      packagePath = process.cwd()
-      verbose = argv?.V? || argv?.verbose?
+      projectPath = process.cwd()
 
       # get package.json files
       bumperJson = @_getPackageJson bumperPath
-      packageJson = @_getPackageJson packagePath
+      projectJson = @_getPackageJson projectPath
 
       # get user configuration
-      configFile = @_getConfigFile packagePath
+      configFile = @_getConfigFile projectPath
 
       # additional config
-      name = configFile.name || packageJson.name || 'Bumper'
+      name = configFile.name || projectJson.name || 'Bumper'
       jsFormats = [ 'coffee', 'js' ]
 
       # get package libraries
-      libs = @_getlibs packagePath, jsFormats
+      libs = @_getlibs projectPath, jsFormats
       if !Object.keys(libs).length
-        @_logMessage 'No valid Bumper libraries found', 'fail', true
+        global.bumper.log 'No valid Bumper libraries found',
+          exit: 1
+          type: 'error'
 
       # return all config values
       return @config =
@@ -37,49 +36,16 @@ module.exports =
         file: configFile
         flair: chalk.bold '------======------'
         libs: libs
-        log: @_logMessage
         name: name
         nameSafe: name.toLowerCase().replace /\W/g, '_'
-        packagePath: packagePath
-        verbose: verbose
-        version: packageJson.version
+        projectPath: projectPath
+        verbose: configFile.verbose == true
+        version: projectJson.version
         formats:
           css: [ 'css', 'sass', 'scss' ]
           docs: [ 'md' ]
           html: Object.keys consolidate
           js: jsFormats
-
-    # Log a formatted message
-    # @arg {String} message - the message to log
-    # @arg {String} type - the type of message to log
-    # @arg {Error|Boolean} exception, or true to use message as exception
-    # @arg {Boolean} verbose - log additional information
-    #
-    _logMessage: (message, type, exception, verbose) ->
-      isVerbose = verbose || @config?.verbose
-
-      # log based on message type
-      switch type
-        when 'error', 'fail'
-          console.error chalk.red "\n=> #{message} <=\n"
-        when 'alert', 'info', 'warning'
-          console.warn chalk.yellow "\n=> #{message} <=\n"
-        when 'success', 'pass'
-          console.log chalk.green "\n=> #{message} <=\n"
-        else
-          console.log message
-
-      # log full stack trace if a developer
-      console.error 'EXCEPTION && VERBOSE'
-      console.error exception, isVerbose
-      if exception && isVerbose
-        if exception == true
-          throw new Error message
-        else
-          throw exception
-
-      # exit node if exception
-      process.exit 1 if exception
 
     # get package.json
     # @arg {String} path - absolute directory path
@@ -89,38 +55,39 @@ module.exports =
       try
         return require "#{path}/package.json"
       catch err
-        @_logMessage err, 'fail', err
-        @_logMessage err.message, 'fail', err
-        @_logMessage 'No `package.json` found', 'fail', err
-        return new Object
+        global.bumper.log 'No `package.json` found',
+          exit: false
+          type: 'alert'
 
     # Get user configuration
-    # @arg {String} packagePath - path to bumper package
+    # @arg {String} projectPath - path to bumper package
     # @return {Object}
     #
-    _getConfigFile: (packagePath) ->
+    _getConfigFile: (projectPath) ->
       # look for yaml file
-      configFile = try yaml.safeLoad fs.readFileSync "#{packagePath}/config.yaml"
+      configFile = try yaml.safeLoad fs.readFileSync "#{projectPath}/config.yaml"
 
       # look for json file
-      configFile ||= try JSON.parse fs.readFileSync "#{packagePath}/config.json"
+      configFile ||= try JSON.parse fs.readFileSync "#{projectPath}/config.json"
 
       return configFile || new Object
 
     # Get all current package libraries
     # @return {Object} key: library name, value: library source path
     #
-    _getlibs: (packagePath, formats) ->
+    _getlibs: (projectPath, formats) ->
       libFormats = formats.join '|'
       libs = new Object
 
       try
-        files = fs.readdirSync "#{packagePath}/libs"
+        files = fs.readdirSync "#{projectPath}/libs"
       catch err
-        @_logMessage 'No `libs` directory found', 'fail', err
+        global.bumper.log 'No `libs` directory found',
+          exit: 1
+          type: 'error'
 
       for file in files
-        libGlobPath = "#{packagePath}/libs/#{file}/#{file}.+(#{libFormats})"
+        libGlobPath = "#{projectPath}/libs/#{file}/#{file}.+(#{libFormats})"
         libPath = glob.sync(libGlobPath)[0]
 
         if libPath

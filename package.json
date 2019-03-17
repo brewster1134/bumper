@@ -2,7 +2,7 @@
   "author": "Ryan Brewster <brewster1134@gmail.com>",
   "description": "Protect Your Frontend",
   "license": "GPL-3.0-or-later",
-  "main": "./lib/main",
+  "main": "./lib/bumper",
   "name": "bumper",
   "repository": "brewster1134/bumper",
   "version": "0.0.0",
@@ -48,7 +48,7 @@
     "js-yaml": "^3",
     "marked": "^0",
     "mini-css-extract-plugin": "^0",
-    "mocha": "^5",
+    "mocha": "^6",
     "node-sass": "^4",
     "nodemon": "^1",
     "normalize.css": "^8",
@@ -63,10 +63,9 @@
     "webpack-glob-entry": "^2",
     "webpack-node-externals": "^1",
     "write-file-webpack-plugin": "^4",
-    "yargs": "^12"
+    "yargs": "^13"
   },
   "devDependencies": {
-    "istanbul": "^0",
     "nyc": "^13"
   }
 }

@@ -15,11 +15,11 @@ module.exports =
     _getWebpackConfig: ->
       mode: 'development'
       target: 'node'
-      entry: globEntries  "#{@config.packagePath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
+      entry: globEntries  "#{@config.projectPath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
       externals: [nodeExternals()]
       output:
         filename: '[name].js'
-        path: "#{@config.packagePath}/.tmp/test"
+        path: "#{@config.projectPath}/.tmp/test"
       plugins: [
         new Write
       ]
@@ -59,7 +59,7 @@ module.exports =
           ui: 'bdd'
           reporter: 'spec'
 
-        tests = glob.sync "#{@config.packagePath}/.tmp/test/+(#{@config.test.libs.join('|')})_test.js"
+        tests = glob.sync "#{@config.projectPath}/.tmp/test/+(#{@config.test.libs.join('|')})_test.js"
         for test in tests
           mocha.addFile test
 

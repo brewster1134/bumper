@@ -32,12 +32,12 @@ class Demo
     devtool: if @config.develop then false else 'eval'
     externals: [nodeExternals()]
     entry: glob "#{@config.bumperPath}/demo/scripts/demo.coffee",
-                "#{@config.packagePath}/demo/user_demo.coffee",
-                "#{@config.packagePath}/libs/**/*.coffee",
-                "#{@config.packagePath}/libs/**/*.js"
+                "#{@config.projectPath}/demo/user_demo.coffee",
+                "#{@config.projectPath}/libs/**/*.coffee",
+                "#{@config.projectPath}/libs/**/*.js"
     output:
       filename: "[name].js"
-      path: "#{@config.packagePath}/.tmp/demo"
+      path: "#{@config.projectPath}/.tmp/demo"
     plugins: [
       new Write
       new Extract

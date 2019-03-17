@@ -1,147 +1,71 @@
 { expect, sinon } = require '../test_helpers'
 
 Bumper = require '../../lib/bumper'
-fs = require 'fs-extra'
-glob = require 'glob'
-yaml = require 'js-yaml'
+Cli = require '../../lib/cli'
+Config = require '../../lib/config'
 
 describe 'Bumper', ->
-  main = null
+  bumper = null
   sandbox = sinon.createSandbox()
-
-  beforeEach ->
-    main = sandbox.createStubInstance Bumper
 
   after ->
     sandbox.restore()
 
-  describe '#_getOptionValue', ->
-    beforeEach ->
-      main._getOptionValue.restore()
+  describe '#run', ->
+    spyProcess = null
+    stubLog = null
+    stubConfig = null
+    stubCli = null
 
-    it 'should check for values in the right order', ->
-      main._getOptionDefault.returns 'default'
+    before ->
+      bumper = sandbox.createStubInstance Bumper
+      bumper.run.restore()
 
-      main._getOptionValue()
+      spyProcess = sandbox.spy process, 'on'
+      stubConfig = sandbox.stub(Config::, 'build').returns new Object
+      stubCli = sandbox.stub Cli::, 'run'
 
-      expect(main._getOptionDefault).to.have.been.called
-      expect(main._getEnvVarValue).to.have.been.calledAfter main._getOptionDefault
-      expect(main._getConfigValue).to.have.been.calledAfter main._getEnvVarValue
+      process.removeAllListeners 'uncaughtException'
+      bumper.run()
 
-    it 'should use the default value type to lookup the environment variable', ->
-      main._getOptionDefault.returns true
+    it.skip 'should catch exceptions', ->
+      throw new Error 'exception'
 
-      main._getOptionValue 'command', 'option'
+      expect(spyProcess).to.be.calledOnce
+      expect(stubLog).to.be.calledOnce
 
-      expect(main._getEnvVarValue).to.be.calledWith 'command', 'option', Boolean
+    it 'should create a global object', ->
+      expect(global.bumper.log).to.be.an.instanceof Function
+      expect(global.bumper.verbose).to.be.an.instanceof Function
+      expect(global.bumper.config).to.be.an.instanceof Object
 
-    it 'should return the environment variable immediately if found', ->
-      main._getEnvVarValue.returns 'value'
-      main._getOptionDefault.returns 'default'
+    it 'should initialize the cli', ->
+      expect(stubCli).to.be.calledOnce
 
-      main._getOptionValue 'command', 'option'
+  describe.skip '#_log', ->
+    before ->
+      bumper = sandbox.createStubInstance Bumper
+      bumper._log.restore()
 
-      expect(main._getConfigValue).to.have.not.been.called
+  describe '#_getVerbose', ->
+    before ->
+      bumper = sandbox.createStubInstance Bumper
+      bumper._getVerbose.restore()
 
-  describe '#_getEnvVarValue', ->
-    beforeEach ->
-      main._getEnvVarValue.restore()
-      main.config =
-        nameSafe: 'bumpertest'
+    it 'should check the global config first', ->
+      global.bumper =
+        config:
+          verbose: 'global'
 
-    afterEach ->
-      delete process.env.BUMPERTEST_COMMAND_OPTION
-      delete process.env.BUMPERTEST_OPTION
-      delete process.env.BUMPER_COMMAND_OPTION
-      delete process.env.BUMPER_OPTION
+      verbose = bumper._getVerbose()
 
-    it 'should check for values in the right order', ->
-      delete process.env.BUMPERTEST_COMMAND_OPTION
-      delete process.env.BUMPERTEST_OPTION
-      delete process.env.BUMPER_COMMAND_OPTION
-      process.env.BUMPER_OPTION = 'BO'
-      expect(main._getEnvVarValue('command', 'option')).to.equal 'BO'
+      expect(verbose).to.equal 'global'
 
-      delete process.env.BUMPERTEST_COMMAND_OPTION
-      delete process.env.BUMPERTEST_OPTION
-      process.env.BUMPER_COMMAND_OPTION = 'BCO'
-      process.env.BUMPER_OPTION = 'BO'
-      expect(main._getEnvVarValue('command', 'option')).to.equal 'BCO'
+    it.skip 'should check if passed via cli', ->
+      global.bumper =
+        config: undefined
+      process.argv.push '--verbose'
 
-      delete process.env.BUMPERTEST_COMMAND_OPTION
-      process.env.BUMPERTEST_OPTION = 'BTO'
-      process.env.BUMPER_COMMAND_OPTION = 'BCO'
-      process.env.BUMPER_OPTION = 'BO'
-      expect(main._getEnvVarValue('command', 'option')).to.equal 'BTO'
+      verbose = bumper._getVerbose()
 
-      process.env.BUMPERTEST_COMMAND_OPTION = 'BTCO'
-      process.env.BUMPERTEST_OPTION = 'BTO'
-      process.env.BUMPER_COMMAND_OPTION = 'BCO'
-      process.env.BUMPER_OPTION = 'BO'
-      expect(main._getEnvVarValue('command', 'option')).to.equal 'BTCO'
-
-    it 'should type-cast non-string values', ->
-      process.env.BUMPER_COMMAND_OPTION = 'foo,bar'
-      expect(main._getEnvVarValue('command', 'option', Array)).to.deep.equal [ 'foo', 'bar' ]
-
-      process.env.BUMPER_COMMAND_OPTION = 'true'
-      expect(main._getEnvVarValue('command', 'option', Boolean)).to.equal true
-
-      process.env.BUMPER_COMMAND_OPTION = 'false'
-      expect(main._getEnvVarValue('command', 'option', Boolean)).to.equal false
-
-      process.env.BUMPER_COMMAND_OPTION = '138'
-      expect(main._getEnvVarValue('command', 'option', Number)).to.equal 138
-
-      main._getGlobalsFromArray.restore()
-      process.env.BUMPER_COMMAND_OPTION = 'foo:bar,bar:baz'
-      expect(main._getEnvVarValue('command', 'option', Object)).to.deep.equal
-        foo: 'bar'
-        bar: 'baz'
-
-  describe '#_getGlobalsFromArray', ->
-    beforeEach ->
-      main._getGlobalsFromArray.restore()
-
-    it 'should convert a properly formatted strings to an object', ->
-      globals = main._getGlobalsFromArray ['foo:bar', 'bar:baz']
-
-      expect(globals).to.deep.equal
-        foo: 'bar'
-        bar: 'baz'
-
-  describe '#_buildLibGlobals', ->
-    beforeEach ->
-      main._buildLibGlobals.restore()
-
-    it 'should move shared globals into library globals', ->
-      main.config =
-        libs:
-          fooLib: 'path/to/fooLib'
-          barLib: 'path/to/barLib'
-
-      globals = main._buildLibGlobals
-        keyOne: 'valOne'
-        keyTwo: 'valTwo'
-
-      expect(globals).to.deep.equal
-        fooLib:
-          keyOne: 'valOne'
-          keyTwo: 'valTwo'
-        barLib:
-          keyOne: 'valOne'
-          keyTwo: 'valTwo'
-
-    it 'should not overwrite existing lib globals', ->
-      main.config =
-        libs:
-          fooLib: 'path/to/fooLib'
-
-      globals = main._buildLibGlobals
-        fooLib:
-          key: 'fooVal'
-        key: 'val'
-
-      expect(globals).to.deep.equal
-        fooLib:
-          key: 'fooVal'
+      expect(verbose).to.equal true

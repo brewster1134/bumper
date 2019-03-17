@@ -37,7 +37,7 @@
 ```shell
 # install Bumper
 yarn global add bumper
-# create the package
+# create the project
 bumper init
 # create a library
 bumper lib create --name foo
@@ -48,7 +48,7 @@ bumper demo
 ---
 ### Details
 
-**Package:** A Bumper package will mainly be your Bumper libraries, but can also have scripts and styles to customize the demo  
+**Project:** A Bumper project will mainly be your Bumper libraries, but can also have scripts and styles to customize the demo  
 **Library:** A Bumper library is a collection of files as defined below
 
 ##### Supported File Formats
@@ -65,7 +65,7 @@ bumper demo
 * Any optional library files must be named according to the example below...
 
 ```shell
-# package structure
+# project structure
 ├── demo
 │   ├── demo.js
 │   ├── demo.css
@@ -104,7 +104,7 @@ Options can be set as environment variables in the format of `[NAME]_[COMMAND]_[
 > e.g. `BUMPER_OBJECT=foo:bar,bar:baz`
 
 ##### Config File
-Options can be defined in a `config.yaml`/`config.json` file at the root of your package directory
+Options can be defined in a `config.yaml`/`config.json` file at the root of your project directory
 
 ---
 ### Demo Globals
@@ -155,21 +155,23 @@ yarn watch
   * source maps
   * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
 * DEMO
+  * share lib/commands for demo/routes
   * interpolate
   * shorthand route for showing all libs (lib/* or lib/all)
+  * support tests in develop mode (broken due to css extracted and needing window object to load)
   * demo design
   * separate documentation for developers and designers
   * generate & assign permanent identifiers for labeling objects (the idea is for a designer to label e.g. a button with #A1 that represents a particular style)
   * cdn (bumper.js?foo:1.2.3,bar:latest)
-* BUMPER PACKAGE
+* BUMPER PROJECT
   * browserslist
   * atrackt
   * old bumper stuff
 * CLI
-  * detect if running in bumper vs bumper package
+  * address coerce running twice https://github.com/yargs/yargs/issues/923#issuecomment-458301555
   * bumper build (single asset, or individual libs)
   * bumper deploy (build assets, docs, prod demo)
-  * bumper init (create skeleton for package)
+  * bumper init (create skeleton for project)
   * bumper lib new (create new blank lib)
   * bumper lib depend (add dependencies to lib) - will it work with workspaces?
   * bumper version new (release a new semantic version)
