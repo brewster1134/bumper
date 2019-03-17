@@ -28,7 +28,6 @@
   ],
   "scripts": {
     "coverage": "c8 report",
-    "coveralls": "c8 report --reporter=text-lcov | coveralls",
     "test": "c8 mocha",
     "watch": "mocha --watch-extensions coffee --watch"
   },
@@ -68,6 +67,7 @@
     "yargs": "^13"
   },
   "devDependencies": {
-    "c8": "^3"
+    "c8": "^3",
+    "coveralls": "^3"
   }
 }

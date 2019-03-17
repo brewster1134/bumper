@@ -3,18 +3,16 @@ env:
   - YARN_GPG=no
 node_js:
   - node
-  - 11
-  - 10
-  - 9
-  - 8
+  # - 11
+  # - 10
 os:
   - osx
-  - linux
-  - windows
+  # - linux
+  # - windows
 script:
   - yarn test
 jobs:
   include:
     - stage: coveralls
-      install: yarn add coveralls
-      script: yarn coveralls
+      install: npm i -g c8 coveralls
+      script: c8 report --reporter=text-lcov | coveralls

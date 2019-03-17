@@ -146,12 +146,10 @@ yarn watch
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
 * BUMPER
   * nconf ?
-  * code coverage
   * postcss
   * semantic versioning (entire project vs individual libs)
   * view diff between versions
-  * [docco](http://ashkenas.com/docco) & enable github pages for `/docs`
-  * create workspace for demo and main?
+  * generate documentation & host `/docs` on github pages
   * source maps
   * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
 * DEMO
@@ -178,6 +176,4 @@ yarn watch
   * bumper version list (list existing semantic versions)
   * support white space in --globals keys & values
 * BUGS
-  * demo/scripts/helpers.coffee - `mocha.run()` running asynchronously [3682](https://github.com/mochajs/mocha/issues/3682)
   * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
-  * better way to check if default is used [95](https://github.com/yargs/yargs/pull/95)
