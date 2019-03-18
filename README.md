@@ -12,13 +12,13 @@
 ###### Protect Your Frontend
 
 ---
-**Bumper** provides a platform for managing your front end library, with a live demo and command line interface, that can both document, build, test, and release your libraries
+**Bumper** provides a framework for managing your front end library, with a live demo and command line interface, that can both document, build, test, and release your libraries
 ### Features
 * Build production-ready assets with all, or select libraries
-* Release semantic versions of all or individual libraries
+* Release semantic versions of all, or select libraries
 
 ##### Demo
-* Run a single library, or any combination of libraries to see how they interact
+* Run a single library, or any combination of libraries to see how they operate together
 * Interactively change settings on-the-fly
 * Display api documentation for developers
 * Display style-guide details for designers
@@ -144,14 +144,40 @@ yarn watch
 ---
 ## TODO:
 * **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
+* BUGS
+  * address coerce running twice https://github.com/yargs/yargs/issues/923#issuecomment-458301555
+  * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
 * BUMPER
   * nconf ?
   * postcss
   * semantic versioning (entire project vs individual libs)
   * view diff between versions
   * generate documentation & host `/docs` on github pages
+  * [markdown styleguide generator](https://github.com/emiloberg/markdown-styleguide-generator)
   * source maps
   * [mocha-multi-reporters](https://www.npmjs.com/package/mocha-multi-reporters)
+  * [shields](https://shields.io/category/coverage) or [badgen](https://badgen.net)
+  * sourcegraph.com
+* BUMPER PROJECT
+  * browserslist
+  * atrackt
+  * old bumper stuff
+  * multiple project support?
+* CLI
+  * bumper build (single asset, or individual libs)
+  * bumper deploy (build assets, docs, prod demo)
+  * bumper init (create skeleton for project)
+  * bumper lib new (create new blank lib)
+  * bumper lib depend (add dependencies to lib) - will it work with workspaces?
+  * bumper version new (release a new semantic version)
+  * bumper version list (list existing semantic versions)
+  * support white space in --globals keys & values
+* CI
+  * code coverage
+  * lint
+  * generate & deploy bumper development docs to github pages
+  * build/release version to npm & github
+  * deploy to heroku/?
 * DEMO
   * share lib/commands for demo/routes
   * interpolate
@@ -161,19 +187,10 @@ yarn watch
   * separate documentation for developers and designers
   * generate & assign permanent identifiers for labeling objects (the idea is for a designer to label e.g. a button with #A1 that represents a particular style)
   * cdn (bumper.js?foo:1.2.3,bar:latest)
-* BUMPER PROJECT
-  * browserslist
-  * atrackt
-  * old bumper stuff
-* CLI
-  * address coerce running twice https://github.com/yargs/yargs/issues/923#issuecomment-458301555
-  * bumper build (single asset, or individual libs)
-  * bumper deploy (build assets, docs, prod demo)
-  * bumper init (create skeleton for project)
-  * bumper lib new (create new blank lib)
-  * bumper lib depend (add dependencies to lib) - will it work with workspaces?
-  * bumper version new (release a new semantic version)
-  * bumper version list (list existing semantic versions)
-  * support white space in --globals keys & values
-* BUGS
-  * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
+  * puppeteer
+  * [david](https://david-dm.org)
+* FUTURE
+  * replace webpack (parcel, browserify, rollup)
+  * replace travis (circle, gitlab, codefresh, buildkite, bitrise)
+  * replace coveralls (code climate, codecov)
+  

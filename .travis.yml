@@ -1,18 +1,46 @@
+# CONFIG
+# ======
+cache:
+  yarn: true
+  directories:
+    - node_modules
 language: node_js
+stages:
+  - test
+  - release
+
+# JOB EXPANSION
+# ======
 env:
   - YARN_GPG=no
 node_js:
   - node
-  # - 11
-  # - 10
+  - 11
+  - 10
 os:
   - osx
-  # - linux
-  # - windows
+  - linux
+  - windows
+
+# JOB LIFECYCLE
+# ======
+# before_install: # anything needed to install dependencies
+# install:        # install dependencies
+# before_script:  # anything needed to run the main script
+# script:         # the main script
+# before_cache:   # clean up cache
+# after_success:  # callbqck
+# after_failure:  # callbqck
+# before_deploy:  # anything needed to run the main deployment script
+# deploy:         # the main deployment script
+# after_deploy:   #
+# after_script:   #
 script:
-  - yarn test
+  - yarn ci-test
+
 jobs:
   include:
-    - stage: coveralls
-      install: npm i -g c8 coveralls
-      script: c8 report --reporter=text-lcov | coveralls
+    - stage: release
+      script:
+        - yarn ci-test
+        - yarn ci-coverage

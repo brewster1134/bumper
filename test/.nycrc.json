@@ -1,0 +1,9 @@
+{
+  "all": true,
+  "clean": true,
+  "extension": [".coffee"],
+  "instrument": false,
+  "perFile": true,
+  "sourceMap": false,
+  "tempDir": "./.tmp/coverage"
+}

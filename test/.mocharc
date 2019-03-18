@@ -1,2 +1,3 @@
 --require coffeescript/register
+--require ./test/coffee_coverage.coffee
 test/**/*_test.coffee

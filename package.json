@@ -1,19 +1,25 @@
 {
-  "author": "Ryan Brewster <brewster1134@gmail.com>",
+  "author": "Brewster <brewster1134@gmail.com>",
+  "bugs": "github:brewster1134/bumper/issues",
+  "contributors": "Brewster <brewster1134@gmail.com> (github:brewster1134)",
+  "homepage": "github:brewster1134/bumper",
   "description": "Protect Your Frontend",
   "license": "GPL-3.0-or-later",
   "main": "./lib/bumper",
   "name": "bumper",
-  "repository": "brewster1134/bumper",
-  "version": "0.0.0",
+  "repository": "github:brewster1134/bumper",
+  "version": "2.0.0",
   "bin": {
     "bumper": "./bin/bumper"
   },
   "directories": {
-    "bin": "bin",
-    "doc": "docs",
-    "lib": "lib",
-    "test": "test"
+    "bin": "./bin",
+    "doc": "./doc",
+    "lib": "./lib",
+    "test": "./test"
+  },
+  "engines": {
+    "node": ">=10"
   },
   "keywords": [
     "api",
@@ -27,9 +33,11 @@
     "test"
   ],
   "scripts": {
-    "coverage": "c8 report",
-    "test": "c8 mocha",
-    "watch": "mocha --watch-extensions coffee --watch"
+    "test": "nyc --nycrc-path=./test/.nycrc.json --reporter=text --reporter=html mocha --opts=./test/.mocharc",
+    "watch": "mocha --opts=./test/.mocharc --watch-extensions=coffee --watch",
+    "watch-cover": "nodemon --exec nyc --nycrc-path=./test/.nycrc.json --reporter=text --reporter=html mocha --opts=./test/.mocharc",
+    "ci-test": "nyc --nycrc-path=./test/.nycrc.json --reporter=text-summary mocha --opts=./test/.mocharc",
+    "ci-coverage": "nyc --nycrc-path=./test/.nycrc.json report --reporter=text-lcov | coveralls"
   },
   "dependencies": {
     "@babel/core": "^7",
@@ -49,7 +57,6 @@
     "marked": "^0",
     "mini-css-extract-plugin": "^0",
     "mocha": "^6",
-    "mocha-lcov-reporter": "^1",
     "node-sass": "^4",
     "nodemon": "^1",
     "normalize.css": "^8",
@@ -67,7 +74,8 @@
     "yargs": "^13"
   },
   "devDependencies": {
-    "c8": "^3",
-    "coveralls": "^3"
+    "coffee-coverage": "^3",
+    "coveralls": "^3",
+    "nyc": "^13"
   }
 }
