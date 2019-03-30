@@ -9,7 +9,7 @@ webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
 class Demo
-  constructor: ->
+  run: ->
     @config = JSON.parse argv.config
 
     # helpers
@@ -17,8 +17,7 @@ class Demo
     @helpers = new Helpers @config
 
     # webpack
-    webpackConfig = @_webpackConfig()
-    webpackCompiler = @_webpackCompiler webpackConfig
+    webpackCompiler = webpack @_getWebpackConfig()
 
     # start server
     @_runServer webpackCompiler
@@ -26,28 +25,15 @@ class Demo
   # the webpack configuration object
   # @return {Object}
   #
-  _webpackConfig: ->
+  _getWebpackConfig: ->
+    devtool: 'source-map'
+    externals: [nodeExternals()]
     mode: 'development'
     target: 'node'
-    devtool: if @config.develop then false else 'eval'
-    externals: [nodeExternals()]
     entry: glob "#{@config.bumperPath}/demo/scripts/demo.coffee",
                 "#{@config.projectPath}/demo/user_demo.coffee",
                 "#{@config.projectPath}/libs/**/*.coffee",
                 "#{@config.projectPath}/libs/**/*.js"
-    output:
-      filename: "[name].js"
-      path: "#{@config.projectPath}/.tmp/demo"
-    plugins: [
-      new Write
-      new Extract
-      new webpack.HotModuleReplacementPlugin
-    ]
-    resolve:
-      modules: [
-        @config.bumperPath
-        'node_modules'
-      ]
     module:
       rules: [
         test: /\.pug$/
@@ -70,17 +56,35 @@ class Demo
         test: /\.(sass|css)$/
         use: [
           loader: if @config.develop then 'style-loader' else Extract.loader
+          options:
+            sourceMap: true
         ,
           loader: 'css-loader'
+          options:
+            sourceMap: true
         ,
           loader: 'sass-loader'
+          options:
+            sourceMap: true
         ]
       ]
-
-  # get a webpack compiler instance
-  #
-  _webpackCompiler: (webpackConfig) ->
-    webpack webpackConfig
+    optimization:
+      minimize: false
+      noEmitOnErrors: false
+    output:
+      filename: '[name].js'
+      path: "#{@config.projectPath}/.tmp/demo"
+    plugins: [
+      new Write
+      new Extract
+        filename: '[name].css'
+      new webpack.HotModuleReplacementPlugin
+    ]
+    resolve:
+      modules: [
+        @config.bumperPath
+        @config.projectPath
+      ]
 
   # setup and run the web server
   #
@@ -109,4 +113,4 @@ class Demo
     demo.listen @config.demo.port, @config.demo.host
 
 # run demo
-new Demo
+new Demo().run()

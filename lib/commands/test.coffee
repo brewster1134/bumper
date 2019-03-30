@@ -8,26 +8,16 @@ Write = require 'write-file-webpack-plugin'
 module.exports =
   class Tests
     constructor: (@config) ->
-      webpackConfig = @_getWebpackConfig()
-      webpackCompiler = @_getWebpackCompiler webpackConfig
-      @_runWebpack webpackCompiler
+
+    run: ->
+      @_runWebpack @_getWebpackConfig()
 
     _getWebpackConfig: ->
-      mode: 'development'
-      target: 'node'
+      devtool: 'source-map'
       entry: globEntries  "#{@config.projectPath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
       externals: [nodeExternals()]
-      output:
-        filename: '[name].js'
-        path: "#{@config.projectPath}/.tmp/test"
-      plugins: [
-        new Write
-      ]
-      resolve:
-        modules: [
-          @config.bumperPath
-          'node_modules'
-        ]
+      mode: 'development'
+      target: 'node'
       module:
         rules: [
           test: /\.coffee$/
@@ -49,11 +39,24 @@ module.exports =
             loader: 'sass-loader'
           ]
         ]
+      optimization:
+        minimize: false
+        noEmitOnErrors: false
+      output:
+        filename: '[name].js'
+        path: "#{@config.projectPath}/.tmp/test"
+      plugins: [
+        new Write
+      ]
+      resolve:
+        modules: [
+          @config.bumperPath
+          @config.projectPath
+        ]
 
-    _getWebpackCompiler: (webpackConfig) ->
-      webpack webpackConfig
+    _runWebpack: (webpackConfig) ->
+      compiler = webpack webpackConfig
 
-    _runWebpack: (webpackCompiler) ->
       webpackCompiler.run =>
         mocha = new Mocha
           ui: 'bdd'

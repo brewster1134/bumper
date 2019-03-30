@@ -8,11 +8,13 @@ Write = require 'write-file-webpack-plugin'
 module.exports =
   class Build
     constructor: (@config) ->
+
+    run: ->
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
       @downloadsDir = downloadsFolder()
       @tmpDir = "#{@config.projectPath}/.tmp/build"
 
-      @_runWebpack()
+      @_runWebpack @_getWebpackConfig()
 
     # Get webpack entries based on the split option
     # @return {String|Object} lib path or object of multiple lib paths
@@ -73,11 +75,10 @@ module.exports =
 
     # Get webpack mode configuration value
     # https://webpack.js.org/concepts/mode/
-    # @arg {Boolean} develop
     # @return {String}
     #
-    _getWebpackMode: (develop) ->
-      if develop == true
+    _getWebpackMode: ->
+      if @config.develop
         return 'development'
       else
         return 'production'
@@ -85,24 +86,12 @@ module.exports =
     # The webpack configuration object
     # @return {Object}
     #
-    _webpackConfig: ->
-      mode: @_getWebpackMode @config.develop
-      target: 'web'
-      externals: [nodeExternals()]
+    _getWebpackConfig: ->
+      devtool: 'source-map'
       entry: @_getEntries()
-      output:
-        filename: @_getOutputFile 'js'
-        path: @tmpDir
-      plugins: [
-        new Write
-        new Extract
-          filename: @_getOutputFile 'css'
-      ]
-      resolve:
-        modules: [
-          @config.bumperPath
-          'node_modules'
-        ]
+      externals: [nodeExternals()]
+      mode: @_getWebpackMode()
+      target: 'web'
       module:
         rules: [
           test: /\.coffee$/
@@ -120,18 +109,40 @@ module.exports =
           test: /\.(sass|css)$/
           use: [
             loader: Extract.loader
+            options:
+              sourceMap: true
           ,
             loader: 'css-loader'
+            options:
+              sourceMap: true
           ,
             loader: 'sass-loader'
+            options:
+              sourceMap: true
           ]
+        ]
+      optimization:
+        minimize: !@config.develop
+        noEmitOnErrors: !@config.develop
+      output:
+        filename: @_getOutputFile 'jss'
+        path: @tmpDir
+      plugins: [
+        new Write
+        new Extract
+          filename: @_getOutputFile 'css'
+      ]
+      resolve:
+        modules: [
+          @config.bumperPath
+          @config.projectPath
         ]
 
     # Compile the bundles with webpack
     # @return {Boolean}
     #
-    _runWebpack: ->
-      compiler = webpack @_webpackConfig()
+    _runWebpack: (webpackConfig) ->
+      compiler = webpack webpackConfig
 
       # webpack success callback
       compiler.run =>

@@ -228,7 +228,7 @@ module.exports =
     # ---
     _runBuild: (config) ->
       Build = require './commands/build.coffee'
-      new Build config
+      new Build(config).run()
 
     # => DEMO
     # ---
@@ -264,7 +264,7 @@ module.exports =
     # ---
     _runTest: (config) ->
       Test = require './commands/test.coffee'
-      new Test config
+      new Test(config).run()
 
     # Build command line interface
     #
