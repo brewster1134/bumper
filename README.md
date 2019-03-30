@@ -143,9 +143,14 @@ yarn watch
 ---
 ---
 ## TODO:
-* **USE THE ABOVE DOCUMENTATION AS A TODO LIST!!!**
+* !PRIORITY!
+  * build
+    * minify
+    * split
+    * compress
+    * move
 * BUGS
-  * address coerce running twice https://github.com/yargs/yargs/issues/923#issuecomment-458301555
+  * address coerce running twice [923](https://github.com/yargs/yargs/issues/923#issuecomment-458301555)
   * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
 * BUMPER
   * nconf ?
@@ -190,6 +195,7 @@ yarn watch
   * puppeteer
   * [david](https://david-dm.org)
 * FUTURE
+  * verify README docs are up to date
   * replace webpack (parcel, browserify, rollup)
   * replace travis (circle, gitlab, codefresh, buildkite, bitrise)
   * replace coveralls (code climate, codecov)
