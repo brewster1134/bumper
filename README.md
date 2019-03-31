@@ -144,11 +144,9 @@ yarn watch
 ---
 ## TODO:
 * !PRIORITY!
+  * support verbose for root errors (no libs directory, no command passed, unknown argument)
   * build
-    * minify
-    * split
-    * compress
-    * move
+    * integrate more verbose logging
 * BUGS
   * address coerce running twice [923](https://github.com/yargs/yargs/issues/923#issuecomment-458301555)
   * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
@@ -183,6 +181,9 @@ yarn watch
   * generate & deploy bumper development docs to github pages
   * build/release version to npm & github
   * deploy to heroku/?
+* COMMANDS
+  * BUILD
+    * create package.json & other meta data
 * DEMO
   * share lib/commands for demo/routes
   * interpolate

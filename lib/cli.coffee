@@ -334,6 +334,7 @@ module.exports =
             alias: 's'
             default: @_getOptionValue 'build', 'split'
             desc: 'Build each library separately'
+            type: 'boolean'
         , (args) =>
           config = @_buildCommandConfig 'build', args
           @_runBuild config

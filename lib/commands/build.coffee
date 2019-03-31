@@ -13,8 +13,20 @@ module.exports =
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
       @downloadsDir = downloadsFolder()
       @tmpDir = "#{@config.projectPath}/.tmp/build"
+      @distDir = "#{@tmpDir}/dist"
+      webpackConfig = @_getWebpackConfig()
 
-      @_runWebpack @_getWebpackConfig()
+      fs.ensureDirSync @distDir
+
+      # initialize zip plugin if compress option is set
+      if @config.build.compress
+        Zip = require 'zip-webpack-plugin'
+
+        webpackConfig.plugins.push new Zip
+          filename: @bundleName
+          path: @downloadsDir
+
+      @_runWebpack webpackConfig
 
     # Get webpack entries based on the split option
     # @return {String|Object} lib path or object of multiple lib paths
@@ -46,22 +58,10 @@ module.exports =
       else
         "#{@bundleName}.#{extension}"
 
-    # Compress library and create archive in downloads directory
-    #
-    _compressLib: ->
-      archiver = require 'archiver'
-      archive = archiver 'zip',
-        zlib:
-          level: 9
-
-      archive.pipe fs.createWriteStream "#{@downloadsDir}/#{@bundleName}.zip"
-      archive.directory @tmpDir, false
-      archive.finalize()
-
     # Move built assets to downloads directory
     #
     _moveLib: ->
-      fs.copy @tmpDir, "#{@downloadsDir}/#{@bundleName}"
+      fs.copySync @distDir, "#{@downloadsDir}/#{@bundleName}"
 
     # Log output to user
     #
@@ -125,8 +125,8 @@ module.exports =
         minimize: !@config.develop
         noEmitOnErrors: !@config.develop
       output:
-        filename: @_getOutputFile 'jss'
-        path: @tmpDir
+        filename: @_getOutputFile 'js'
+        path: @distDir
       plugins: [
         new Write
         new Extract
@@ -146,10 +146,8 @@ module.exports =
 
       # webpack success callback
       compiler.run =>
-        # handle assets
-        if @config.build.compress
-          @_compressLib()
-        else
+        # if uncompressed, move asset directory
+        if !@config.build.compress
           @_moveLib()
 
         # log output

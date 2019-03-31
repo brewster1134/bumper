@@ -40,8 +40,8 @@ module.exports =
           ]
         ]
       optimization:
-        minimize: false
-        noEmitOnErrors: false
+        minimize: true
+        noEmitOnErrors: true
       output:
         filename: '[name].js'
         path: "#{@config.projectPath}/.tmp/test"
@@ -57,7 +57,7 @@ module.exports =
     _runWebpack: (webpackConfig) ->
       compiler = webpack webpackConfig
 
-      webpackCompiler.run =>
+      compiler.run =>
         mocha = new Mocha
           ui: 'bdd'
           reporter: 'spec'

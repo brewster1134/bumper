@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "@babel/core": "^7",
-    "archiver": "^3",
     "babel-loader": "^8",
     "body-parser": "^1",
     "chai": "^4",
@@ -71,7 +70,8 @@
     "webpack-glob-entry": "^2",
     "webpack-node-externals": "^1",
     "write-file-webpack-plugin": "^4",
-    "yargs": "^13"
+    "yargs": "^13",
+    "zip-webpack-plugin": "^3.0.0"
   },
   "devDependencies": {
     "coffee-coverage": "^3",
