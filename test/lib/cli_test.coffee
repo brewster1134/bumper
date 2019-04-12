@@ -9,10 +9,10 @@ describe 'Cli', ->
   after ->
     sandbox.restore()
 
-  describe '#_getOptionValue', ->
+  describe '#getOptionValue', ->
     before ->
       cli = sandbox.createStubInstance Cli
-      cli._getOptionValue.restore()
+      cli.getOptionValue.restore()
 
     beforeEach ->
       cli._getConfigValue.reset()
@@ -20,7 +20,7 @@ describe 'Cli', ->
     it 'should check for values in the right order', ->
       cli._getOptionDefault.returns 'default'
 
-      cli._getOptionValue()
+      cli.getOptionValue()
 
       expect(cli._getOptionDefault).to.have.been.called
       expect(cli._getEnvVarValue).to.have.been.calledAfter cli._getOptionDefault
@@ -29,7 +29,7 @@ describe 'Cli', ->
     it 'should use the default value type to lookup the environment variable', ->
       cli._getOptionDefault.returns true
 
-      cli._getOptionValue 'command', 'option'
+      cli.getOptionValue 'command', 'option'
 
       expect(cli._getEnvVarValue).to.be.calledWith 'command', 'option', Boolean
 
@@ -37,7 +37,7 @@ describe 'Cli', ->
       cli._getEnvVarValue.returns 'value'
       cli._getOptionDefault.returns 'default'
 
-      cli._getOptionValue 'command', 'option'
+      cli.getOptionValue 'command', 'option'
 
       expect(cli._getConfigValue).to.have.not.been.called
 
@@ -45,7 +45,7 @@ describe 'Cli', ->
     before ->
       cli = sandbox.createStubInstance Cli
       cli._getEnvVarValue.restore()
-      global.bumper.config =
+      global.bumper =
         nameSafe: 'clitest'
 
     afterEach ->
@@ -116,7 +116,7 @@ describe 'Cli', ->
       cli._buildLibGlobals.restore()
 
     it 'should move shared globals into library globals', ->
-      global.bumper.config =
+      global.bumper =
         libs:
           fooLib: 'path/to/fooLib'
           barLib: 'path/to/barLib'
@@ -134,7 +134,7 @@ describe 'Cli', ->
           keyTwo: 'valTwo'
 
     it 'should not overwrite existing lib globals', ->
-      global.bumper.config =
+      global.bumper =
         libs:
           fooLib: 'path/to/fooLib'
 

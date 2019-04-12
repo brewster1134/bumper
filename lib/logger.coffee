@@ -15,8 +15,8 @@ module.exports =
 
       if Number.isInteger options.exit
         # log stack trace if error
-        if options.exit != 0
-          @_logStack()
+        if global.bumper.verbose && options.exit != 0
+          @_log @stack
 
         process.exit options.exit
 
@@ -35,7 +35,3 @@ module.exports =
           console.log chalk.green "\n=> #{message} <=\n"
         else
           console.log message
-
-    _logStack: ->
-      @_log @name, 'error'
-      console.log @stack

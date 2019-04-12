@@ -5,7 +5,6 @@ Cli = require '../../lib/cli'
 Config = require '../../lib/config'
 
 describe 'Bumper', ->
-  bumper = null
   sandbox = sinon.createSandbox()
 
   after ->
@@ -15,15 +14,18 @@ describe 'Bumper', ->
     spyProcess = null
     stubLog = null
     stubConfig = null
-    stubCli = null
+    stubCliRun = null
+    stubCliVerbose = null
 
     before ->
       bumper = sandbox.createStubInstance Bumper
       bumper.run.restore()
 
       spyProcess = sandbox.spy process, 'on'
-      stubConfig = sandbox.stub(Config::, 'build').returns new Object
-      stubCli = sandbox.stub Cli::, 'run'
+      stubConfig = sandbox.stub(Config::, 'build').returns
+        foo: 'bar'
+      stubCliRun = sandbox.stub Cli::, 'run'
+      stubCliVerbose = sandbox.stub Cli::, 'getVerbose'
 
       process.removeAllListeners 'uncaughtException'
       bumper.run()
@@ -35,38 +37,9 @@ describe 'Bumper', ->
       expect(stubLog).to.be.calledOnce
 
     it 'should create a global object', ->
-      expect(global.bumper.log).to.be.an.instanceof Function
-      expect(global.bumper.verbose).to.be.an.instanceof Function
-      expect(global.bumper.config).to.be.an.instanceof Object
+      expect(global.bumper).to.deep.equal
+        foo: 'bar'
 
-    it 'should initialize the cli', ->
-      expect(stubCli).to.be.calledOnce
-
-  describe '#_log', ->
-    before ->
-      bumper = sandbox.createStubInstance Bumper
-      bumper._log.restore()
-
-  describe '#_getVerbose', ->
-    before ->
-      bumper = sandbox.createStubInstance Bumper
-      bumper._getVerbose.restore()
-
-    it 'should check the global config first', ->
-      global.bumper =
-        config:
-          verbose: 'global'
-
-      verbose = bumper._getVerbose()
-
-      expect(verbose).to.equal 'global'
-
-    it 'should check if passed via cli', ->
-      global.bumper =
-        config: undefined
-      unless process.argv.includes '--verbose'
-        process.argv.push '--verbose'
-
-      verbose = bumper._getVerbose()
-
-      expect(verbose).to.equal true
+    it 'should initialize cli & config', ->
+      expect(stubConfig).to.be.calledOnce
+      expect(stubCliRun).to.be.calledOnce

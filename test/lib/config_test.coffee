@@ -63,6 +63,29 @@ describe 'Config', ->
 
         expect(configFile).to.deep.equal {}
 
+  describe '#_getVerbose', ->
+    before ->
+      config = sandbox.createStubInstance Config
+      config._getVerbose.restore()
+
+    it 'should check the global config first', ->
+      global.bumper =
+        verbose: 'global'
+
+      verbose = config._getVerbose()
+
+      expect(verbose).to.equal 'global'
+
+    it 'should call clis getOptionValue method', ->
+      global.bumper =
+        verbose: undefined
+      config.cli =
+        getOptionValue: sinon.stub()
+
+      verbose = config._getVerbose()
+
+      expect(config.cli.getOptionValue).to.be.calledOnce
+
   describe '#_getlibs', ->
     readdirSyncStub = sandbox.stub fs, 'readdirSync'
 

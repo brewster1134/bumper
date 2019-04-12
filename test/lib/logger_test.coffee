@@ -10,11 +10,9 @@ describe 'Logger', ->
 
   describe '.constructor', ->
     stubLog = null
-    stubLogStack = null
 
     before ->
       stubLog = sandbox.stub Logger::, '_log'
-      stubLogStack = sandbox.stub Logger::, '_logStack'
 
       new Logger 'message',
         exit: false
@@ -22,7 +20,6 @@ describe 'Logger', ->
 
     after ->
       stubLog.restore()
-      stubLogStack.restore()
 
     beforeEach ->
       stubLog.reset()
@@ -46,7 +43,6 @@ describe 'Logger', ->
             exit: 0
 
           expect(stubProcess).to.be.calledOnceWith 0
-          expect(stubLogStack).to.not.be.called
 
       context 'to 1', ->
         it 'should exit with code 1', ->
@@ -54,7 +50,6 @@ describe 'Logger', ->
             exit: 1
 
           expect(stubProcess).to.be.calledOnceWith 1
-          expect(stubLogStack).to.be.calledOnce
 
     context 'when type option is set', ->
       it 'should pass the type', ->

@@ -144,6 +144,7 @@ yarn watch
 ---
 ## TODO:
 * !PRIORITY!
+  * [storybook?](https://github.com/storybooks/storybook)
   * support verbose for root errors (no libs directory, no command passed, unknown argument)
   * build
     * integrate more verbose logging
@@ -151,6 +152,7 @@ yarn watch
   * address coerce running twice [923](https://github.com/yargs/yargs/issues/923#issuecomment-458301555)
   * coverage caching [974](https://github.com/istanbuljs/nyc/issues/974)
 * BUMPER
+  * https://www.creativebloq.com/features/50-awesome-new-tools-for-developers-in-2019
   * nconf ?
   * postcss
   * semantic versioning (entire project vs individual libs)
@@ -174,6 +176,7 @@ yarn watch
   * bumper lib depend (add dependencies to lib) - will it work with workspaces?
   * bumper version new (release a new semantic version)
   * bumper version list (list existing semantic versions)
+  * bumper --version (list bumper, project/project library versions)
   * support white space in --globals keys & values
 * CI
   * code coverage

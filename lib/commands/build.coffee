@@ -69,7 +69,7 @@ module.exports =
       builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
       fileExt = if @config.build.compress then '.zip' else ''
 
-      global.bumper.log "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
+      new Logger "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
         exit: 0
         type: 'success'
 
