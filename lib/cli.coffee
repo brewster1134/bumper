@@ -63,6 +63,10 @@ module.exports =
       # add command options into command namespace
       config[command] = @_cleanupCommandConfig args
 
+      new Logger "running: #{command} w/ #{JSON.stringify(config[command], null, 2)}",
+        type: 'alert'
+        verbose: true
+
       # update global config
       return global.bumper.config = config
 
@@ -226,8 +230,13 @@ module.exports =
     # => DEMO
     # ---
     _runDemo: (config) ->
+      # delete package.json data for sending through nodemon
+      delete config.bumperJson
+      delete config.projectJson
+
       nodemon = require 'nodemon'
       nodemon
+        verbose: config.verbose
         script: "#{config.bumperPath}/lib/commands/demo.coffee"
         ext: config.formats.js.join ' '
         args: [ "--config='#{JSON.stringify(config)}'" ]

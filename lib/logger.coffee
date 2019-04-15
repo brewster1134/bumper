@@ -6,6 +6,9 @@ module.exports =
     constructor: (error, options = {}) ->
       super error
 
+      # if verbose flag is set, only log it if in verbose mode
+      return if options.verbose && !global.bumper.config.verbose
+
       # create error instance if only string is passed
       if typeof error == 'string'
         error = new Error error
@@ -14,6 +17,7 @@ module.exports =
       options = _.merge
         exit: false
         type: 'pass'
+        verbose: false
       , options
 
       # log message
