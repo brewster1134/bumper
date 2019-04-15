@@ -1,4 +1,3 @@
-downloadsFolder = require 'downloads-folder'
 Extract = require 'mini-css-extract-plugin'
 fs = require 'fs-extra'
 nodeExternals = require 'webpack-node-externals'
@@ -13,7 +12,7 @@ module.exports =
 
     run: ->
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
-      @downloadsDir = downloadsFolder()
+      @downloadsDir = @config.build.output
       @tmpDir = "#{@config.projectPath}/.tmp/build"
       @distDir = "#{@tmpDir}/dist"
       webpackConfig = @_getWebpackConfig()

@@ -337,6 +337,11 @@ module.exports =
             default: @getOptionValue 'build', 'split'
             desc: 'Build each library separately'
             type: 'boolean'
+          yargs.option 'output',
+            alias: 'o'
+            default: @getOptionValue 'build', 'output'
+            desc: 'Local directory to save built project to'
+            type: 'string'
         , (args) =>
           config = @_buildCommandConfig 'build', args
           @_runBuild config

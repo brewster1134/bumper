@@ -1,4 +1,5 @@
 argv = require('yargs-parser') process.argv.slice 2
+downloadsFolder = require 'downloads-folder'
 
 Cli = require './cli.coffee'
 Config = require './config.coffee'
@@ -24,6 +25,7 @@ module.exports =
           verbose: false
           build:
             compress: false
+            output: downloadsFolder()
             split: false
           demo:
             host: 'localhost'

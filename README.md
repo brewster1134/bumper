@@ -1,10 +1,6 @@
 <!--- topics: api build demo deploy documentation frontend release styleguide test -->
-![github: release](https://badgen.net/github/release/brewster1134/bumper)
-![github: status](https://badgen.net/github/status/brewster1134/bumper)
-![github: open prs](https://badgen.net/github/open-prs/brewster1134/bumper)
-![npm: version](https://badgen.net/npm/v/bumper)
-[![travis](https://travis-ci.com/brewster1134/bumper.svg?branch=express)](https://travis-ci.com/brewster1134/bumper)
-[![codecov](https://codecov.io/gh/brewster1134/bumper/branch/express/graph/badge.svg)](https://codecov.io/gh/brewster1134/bumper)
+[![build](https://travis-ci.com/brewster1134/bumper.svg?branch=express)](https://travis-ci.com/brewster1134/bumper)
+[![test: coverage](https://coveralls.io/repos/github/brewster1134/bumper/badge.svg?branch=express)](https://coveralls.io/github/brewster1134/bumper?branch=express)
 
 ---
 # Bumper
