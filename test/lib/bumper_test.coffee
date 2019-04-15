@@ -37,7 +37,7 @@ describe 'Bumper', ->
       expect(stubLog).to.be.calledOnce
 
     it 'should create a global object', ->
-      expect(global.bumper).to.deep.equal
+      expect(global.bumper.config).to.deep.equal
         foo: 'bar'
 
     it 'should initialize cli & config', ->

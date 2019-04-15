@@ -1,3 +1,4 @@
 --require coffeescript/register
 --require ./test/coffee_coverage.coffee
+--growl
 test/**/*_test.coffee

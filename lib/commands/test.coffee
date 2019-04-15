@@ -5,6 +5,8 @@ nodeExternals = require 'webpack-node-externals'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
+Logger = require '../logger.coffee'
+
 module.exports =
   class Tests
     constructor: (@config) ->

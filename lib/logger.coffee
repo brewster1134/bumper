@@ -3,20 +3,26 @@ chalk = require 'chalk'
 
 module.exports =
   class Logger extends Error
-    constructor: (message, options = {}) ->
-      super message
+    constructor: (error, options = {}) ->
+      super error
 
+      # create error instance if only string is passed
+      if typeof error == 'string'
+        error = new Error error
+
+      # set defaults
       options = _.merge
         exit: false
         type: 'pass'
       , options
 
-      @_log message, options.type
+      # log message
+      @_log error.message, options.type
 
       if Number.isInteger options.exit
-        # log stack trace if error
-        if global.bumper.verbose && options.exit != 0
-          @_log @stack
+        # log stack trace for fatal errors
+        if global.bumper.config.verbose && options.exit != 0
+          @_log error.stack
 
         process.exit options.exit
 

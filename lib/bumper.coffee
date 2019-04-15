@@ -9,20 +9,38 @@ module.exports =
     run: ->
       # route uncaught exceptions through logger
       process.on 'uncaughtException', (error) ->
-        new Logger error.message,
+        new Logger error,
           exit: 1
           type: 'error'
+
+      # create global bumper object
+      global.bumper =
+        config: new Object
+        optionGlobals:
+          develop: 'D'
+          verbose: 'V'
+        optionDefaults:
+          develop: false
+          verbose: false
+          build:
+            compress: false
+            split: false
+          demo:
+            host: 'localhost'
+            port: 8383
+            tests: false
+          test:
+            watch: false
 
       # initialize singletons
       cli = new Cli argv
       config = new Config cli
 
-      # create global bumper object
-      global.bumper =
-        verbose: cli.getVerbose()
+      # add cli verbose to config in case config.build() needs it
+      global.bumper.config.verbose = cli.getVerbose()
 
-      # replace global object with full config
-      global.bumper = config.build()
+      # populate global object with full config
+      global.bumper.config = config.build()
 
       # initialize cli
       cli.run()

@@ -14,7 +14,7 @@ module.exports =
 
     # check if verbose option was enabled
     #
-    getVerbose: () ->
+    getVerbose: ->
       return @argv.verbose if @argv.verbose?
       return @argv.V if @argv.V?
       return null
@@ -45,24 +45,10 @@ module.exports =
     # @return {Object}
     #
     _getOptionDefault: (command, option) ->
-      defaults =
-        develop: false
-        libs: Object.keys global.bumper.libs || new Object
-        verbose: false
-        build:
-          compress: false
-          split: false
-        demo:
-          host: 'localhost'
-          port: 8383
-          tests: false
-        test:
-          watch: false
-
-      if defaults[command]?[option]?
-        return defaults[command][option]
+      if global.bumper.optionDefaults[command]?[option]?
+        global.bumper.optionDefaults[command][option]
       else
-        return defaults[option]
+        global.bumper.optionDefaults[option]
 
     # Build the entire config object to be passed to each command script
     # @arg {String} command
@@ -72,15 +58,13 @@ module.exports =
       config = new Object
 
       # merge global options into config core
-      _.merge config, global.bumper, @_getGlobalOptions(command, args)
+      _.merge config, global.bumper.config, @_getGlobalOptions(command, args)
 
       # add command options into command namespace
       config[command] = @_cleanupCommandConfig args
 
       # update global config
-      global.bumper = config
-
-      return config
+      return global.bumper.config = config
 
     # cleanup unnecessary keys
     # @arg {Object} args
@@ -92,8 +76,9 @@ module.exports =
       delete args._
 
       # remove global options from command object
-      delete args.develop
-      delete args.verbose
+      for option, alias of global.bumper.optionGlobals
+        delete args[option]
+        delete args[alias]
 
       # remove aliases
       for key, val of args
@@ -109,13 +94,10 @@ module.exports =
     #
     _getGlobalOptions: (command, args) ->
       globalOptions = new Object
-      commandOptions =
-        develop: 'D'
-        verbose: 'V'
 
-      for option, alias of commandOptions
+      for option, alias of global.bumper.optionGlobals
         # check if a value was passed in from the command line
-        fromCli = @argv[alias]? || @argv[option]?
+        fromCli = @argv[option]? || @argv[alias]?
 
         if fromCli
           globalOptions[option] = args[option]
@@ -132,8 +114,8 @@ module.exports =
     #
     _getEnvVarValue: (command, option, type) ->
       # search all variations of environment variable names
-      customCommandEnvVar = "#{global.bumper.nameSafe}_#{command}_#{option}".toUpperCase()
-      customEnvVar = "#{global.bumper.nameSafe}_#{option}".toUpperCase()
+      customCommandEnvVar = "#{global.bumper.config.nameSafe}_#{command}_#{option}".toUpperCase()
+      customEnvVar = "#{global.bumper.config.nameSafe}_#{option}".toUpperCase()
       bumperCommandEnvVar = "bumper_#{command}_#{option}".toUpperCase()
       bumperEnvVar = "bumper_#{option}".toUpperCase()
       envVar =  process.env[customCommandEnvVar] ||
@@ -162,10 +144,10 @@ module.exports =
     # @arg {String} option
     #
     _getConfigValue: (command, option) ->
-      if global.bumper.file[command]?[option]?
-        return global.bumper.file[command][option]
+      if global.bumper.config.file[command]?[option]?
+        return global.bumper.config.file[command][option]
       else
-        return global.bumper.file[option]
+        return global.bumper.config.file[option]
 
     # Parse object from command line into key/value pairs
     # @arg {String[]} globalsArray - array of key/value pairs in the format 'key:value'
@@ -193,7 +175,7 @@ module.exports =
 
       # Create skeleton of lib
       libGlobals = new Object
-      for lib, path of global.bumper.libs
+      for lib, path of global.bumper.config.libs
         libGlobals[lib] = new Object
 
       # Merge all globals together
@@ -215,12 +197,12 @@ module.exports =
       nonLibGlobals = new Object
 
       # create empty objects for each lib
-      for lib, path of global.bumper.libs
+      for lib, path of global.bumper.config.libs
         libGlobals[lib] = new Object
 
       # separate lib and non-lib globals
       for key, val of originalGlobals
-        if global.bumper.libs[key]
+        if global.bumper.config.libs[key]
           libGlobals[key] = val
         else
           nonLibGlobals[key] = val
@@ -281,14 +263,14 @@ module.exports =
     #
     _buildCli: ->
       return yargs
-        .epilogue global.bumper.flair
+        .epilogue global.bumper.config.flair
         .example chalk.bold 'bumper [COMMAND] --help'
         .example chalk.bold 'bumper --version'
         .hide 'help'
         .hide 'version'
         .scriptName chalk.bold 'bumper'
         .strict()
-        .usage global.bumper.flair
+        .usage global.bumper.config.flair
 
         # handle missing or unsupported commands
         .demandCommand 1, 'no command was passed'
@@ -304,7 +286,7 @@ module.exports =
           command = @argv._[0]
 
           # get path to command cache directory
-          tmpDir = "#{global.bumper.projectPath}/.tmp/#{command}"
+          tmpDir = "#{global.bumper.config.projectPath}/.tmp/#{command}"
 
           # ensure command cache directory exists & is empty
           fs.ensureDirSync tmpDir

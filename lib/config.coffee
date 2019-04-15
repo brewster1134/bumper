@@ -18,7 +18,7 @@ module.exports =
 
       # get user configuration & set it to global for checking for verbose
       configFile = @_getConfigFile projectPath
-      global.bumper.file = configFile
+      global.bumper.config.file = configFile
 
       # check if verbose is set
       verbose = @_getVerbose()
@@ -37,6 +37,9 @@ module.exports =
         new Logger 'No valid Bumper libraries found',
           exit: 1
           type: 'error'
+
+      # set libs option default
+      global.bumper.optionDefaults.libs = Object.keys libs
 
       # return all config values
       return
@@ -76,7 +79,7 @@ module.exports =
     #
     _getVerbose: ->
       # if verbose passed via cli
-      return global.bumper.verbose if global.bumper.verbose?
+      return global.bumper.config.verbose if global.bumper.config.verbose?
       return @cli.getOptionValue null, 'verbose'
 
     # get package.json

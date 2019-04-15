@@ -8,6 +8,8 @@ nodeExternals = require 'webpack-node-externals'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
+Logger = require '../logger.coffee'
+
 class Demo
   run: ->
     @config = JSON.parse argv.config

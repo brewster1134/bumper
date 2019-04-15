@@ -69,18 +69,18 @@ describe 'Config', ->
       config._getVerbose.restore()
 
     it 'should check the global config first', ->
-      global.bumper =
+      global.bumper.config =
         verbose: 'global'
 
       verbose = config._getVerbose()
 
-      expect(verbose).to.equal 'global'
+      expect(verbose).to.eq 'global'
 
     it 'should call clis getOptionValue method', ->
-      global.bumper =
+      global.bumper.config =
         verbose: undefined
       config.cli =
-        getOptionValue: sinon.stub()
+        getOptionValue: sandbox.stub()
 
       verbose = config._getVerbose()
 
