@@ -12,9 +12,8 @@ stages:
 # JOB EXPANSION
 # ======
 env:
-  - YARN_GPG=no
+  - YARN_GPG=no # needed for windows to exit correctly
 node_js:
-  - node
   - 11
   - 10
 os:
