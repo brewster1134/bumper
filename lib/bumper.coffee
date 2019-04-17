@@ -1,4 +1,4 @@
-argv = require('yargs-parser') process.argv.slice 2
+argvParser = require 'yargs-parser'
 downloadsFolder = require 'downloads-folder'
 
 Cli = require './cli.coffee'
@@ -8,6 +8,10 @@ Logger = require './logger.coffee'
 module.exports =
   class Bumper
     run: ->
+      # extract command & cli options
+      @args = argvParser process.argv.slice 2
+      command = @args._[0]
+
       # route uncaught exceptions through logger
       process.on 'uncaughtException', (error) ->
         new Logger error,
@@ -16,8 +20,11 @@ module.exports =
 
       # create global bumper object
       global.bumper =
-        config: new Object
-        optionGlobals:
+        setSharedOptionValues: @_setSharedOptionValues.bind @
+        config:
+          command: command
+          file: {}
+        optionShared:
           develop: 'D'
           verbose: 'V'
         optionDefaults:
@@ -34,15 +41,25 @@ module.exports =
           test:
             watch: false
 
-      # initialize singletons
-      cli = new Cli argv
-      config = new Config cli
+      # create cli singleton
+      @cli = new Cli
 
-      # add cli verbose to config in case config.build() needs it
-      global.bumper.config.verbose = cli.getVerbose()
-
-      # populate global object with full config
+      # populate global config
+      config = new Config
       global.bumper.config = config.build()
 
       # initialize cli
-      cli.run()
+      @cli.run()
+
+    # set shared options to global config object
+    #
+    _setSharedOptionValues: ->
+      for option, alias of global.bumper.optionShared
+        optVal = if @args[option]?
+          @args[option]
+        else if @args[alias]?
+          @args[alias]
+        else
+          @cli.getOptionValue global.bumper.config.command, option
+
+        global.bumper.config[option] = optVal

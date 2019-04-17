@@ -4,6 +4,16 @@
   "extension": [".coffee"],
   "instrument": false,
   "perFile": true,
-  "sourceMap": false,
-  "tempDir": "./.tmp/coverage"
+  "sourceMap": true,
+  "tempDir": "./.tmp/coverage",
+  "statements": 60,
+  "branches": 50,
+  "functions": 40,
+  "lines": 60,
+  "watermarks": {
+    "statements": [60, 90],
+    "branches": [50, 90],
+    "functions": [40, 90],
+    "lines": [60, 90]
+  }
 }

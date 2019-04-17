@@ -76,6 +76,6 @@
   "devDependencies": {
     "coffee-coverage": "^3",
     "coveralls": "^3",
-    "nyc": "^13"
+    "nyc": "^14"
   }
 }

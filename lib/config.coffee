@@ -1,3 +1,4 @@
+_ = require 'lodash'
 chalk = require 'chalk'
 consolidate = require 'consolidate'
 fs = require 'fs-extra'
@@ -9,19 +10,16 @@ Logger = require './logger.coffee'
 
 module.exports =
   class Config
-    constructor: (@cli) ->
-
     build: ->
+      global.bumper.setSharedOptionValues()
+
       # get npm json files
       bumperPath = path.resolve __dirname, '..'
       projectPath = process.cwd()
 
       # get user configuration & set it to global for checking for verbose
       configFile = @_getConfigFile projectPath
-      global.bumper.config.file = configFile
-
-      # check if verbose is set
-      verbose = @_getVerbose()
+      # global.bumper.config.file = configFile
 
       # get package.json files
       bumperJson = @_getPackageJson bumperPath
@@ -32,7 +30,7 @@ module.exports =
       jsFormats = [ 'coffee', 'js' ]
 
       # get package libraries
-      libs = @_getlibs projectPath, jsFormats
+      libs = @_getLibs projectPath, jsFormats
       if !Object.keys(libs).length
         new Logger 'No valid Bumper libraries found',
           exit: 1
@@ -41,10 +39,11 @@ module.exports =
       # set libs option default
       global.bumper.optionDefaults.libs = Object.keys libs
 
-      # return all config values
-      return
+      # create full config object
+      config =
         bumperJson: bumperJson
         bumperPath: bumperPath
+        command: global.bumper.config.command
         file: configFile
         flair: chalk.bold '------======------'
         libs: libs
@@ -52,7 +51,6 @@ module.exports =
         nameSafe: name.toLowerCase().replace /\W/g, '_'
         projectJson: projectJson
         projectPath: projectPath
-        verbose: verbose
         version: projectJson.version
         formats:
           css: [ 'css', 'sass', 'scss' ]
@@ -60,9 +58,11 @@ module.exports =
           html: Object.keys consolidate
           js: jsFormats
 
+      return config
+
     # get user configuration
-    # @arg {String} projectPath - path to bumper package
-    # @return {Object}
+    # @arg {string} projectPath - path to bumper package
+    # @return {object}
     #
     _getConfigFile: (projectPath) ->
       # look for yaml file
@@ -71,20 +71,11 @@ module.exports =
       # look for json file
       configFile ||= try JSON.parse fs.readFileSync "#{projectPath}/config.json"
 
-      return configFile || new Object
-
-    # check all config sources for verbose flag
-    # @arg {Object} configFile
-    # @return {Boolean}
-    #
-    _getVerbose: ->
-      # if verbose passed via cli
-      return global.bumper.config.verbose if global.bumper.config.verbose?
-      return @cli.getOptionValue null, 'verbose'
+      return configFile || {}
 
     # get package.json
-    # @arg {String} path - absolute directory path
-    # @return {Object}
+    # @arg {string} path - absolute directory path
+    # @return {object}
     #
     _getPackageJson: (path) ->
       try
@@ -94,13 +85,13 @@ module.exports =
           type: 'alert'
 
     # Get all current package libraries
-    # @arg {String} projectPath
-    # @arg {Array} formats
-    # @return {Object} key: library name, value: library source path
+    # @arg {string} projectPath
+    # @arg {array} formats
+    # @return {object} key: library name, value: library source path
     #
-    _getlibs: (projectPath, formats) ->
+    _getLibs: (projectPath, formats) ->
       libFormats = formats.join '|'
-      libs = new Object
+      libs = {}
 
       try
         files = fs.readdirSync "#{projectPath}/libs"

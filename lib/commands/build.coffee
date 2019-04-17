@@ -8,9 +8,8 @@ Logger = require '../logger.coffee'
 
 module.exports =
   class Build
-    constructor: (@config) ->
-
     run: ->
+      @config = global.bumper.config
       @bundleName = "#{@config.nameSafe}_#{@config.version}"
       @downloadsDir = @config.build.output
       @tmpDir = "#{@config.projectPath}/.tmp/build"
@@ -29,63 +28,8 @@ module.exports =
 
       @_runWebpack webpackConfig
 
-    # Get webpack entries based on the split option
-    # @return {String|Object} lib path or object of multiple lib paths
-    #
-    _getEntries: ->
-      # build object of each library to build separately
-      if @config.build.split
-        entries = new Object
-        for lib in @config.build.libs
-          entries[lib] = @config.libs[lib]
-
-      # write js file with import for each library to build
-      else
-        entries = "#{@tmpDir}/#{@bundleName}.js"
-        bundleWrite = fs.createWriteStream entries
-        for lib in @config.build.libs
-          bundleWrite.write "import #{lib} from '#{@config.libs[lib]}'\n"
-        bundleWrite.end()
-
-      return entries
-
-    # Get combined bundle file name
-    # @arg {String} extension
-    # @return {String} the name of the bundle file
-    #
-    _getOutputFile: (extension) ->
-      if @config.build.split
-        "[name].#{extension}"
-      else
-        "#{@bundleName}.#{extension}"
-
-    # Move built assets to downloads directory
-    #
-    _moveLib: ->
-      fs.copySync @distDir, "#{@downloadsDir}/#{@bundleName}"
-
-    # Log output to user
-    #
-    _logOutput: ->
-      builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
-      fileExt = if @config.build.compress then '.zip' else ''
-
-      new Logger "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
-        exit: 0
-        type: 'success'
-
-    # Get webpack mode configuration value
-    # https://webpack.js.org/concepts/mode/
-    # @return {String}
-    #
-    _getWebpackMode: ->
-      if @config.develop
-        return 'development'
-      else
-        return 'production'
-
     # The webpack configuration object
-    # @return {Object}
+    # @return {object}
     #
     _getWebpackConfig: ->
       devtool: 'source-map'
@@ -139,8 +83,48 @@ module.exports =
           @config.projectPath
         ]
 
+    # Get webpack entries based on the split option
+    # @return {string|object} lib path or object of multiple lib paths
+    #
+    _getEntries: ->
+      # build object with each project library name & path
+      if @config.build.split
+        entries = {}
+        for lib in @config.build.libs
+          entries[lib] = @config.libs[lib]
+
+      # write js file with import for each library to build
+      else
+        entries = "#{@tmpDir}/#{@bundleName}.js"
+        bundleWrite = fs.createWriteStream entries
+        for lib in @config.build.libs
+          bundleWrite.write "import #{lib} from '#{@config.libs[lib]}'\n"
+        bundleWrite.end()
+
+      return entries
+
+    # Get webpack mode configuration value
+    # https://webpack.js.org/concepts/mode/
+    # @return {string}
+    #
+    _getWebpackMode: ->
+      if @config.develop
+        return 'development'
+      else
+        return 'production'
+
+    # Get combined bundle file name
+    # @arg {string} extension
+    # @return {string} the name of the bundle file
+    #
+    _getOutputFile: (extension) ->
+      if @config.build.split
+        "[name].#{extension}"
+      else
+        "#{@bundleName}.#{extension}"
+
     # Compile the bundles with webpack
-    # @return {Boolean}
+    # @return {boolean}
     #
     _runWebpack: (webpackConfig) ->
       compiler = webpack webpackConfig
@@ -153,3 +137,18 @@ module.exports =
 
         # log output
         @_logOutput()
+
+    # Move built assets to downloads directory
+    #
+    _moveLib: ->
+      fs.copySync @distDir, "#{@downloadsDir}/#{@bundleName}"
+
+    # Log output to user
+    #
+    _logOutput: ->
+      builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
+      fileExt = if @config.build.compress then '.zip' else ''
+
+      new Logger "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
+        exit: 0
+        type: 'success'

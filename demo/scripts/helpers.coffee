@@ -9,18 +9,18 @@ module.exports = ->
     constructor: (@config) ->
 
     # Build a single string from multiple strings
-    # @arg {...String} strings - 1 or more strings to be concatenated
-    # @return {String} Full title
+    # @arg {...string} strings - 1 or more strings to be concatenated
+    # @return {string} Full title
     #
     buildTitle: (strings...) ->
       _.compact(strings).join ': '
 
     # Builds lib object required for the lib route
-    # @arg {...String} libNames - lib names
-    # @return {Object} Object of all globals needed to render the demo page
+    # @arg {...string} libNames - lib names
+    # @return {object} Object of all globals needed to render the demo page
     #
     demoBuildLibObject: (libNames...) ->
-      libs = new Object
+      libs = {}
 
       for libName in libNames
         libs[libName] =
@@ -42,10 +42,10 @@ module.exports = ->
       return libs
 
     # Interpolate template placeholders with values
-    # @arg {String} filePath - full path to a file
-    # @arg {Object} locals - locals object with key/value pairs of placeholders and values
-    # @arg {Boolean} modifyOriginal - if set to false, copy file to tmp, and modify the tmp file instead
-    # @return {Object} full path to the interpolated file
+    # @arg {string} filePath - full path to a file
+    # @arg {object} locals - locals object with key/value pairs of placeholders and values
+    # @arg {boolean} modifyOriginal - if set to false, copy file to tmp, and modify the tmp file instead
+    # @return {object} full path to the interpolated file
     #
     _interpolateFile: (filePath, locals, modifyOriginal = false) ->
       # Use mustache style interpolation
@@ -76,15 +76,15 @@ module.exports = ->
         contents: interpolated
 
     # Get path to a specific lib directory
-    # @arg {String} libName - Name of a library
-    # @return {String} Path to the library
+    # @arg {string} libName - Name of a library
+    # @return {string} Path to the library
     #
     _demoGetLibPath: (libName) ->
       "#{@config.projectPath}/libs/#{libName}"
 
     # Renders the demo for a given library
-    # @arg {String} libName - Name of a library
-    # @return {String} Raw html of lib demo
+    # @arg {string} libName - Name of a library
+    # @return {string} Raw html of lib demo
     #
     _demoGetDemoHtml: (libName) ->
       compiledHtml = null
@@ -100,8 +100,8 @@ module.exports = ->
       return compiledHtml
 
     # Renders the documentation for a given library
-    # @arg {String} libName - Name of a library
-    # @return {String} Raw html of lib documentation
+    # @arg {string} libName - Name of a library
+    # @return {string} Raw html of lib documentation
     #
     _demoGetDocsHtml: (libName) ->
       compiledHtml = null
@@ -127,8 +127,8 @@ module.exports = ->
       return compiledHtml
 
     # Renders the test results
-    # @arg {String} libName - Name of a library
-    # @return {String} Raw html of lib test results
+    # @arg {string} libName - Name of a library
+    # @return {string} Raw html of lib test results
     #
     _demoGetTestHtml: (libName) ->
       return false unless @config.demo.tests

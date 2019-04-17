@@ -7,21 +7,13 @@ Logger = require './logger.coffee'
 
 module.exports =
   class Cli
-    constructor: (@argv) ->
-
     run: ->
+      global.bumper.setSharedOptionValues()
       @_buildCli().argv
 
-    # check if verbose option was enabled
-    #
-    getVerbose: ->
-      return @argv.verbose if @argv.verbose?
-      return @argv.V if @argv.V?
-      return null
-
-    # Search for an option's value
-    # @arg {String} command
-    # @arg {String} option
+    # Search for an option's value across all locations
+    # @arg {string} command
+    # @arg {string} option
     # @return {*}
     #
     getOptionValue: (command, option) ->
@@ -33,16 +25,16 @@ module.exports =
       return envVarVal if envVarVal?
 
       # search in the configuration
-      configVal = @_getConfigValue command, option
+      configVal = @_getConfigFileValue command, option
       return configVal if configVal?
 
       # if no value was found, return the default
       return defaultVal
 
     # Lookup command option defaults
-    # @arg {String} command
-    # @arg {String} option
-    # @return {Object}
+    # @arg {string} command
+    # @arg {string} option
+    # @return {object}
     #
     _getOptionDefault: (command, option) ->
       if global.bumper.optionDefaults[command]?[option]?
@@ -50,71 +42,11 @@ module.exports =
       else
         global.bumper.optionDefaults[option]
 
-    # Build the entire config object to be passed to each command script
-    # @arg {String} command
-    # @arg {Object} args - the command line argument object
-    #
-    _buildCommandConfig: (command, args) ->
-      config = new Object
-
-      # merge global options into config core
-      _.merge config, global.bumper.config, @_getGlobalOptions(command, args)
-
-      # add command options into command namespace
-      config[command] = @_cleanupCommandConfig args
-
-      new Logger "running: #{command} w/ #{JSON.stringify(config[command], null, 2)}",
-        type: 'alert'
-        verbose: true
-
-      # update global config
-      return global.bumper.config = config
-
-    # cleanup unnecessary keys
-    # @arg {Object} args
-    # @return {Object}
-    #
-    _cleanupCommandConfig: (args) ->
-      # remove args keys
-      delete args.$0
-      delete args._
-
-      # remove global options from command object
-      for option, alias of global.bumper.optionGlobals
-        delete args[option]
-        delete args[alias]
-
-      # remove aliases
-      for key, val of args
-        if key.length == 1
-          delete args[key]
-
-      return args
-
-    # Look for command-specific values for global options
-    # @arg {String} command
-    # @arg {Object} args
-    # @return {Object}
-    #
-    _getGlobalOptions: (command, args) ->
-      globalOptions = new Object
-
-      for option, alias of global.bumper.optionGlobals
-        # check if a value was passed in from the command line
-        fromCli = @argv[option]? || @argv[alias]?
-
-        if fromCli
-          globalOptions[option] = args[option]
-        else
-          globalOptions[option] = @getOptionValue command, option
-
-      return globalOptions
-
     # Get value from an environment variable
-    # @arg {String} command - the command passed
-    # @arg {String} option - the option passed
-    # @arg {Function} type - the class type of the returned value
-    # @return {Object|null}
+    # @arg {string} command - the command passed
+    # @arg {string} option - the option passed
+    # @arg {function} type - the class type of the returned value
+    # @return {object|null}
     #
     _getEnvVarValue: (command, option, type) ->
       # search all variations of environment variable names
@@ -144,43 +76,62 @@ module.exports =
           envVar
 
     # Search for value in the configuration object
-    # @arg {String} command
-    # @arg {String} option
+    # @arg {string} command
+    # @arg {string} option
     #
-    _getConfigValue: (command, option) ->
-      if global.bumper.config.file[command]?[option]?
+    _getConfigFileValue: (command, option) ->
+      if global.bumper.config?.file[command]?[option]?
         return global.bumper.config.file[command][option]
       else
-        return global.bumper.config.file[option]
+        return global.bumper.config?.file[option]
 
-    # Parse object from command line into key/value pairs
-    # @arg {String[]} globalsArray - array of key/value pairs in the format 'key:value'
-    # @return {Object}
+    # Set the command object on the global config
+    # @arg {string} command
+    # @arg {object} args - the command line argument object
     #
-    _getGlobalsFromArray: (globalsArray) ->
-      return unless globalsArray.length
+    _setCommandOptions: (command, args) ->
+      # add command options into command namespace
+      global.bumper.config[command] = @_cleanCommandOptions args
 
-      objekt = new Object
-      for globalString in globalsArray
-        objectArray = globalString.split ':'
-        if objectArray[0]
-          objekt[objectArray[0]] = objectArray[1]
+      new Logger "running: #{command} w/ #{JSON.stringify(global.bumper.config[command], null, 2)}",
+        type: 'alert'
+        verbose: true
 
-      return objekt
+    # Cleanup unnecessary keys from command specific config
+    # @arg {object} args
+    # @return {object}
+    #
+    _cleanCommandOptions: (args) ->
+      # remove args keys
+      delete args.$0
+      delete args._
+
+      # remove shared options from command object
+      for option, alias of global.bumper.optionShared
+        delete args[option]
+        delete args[alias]
+
+      # remove all aliases, not just for shared options
+      # the requires that aliases are always a lowercase of the first letter of the option
+      for key, val of args
+        if key.length == 1
+          delete args[key]
+
+      return args
 
     # Build the globals object
-    # @arg {Array} cliGlobals - array of globals from command line
-    # @return {Object} object with full globals for each lib
+    # @arg {array} cliGlobals - array of globals from command line
+    # @return {object} object with full globals for each lib
     #
     _buildGlobals: (cliGlobals) ->
       envVarVal = @_getEnvVarValue 'demo', 'globals', Object
-      configVal = @_getConfigValue 'demo', 'globals'
+      configVal = @_getConfigFileValue 'demo', 'globals'
       cliGlobals = @_getGlobalsFromArray cliGlobals
 
       # Create skeleton of lib
-      libGlobals = new Object
+      libGlobals = {}
       for lib, path of global.bumper.config.libs
-        libGlobals[lib] = new Object
+        libGlobals[lib] = {}
 
       # Merge all globals together
       if envVarVal
@@ -192,17 +143,32 @@ module.exports =
 
       return libGlobals
 
+    # Parse object from command line into key/value pairs
+    # @arg {string[]} globalsArray - array of key/value pairs in the format 'key:value'
+    # @return {object}
+    #
+    _getGlobalsFromArray: (globalsArray) ->
+      return null unless globalsArray?.length
+
+      objekt = {}
+      for globalString in globalsArray
+        objectArray = globalString.split ':'
+        if objectArray[0]
+          objekt[objectArray[0]] = objectArray[1] || null
+
+      return objekt
+
     # Duplicate all non-lib globals into each lib's globals
-    # @arg {Object} originalGlobals - globals to inject into each lib globals
-    # @return {Object} object with original globals for each lib
+    # @arg {object} originalGlobals - globals to inject into each lib globals
+    # @return {object} object with original globals for each lib
     #
     _buildLibGlobals: (originalGlobals) ->
-      libGlobals = new Object
-      nonLibGlobals = new Object
+      libGlobals = {}
+      nonLibGlobals = {}
 
       # create empty objects for each lib
       for lib, path of global.bumper.config.libs
-        libGlobals[lib] = new Object
+        libGlobals[lib] = {}
 
       # separate lib and non-lib globals
       for key, val of originalGlobals
@@ -213,23 +179,23 @@ module.exports =
 
       # merge non-lib globals into each lib's globals
       for lib, val of libGlobals
-        libGlobals[lib] = _.merge new Object, nonLibGlobals, libGlobals[lib]
+        libGlobals[lib] = _.merge {}, nonLibGlobals, libGlobals[lib]
 
       return libGlobals
 
     # => COMMANDS
     # Run command-specific script with command-specific configuration
-    # @arg {Object} config - command-specific configuration
+    # @arg {object} config - command-specific configuration
     #
     # => BUILD
     # ---
-    _runBuild: (config) ->
+    _runBuild: ->
       Build = require './commands/build.coffee'
-      new Build(config).run()
+      new Build().run()
 
     # => DEMO
     # ---
-    _runDemo: (config) ->
+    _runDemo: ->
       # delete package.json data for sending through nodemon
       delete config.bumperJson
       delete config.projectJson
@@ -264,9 +230,9 @@ module.exports =
 
     # => TEST
     # ---
-    _runTest: (config) ->
+    _runTest: ->
       Test = require './commands/test.coffee'
-      new Test(config).run()
+      new Test().run()
 
     # Build command line interface
     #
@@ -290,9 +256,9 @@ module.exports =
             type: 'error'
 
         # run before each command
-        .middleware (@argv) =>
+        .middleware (argv) =>
           # get command name
-          command = @argv._[0]
+          command = argv._[0]
 
           # get path to command cache directory
           tmpDir = "#{global.bumper.config.projectPath}/.tmp/#{command}"
@@ -301,7 +267,7 @@ module.exports =
           fs.ensureDirSync tmpDir
           fs.emptyDirSync tmpDir
 
-        # the global options alias must...
+        # the shared options alias must...
         # * match the first character of the option name
         # * be capitalized
         .option 'develop',
@@ -316,7 +282,7 @@ module.exports =
           type: 'boolean'
 
         # => COMMANDS
-        # * Use _buildCommandConfig to build the command-specific configuration object
+        # * Use _setCommandOptions to build the command-specific configuration object
         # * Call the command-specific run method and pass the bumper arguments
         #
         # => BUILD
@@ -343,8 +309,8 @@ module.exports =
             desc: 'Local directory to save built project to'
             type: 'string'
         , (args) =>
-          config = @_buildCommandConfig 'build', args
-          @_runBuild config
+          @_setCommandOptions 'build', args
+          @_runBuild()
 
         # => DEMO
         # ---
@@ -371,8 +337,8 @@ module.exports =
             desc: 'Show test results in the demo (slower)'
             type: 'boolean'
         , (args) =>
-          config = @_buildCommandConfig 'demo', args
-          @_runDemo config
+          @_setCommandOptions 'demo', args
+          @_runDemo()
 
         # => TEST
         # ---
@@ -388,5 +354,5 @@ module.exports =
             desc: 'Watch lib and run tests when changes are made'
             type: 'boolean'
         , (args) =>
-          config = @_buildCommandConfig 'test', args
-          @_runTest config
+          @_setCommandOptions 'test', args
+          @_runTest()

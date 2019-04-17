@@ -9,14 +9,13 @@ Logger = require '../logger.coffee'
 
 module.exports =
   class Tests
-    constructor: (@config) ->
-
     run: ->
+      @config = global.bumper.config
       @_runWebpack @_getWebpackConfig()
 
     _getWebpackConfig: ->
       devtool: 'source-map'
-      entry: globEntries  "#{@config.projectPath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
+      entry: globEntries "#{@config.projectPath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
       externals: [nodeExternals()]
       mode: 'development'
       target: 'node'

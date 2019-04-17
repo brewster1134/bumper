@@ -1,4 +1,3 @@
-argv = require('yargs-parser') process.argv.slice 2
 bodyParser = require 'body-parser'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'
@@ -12,7 +11,7 @@ Logger = require '../logger.coffee'
 
 class Demo
   run: ->
-    @config = JSON.parse argv.config
+    @config = global.bumper.config
 
     # helpers
     Helpers = require("#{@config.bumperPath}/demo/scripts/helpers") @config
@@ -25,7 +24,7 @@ class Demo
     @_runServer webpackCompiler
 
   # the webpack configuration object
-  # @return {Object}
+  # @return {object}
   #
   _getWebpackConfig: ->
     devtool: 'source-map'

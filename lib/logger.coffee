@@ -3,26 +3,36 @@ chalk = require 'chalk'
 
 module.exports =
   class Logger extends Error
-    constructor: (error, options = {}) ->
-      super error
+    constructor: (message, options = {}) ->
+      # extract message from various object types
+      if typeof message == 'object'
+        # check if verbose shorthand trace: 'message' was passed
+        if message.trace?
+          message = message.trace
+          options.verbose = true
+          if !options.type?
+            options.type = false
 
-      # if verbose flag is set, only log it if in verbose mode
+        # check if existing error object was passed
+        else if message instanceof Error
+          message = message.message
+
+      # create error instance from message
+      error = super message
+
+      # only log verbose messages in verbose mode
       return if options.verbose && !global.bumper.config.verbose
 
-      # create error instance if only string is passed
-      if typeof error == 'string'
-        error = new Error error
-
-      # set defaults
+      # apply defaults
       options = _.merge
         exit: false
         type: 'pass'
-        verbose: false
       , options
 
       # log message
-      @_log error.message, options.type
+      @_log message, options.type
 
+      # handle custom exit codes
       if Number.isInteger options.exit
         # log stack trace for fatal errors
         if global.bumper.config.verbose && options.exit != 0
@@ -30,11 +40,13 @@ module.exports =
 
         process.exit options.exit
 
+      else
+        return @
+
     # Log a formatted message
-    # @arg {String} message - the message to log
-    # @arg {String} type - the type of message to log
+    # @arg {string} message - the message to log
+    # @arg {string} type - the type of message to log
     #
-    # _log: (message, type, error, verbose) ->
     _log: (message, type) ->
       switch type
         when 'error', 'fail'
