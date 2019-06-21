@@ -1,3 +1,8 @@
+Demo = require './demo.coffee'
+
+
+
+
 bodyParser = require 'body-parser'
 debMW = require 'webpack-dev-middleware'
 express = require 'express'

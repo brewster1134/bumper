@@ -1,5 +1,6 @@
 { expect, sinon } = require '../../test_helpers'
 fs = require 'fs-extra'
+path = require 'path'
 
 Build = require '../../../lib/commands/build'
 
@@ -150,20 +151,6 @@ describe 'COMMAND: Build', ->
       it 'should return the project name', ->
         expect(build._getOutputFile('ext')).to.eq 'projectName.ext'
 
-  # TODO: need to stub calling `require webpack`
-  describe.skip '_runWebpack', ->
-    before ->
-      stubWebpackRun = sandbox.stub()
-      sandbox.stub(require).returns webpack: stubWebpackRun
-
-      build = sandbox.createStubInstance Build
-      build._runWebpack.restore()
-      build._runWebpack()
-
-    it 'should call webpack with config', ->
-      expect(require).to.be.calledWith 'webpack'
-      expect(stubWebpackRun).to.be.calledWith 'webpack config object'
-
   describe '_moveLib', ->
     before ->
       build = sandbox.createStubInstance Build
@@ -176,13 +163,3 @@ describe 'COMMAND: Build', ->
 
     it 'should copy the generated assets to the download folder', ->
       expect(fs.copySync).to.be.calledWith '/dist', '/downloads/projectName'
-
-  # TODO: need to stub calling `new Logger`
-  describe.skip '_logOutput', ->
-    before ->
-      build = sandbox.createStubInstance Build
-      build._logOutput.restore()
-      build._logOutput()
-
-    it 'should log results to user', ->
-      expect(Logger).to.be.created

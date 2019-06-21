@@ -124,31 +124,27 @@ module.exports =
         "#{@bundleName}.#{extension}"
 
     # Compile the bundles with webpack
-    # @return {boolean}
     #
     _runWebpack: (webpackConfig) ->
       compiler = webpack webpackConfig
+      compiler.run => @_afterBuildSuccess()
 
-      # webpack success callback
-      compiler.run =>
-        # if uncompressed, move asset directory
-        if !@config.build.compress
-          @_moveLib()
-
-        # log output
-        @_logOutput()
-
-    # Move built assets to downloads directory
+    # callback after webpack completes successfully
     #
-    _moveLib: ->
-      fs.copySync @distDir, "#{@downloadsDir}/#{@bundleName}"
+    _afterBuildSuccess: ->
+      # if uncompressed, move asset directory
+      if !@config.build.compress
+        @_moveLib()
 
-    # Log output to user
-    #
-    _logOutput: ->
+      # log output
       builtName = if @config.build.split then @config.build.libs.join(', ') else @config.name
       fileExt = if @config.build.compress then '.zip' else ''
 
       new Logger "#{builtName} libraries built to: #{@bundleName}#{fileExt}",
         exit: 0
         type: 'success'
+
+    # Move built assets to downloads directory
+    #
+    _moveLib: ->
+      fs.copySync @distDir, "#{@downloadsDir}/#{@bundleName}"

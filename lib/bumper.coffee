@@ -1,9 +1,16 @@
 argvParser = require 'yargs-parser'
 downloadsFolder = require 'downloads-folder'
 
-Cli = require './cli.coffee'
-Config = require './config.coffee'
-Logger = require './logger.coffee'
+Cli = require './cli'
+Config = require './config'
+Logger = require './logger'
+
+### !pragma no-coverage-next ###
+# route uncaught exceptions through logger
+process.on 'uncaughtException', (error) ->
+  new Logger error,
+    exit: 1
+    type: 'error'
 
 module.exports =
   class Bumper
@@ -12,15 +19,13 @@ module.exports =
       @args = argvParser process.argv.slice 2
       command = @args._[0]
 
-      # route uncaught exceptions through logger
-      process.on 'uncaughtException', (error) ->
-        new Logger error,
-          exit: 1
-          type: 'error'
-
       # create global bumper object
       global.bumper =
+        # expose function to global object & bind to this bumper instance
+        log: @_log.bind @
+        requirer: @_requirer.bind @
         setSharedOptionValues: @_setSharedOptionValues.bind @
+
         config:
           command: command
           file: {}
@@ -50,6 +55,12 @@ module.exports =
 
       # initialize cli
       @cli.run()
+
+    _log: (args...) ->
+      new Logger args...
+
+    _requirer: (args...) ->
+      require args...
 
     # set shared options to global config object
     #

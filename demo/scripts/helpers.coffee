@@ -31,7 +31,8 @@ module.exports = ->
           demo: @_demoGetDemoHtml libName
 
           # documentation
-          docs: @_demoGetDocsHtml libName
+          # docs: @_demoGetDocsHtml libName
+          docs: '<h1>FUCK ME!</h1>'
 
           # test report
           test: await @_demoGetTestHtml libName

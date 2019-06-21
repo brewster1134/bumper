@@ -5,17 +5,17 @@ nodeExternals = require 'webpack-node-externals'
 webpack = require 'webpack'
 Write = require 'write-file-webpack-plugin'
 
-Logger = require '../logger.coffee'
-
 module.exports =
-  class Tests
+  class Test
     run: ->
       @config = global.bumper.config
+      @libsDelimited = "+(#{@config.test.libs.join('|')})"
+      @formatsDelimited = "+(#{@config.formats.js.join('|')})"
       @_runWebpack @_getWebpackConfig()
 
     _getWebpackConfig: ->
       devtool: 'source-map'
-      entry: globEntries "#{@config.projectPath}/libs/+(#{@config.test.libs.join('|')})/*_test.+(#{@config.formats.js.join('|')})"
+      entry: globEntries "#{@config.projectPath}/libs/#{@libsDelimited}/*_test.#{@formatsDelimited}"
       externals: [nodeExternals()]
       mode: 'development'
       target: 'node'
@@ -55,16 +55,21 @@ module.exports =
           @config.projectPath
         ]
 
+    # Compile the bundles with webpack
+    #
     _runWebpack: (webpackConfig) ->
       compiler = webpack webpackConfig
+      compiler.run => @_afterBuildSuccess()
 
-      compiler.run =>
-        mocha = new Mocha
-          ui: 'bdd'
-          reporter: 'spec'
+    # callback after webpack completes successfully
+    #
+    _afterBuildSuccess: ->
+      mocha = new Mocha
+        ui: 'bdd'
+        reporter: 'spec'
 
-        tests = glob.sync "#{@config.projectPath}/.tmp/test/+(#{@config.test.libs.join('|')})_test.js"
-        for test in tests
-          mocha.addFile test
+      tests = glob.sync "#{@config.projectPath}/.tmp/test/#{@libsDelimited}_test.js"
+      for test in tests
+        mocha.addFile test
 
-        mocha.run()
+      mocha.run()

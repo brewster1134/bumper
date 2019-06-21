@@ -1,12 +1,9 @@
 { expect, sinon } = require '../test_helpers'
-
 fs = require 'fs-extra'
 glob = require 'glob'
 path = require 'path'
 yaml = require 'js-yaml'
 
-# TODO: see skipped tests
-# Logger = require '../../lib/logger'
 Config = require '../../lib/config'
 
 describe 'Config', ->
@@ -33,13 +30,10 @@ describe 'Config', ->
       config = sandbox.createStubInstance Config
       config._getConfigFile.returns name: 'project name'
       config._getLibs.returns lib: '/project/libs'
-      config.build.restore()
-
-    beforeEach ->
-      config._getPackageJson.reset()
       config._getPackageJson
         .onCall(0).returns bumper: 'json'
         .onCall(1).returns version: '1.2.3'
+      config.build.restore()
       build = config.build()
 
     it 'should call other functions', ->
@@ -64,14 +58,6 @@ describe 'Config', ->
       expect(build.libs).to.be.a 'object'
       expect(build.libs).to.not.be.empty
       expect(global.bumper.optionDefaults.libs).to.deep.eq Object.keys(build.libs)
-
-    # TODO: need to stub calling `new Logger`
-    it.skip 'should log an error if no libs are found', ->
-      config._getLibs.returns {}
-
-      config.build()
-
-      expect(Logger).to.be.created
 
   describe '_getConfigFile', ->
     stubReadFile = sandbox.stub fs, 'readFileSync'
@@ -120,16 +106,6 @@ describe 'Config', ->
         configFile = config._getConfigFile 'projectPath'
 
         expect(configFile).to.be.empty
-
-  # TODO: need to stub calling `new Logger`
-  describe.skip '#_getPackageJson', ->
-    before ->
-      config = sandbox.createStubInstance Config
-      config._getPackageJson.restore()
-      config._getPackageJson()
-
-    it 'should log an alert if no package.json is found', ->
-      expect(Logger).to.be.created
 
   describe '_getLibs', ->
     libs = null

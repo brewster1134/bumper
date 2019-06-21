@@ -183,6 +183,7 @@ module.exports =
 
       return libGlobals
 
+    ### !pragma no-coverage-next ###
     # => COMMANDS
     # Run command-specific script with command-specific configuration
     # @arg {object} config - command-specific configuration
@@ -193,47 +194,32 @@ module.exports =
       Build = require './commands/build.coffee'
       new Build().run()
 
+    ### !pragma no-coverage-next ###
     # => DEMO
     # ---
     _runDemo: ->
-      # delete package.json data for sending through nodemon
-      delete config.bumperJson
-      delete config.projectJson
+      Demo = require './commands/demo.coffee'
+      new Demo().run()
 
-      nodemon = require 'nodemon'
-      nodemon
-        verbose: config.verbose
-        script: "#{config.bumperPath}/lib/commands/demo.coffee"
-        ext: config.formats.js.join ' '
-        args: [ "--config='#{JSON.stringify(config)}'" ]
-        watch: [
-          "#{config.bumperPath}/demo/routes"
-          "#{config.bumperPath}/demo/scripts"
-          "#{config.bumperPath}/lib"
-        ]
-      .on 'crash', =>
-        new Logger "#{config.name} demo has crashed",
-          exit: 1
-          type: 'error'
-      .on 'quit', =>
-        new Logger "#{config.name} demo has quit",
-          exit: 0
-          type: 'alert'
-      .on 'restart', (files) =>
-        new Logger "#{config.name} demo restarted due to changes to #{files.toString()}",
-          exit: false
-          type: 'alert'
-      .on 'start', =>
-        new Logger "#{config.name} demo is running at http://#{config.demo.host}:#{config.demo.port}",
-          exit: false
-          type: 'success'
-
+    ### !pragma no-coverage-next ###
     # => TEST
     # ---
     _runTest: ->
       Test = require './commands/test.coffee'
       new Test().run()
 
+
+
+    _runCommand: (command) ->
+      Klass = @_requireCommand command
+      new Klass().run()
+
+    _requireCommand: (command) ->
+      require "./commands/#{command}.coffee"
+
+
+
+    ### !pragma no-coverage-next ###
     # Build command line interface
     #
     _buildCli: ->
@@ -310,7 +296,7 @@ module.exports =
             type: 'string'
         , (args) =>
           @_setCommandOptions 'build', args
-          @_runBuild()
+          @_runCommand 'build'
 
         # => DEMO
         # ---
@@ -338,7 +324,7 @@ module.exports =
             type: 'boolean'
         , (args) =>
           @_setCommandOptions 'demo', args
-          @_runDemo()
+          @_runCommand 'demo'
 
         # => TEST
         # ---
@@ -355,4 +341,4 @@ module.exports =
             type: 'boolean'
         , (args) =>
           @_setCommandOptions 'test', args
-          @_runTest()
+          @_runCommand 'test'

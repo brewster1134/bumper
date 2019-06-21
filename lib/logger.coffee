@@ -10,11 +10,14 @@ module.exports =
         if message.trace?
           message = message.trace
           options.verbose = true
+
           if !options.type?
+            ### !pragma coverage-skip-block ###
             options.type = false
 
-        # check if existing error object was passed
+        ### !pragma no-coverage-next ###
         else if message instanceof Error
+          ### !pragma coverage-skip-block ###
           message = message.message
 
       # create error instance from message

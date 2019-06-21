@@ -31,7 +31,9 @@ module.exports =
 
       # get package libraries
       libs = @_getLibs projectPath, jsFormats
+
       if !Object.keys(libs).length
+        ### !pragma no-coverage-next ###
         new Logger 'No valid Bumper libraries found',
           exit: 1
           type: 'error'
@@ -73,6 +75,7 @@ module.exports =
 
       return configFile || {}
 
+    ### !pragma no-coverage-next ###
     # get package.json
     # @arg {string} path - absolute directory path
     # @return {object}
@@ -96,6 +99,7 @@ module.exports =
       try
         files = fs.readdirSync "#{projectPath}/libs"
       catch err
+        ### !pragma no-coverage-next ###
         new Logger 'No `libs` directory found',
           exit: 1
           type: 'error'
@@ -104,6 +108,7 @@ module.exports =
         libGlobPath = "#{projectPath}/libs/#{file}/#{file}.+(#{libFormats})"
         libPath = glob.sync(libGlobPath)[0]
 
+        ### !pragma no-coverage-next ###
         if libPath
           libs[file] = libPath
 
